@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # ── Backend Laravel API ──
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    container_name: accommity-backend
+    restart: unless-stopped
+    working_dir: /var/www/backend
+    volumes:
+      - ./backend:/var/www/backend
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: accommity_db
+      DB_USERNAME: accommity_user
+      DB_PASSWORD: accommity_password
+    depends_on:
+      - mysql
+    networks:
+      - accommity-network
+
+  # ── Frontend Angular SPA ──
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    container_name: accommity-frontend
+    restart: unless-stopped
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - accommity-network
+
+  # ── Nginx Web Server (Reverse Proxy) ──
+  nginx:
+    image: nginx:alpine
+    container_name: accommity-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/backend
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - accommity-network
+
+  # ── MySQL Database ──
+  mysql:
+    image: mysql:8.0
+    container_name: accommity-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: accommity_db
+      MYSQL_USER: accommity_user
+      MYSQL_PASSWORD: accommity_password
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - accommity-network
+
+  # ── phpMyAdmin (Database Management UI) ──
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: accommity-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root_password
+    depends_on:
+      - mysql
+    networks:
+      - accommity-network
+
+networks:
+  accommity-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local

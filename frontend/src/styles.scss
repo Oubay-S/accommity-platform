@@ -1,0 +1,26 @@
+/* Accommity Global Design Tokens & Variables */
+:root {
+  --primary: #FF385C;
+  --primary-hover: #E00B41;
+  --text-main: #222222;
+  --text-muted: #717171;
+  --bg-light: #F7F7F7;
+  --border-color: #DDDDDD;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 24px;
+  --font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  color: var(--text-main);
+  background-color: #ffffff;
+  line-height: 1.5;
+}
