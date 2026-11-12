@@ -22,7 +22,7 @@ Projet académique de **Gestion de Projet** (2e Année cycle d'ingénieur LSI, F
 
 - **Présentation :** Angular 19 SPA (TypeScript, SCSS, Standalone Components, Reactive Forms).
 - **Logique Métier :** Laravel 11/12/13 API (PHP 8.2+, Sanctum, FormRequests, Services, Repositories).
-- **Base de Données :** MySQL 8.0 (24 tables relationnelles, conformité MLD).
+- **Base de Données :** PostgreSQL 16 (24 tables relationnelles, conformité MLD).
 - **Conteneurisation & DevOps :** Docker Compose, Nginx, GitHub Actions (CI/CD).
 
 ---
@@ -74,12 +74,12 @@ accommity-platform/
 git clone https://github.com/Oubay-S/accommity-platform.git
 cd accommity-platform
 
-# Lancer tous les conteneurs (Backend, Frontend, MySQL, phpMyAdmin, Nginx)
+# Lancer tous les conteneurs (Backend, Frontend, PostgreSQL, pgAdmin, Nginx)
 docker-compose up -d --build
 ```
 - Frontend Angular : `http://localhost:4200`
 - API Laravel : `http://localhost:8000/api`
-- phpMyAdmin : `http://localhost:8080`
+- pgAdmin : `http://localhost:8080` (identifiants: `admin@accommity.ma` / `admin`)
 
 ### Sans Docker (Développement local) :
 **Backend :**

@@ -12,13 +12,14 @@ services:
     volumes:
       - ./backend:/var/www/backend
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
       DB_DATABASE: accommity_db
       DB_USERNAME: accommity_user
       DB_PASSWORD: accommity_password
     depends_on:
-      - mysql
+      - postgres
     networks:
       - accommity-network
 
@@ -52,35 +53,34 @@ services:
     networks:
       - accommity-network
 
-  # ── MySQL Database ──
-  mysql:
-    image: mysql:8.0
-    container_name: accommity-mysql
+  # ── PostgreSQL Database ──
+  postgres:
+    image: postgres:16-alpine
+    container_name: accommity-postgres
     restart: unless-stopped
     ports:
-      - "3306:3306"
+      - "5432:5432"
     environment:
-      MYSQL_DATABASE: accommity_db
-      MYSQL_USER: accommity_user
-      MYSQL_PASSWORD: accommity_password
-      MYSQL_ROOT_PASSWORD: root_password
+      POSTGRES_DB: accommity_db
+      POSTGRES_USER: accommity_user
+      POSTGRES_PASSWORD: accommity_password
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - accommity-network
 
-  # ── phpMyAdmin (Database Management UI) ──
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: accommity-phpmyadmin
+  # ── pgAdmin (PostgreSQL Web UI) ──
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: accommity-pgadmin
     restart: unless-stopped
     ports:
       - "8080:80"
     environment:
-      PMA_HOST: mysql
-      MYSQL_ROOT_PASSWORD: root_password
+      PGADMIN_DEFAULT_EMAIL: admin@accommity.ma
+      PGADMIN_DEFAULT_PASSWORD: admin
     depends_on:
-      - mysql
+      - postgres
     networks:
       - accommity-network
 
@@ -89,5 +89,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql-data:
+  postgres-data:
     driver: local
