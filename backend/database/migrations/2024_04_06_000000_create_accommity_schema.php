@@ -221,7 +221,7 @@ return new class extends Migration {
             $table->timestamp('date_liberation_prevue');
             $table->enum('statut', ['en_attente', 'traite', 'echoue']);
 
-            $table->index('id_reservation');
+            $table->unique('id_reservation');
             $table->index('id_hote');
             $table->foreign('id_reservation')->references('id_reservation')->on('reservations')->onDelete('cascade');
             $table->foreign('id_hote')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
@@ -250,7 +250,7 @@ return new class extends Migration {
         Schema::create('recus', function (Blueprint $table) {
             $table->uuid('id_recu')->primary();
             $table->uuid('id_paiement');
-            $table->string('numero_facture');
+            $table->string('numero_facture')->unique();
             $table->string('chemin_pdf')->nullable();
             $table->timestamp('date_generation')->useCurrent();
 
