@@ -2,21 +2,39 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Annonces\PolitiqueAnnulation;
+use Illuminate\Database\Seeder;
 
 class PolitiquesAnnulationSeeder extends Seeder
 {
     public function run(): void
     {
         $politiques = [
-            ['nom' => 'Flexible', 'description' => 'Remboursement intégral jusqu\'à 24h avant l\'arrivée', 'delai_heures' => 24, 'pourcentage_remboursement' => 100],
-            ['nom' => 'Modérée', 'description' => 'Remboursement intégral jusqu\'à 5 jours avant l\'arrivée', 'delai_heures' => 120, 'pourcentage_remboursement' => 100],
-            ['nom' => 'Stricte', 'description' => 'Remboursement de 50% jusqu\'à 7 jours avant l\'arrivée', 'delai_heures' => 168, 'pourcentage_remboursement' => 50],
+            [
+                'type_politique' => 'flexible',
+                'delai_remb_total' => 24,
+                'delai_remb_partiel' => 0,
+                'taux_remb_partiel' => 0,
+                'description' => "Remboursement intégral jusqu'à 24 h avant l'arrivée.",
+            ],
+            [
+                'type_politique' => 'moderee',
+                'delai_remb_total' => 120,
+                'delai_remb_partiel' => 24,
+                'taux_remb_partiel' => 50,
+                'description' => "Remboursement intégral jusqu'à 5 jours avant l'arrivée, 50 % jusqu'à 24 h avant.",
+            ],
+            [
+                'type_politique' => 'stricte',
+                'delai_remb_total' => 336,
+                'delai_remb_partiel' => 168,
+                'taux_remb_partiel' => 50,
+                'description' => "Remboursement intégral jusqu'à 14 jours avant l'arrivée, 50 % jusqu'à 7 jours avant.",
+            ],
         ];
 
-        foreach ($politiques as $pol) {
-            PolitiqueAnnulation::firstOrCreate(['nom' => $pol['nom']], $pol);
+        foreach ($politiques as $p) {
+            PolitiqueAnnulation::firstOrCreate(['type_politique' => $p['type_politique']], $p);
         }
     }
 }
