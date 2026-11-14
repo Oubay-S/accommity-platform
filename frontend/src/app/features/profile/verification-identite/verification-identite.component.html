@@ -1,3 +1,230 @@
-<div class="verification-identite-page">
-  <h2>Verification Identite</h2>
+<div class="container page">
+  <div class="page-head">
+    <span class="eyebrow">Espace hôte</span>
+    <div class="page-head__row">
+      <div>
+        <h1>Vérification de votre identité d'hôte</h1>
+        <p class="muted" style="max-width: 46rem; margin-top: 0.5rem">
+          Conformément à la réglementation marocaine du tourisme et à notre charte
+          d'excellence, l'identité de chaque propriétaire doit être certifiée avant
+          la publication d'une demeure. Vos documents sont chiffrés et traités en
+          conformité avec la loi n° 09-08 (CNDP).
+        </p>
+      </div>
+    </div>
+  </div>
+
+  @if (!isHote()) {
+    <div class="alert alert--warning" style="margin-bottom: 1.5rem">
+      <span class="icon icon--sm">info</span>
+      <span>
+        Seuls les comptes hôtes peuvent déposer une pièce d'identité. Créez un compte
+        « Hôte d'exception » pour accéder à la vérification.
+      </span>
+    </div>
+  }
+
+  <div class="verif-layout">
+    <div style="display: flex; flex-direction: column; gap: 1.5rem">
+      <section class="card section">
+        <div class="section__head" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap">
+          <div>
+            <h3 class="section__title"><span class="icon">history_edu</span> Circuit de validation officielle</h3>
+            <p class="section__desc">Délai moyen d'audit : 12 h à 24 h ouvrées.</p>
+          </div>
+          <span [class]="statusClass()" style="padding: 6px 12px; font-size: 11.5px">{{ statusLabel() }}</span>
+        </div>
+
+        @if (loading()) {
+          <p class="muted small">Chargement du dossier…</p>
+        } @else {
+          <div class="steps">
+            <div class="step" [class.step--done]="status() !== null">
+              <span class="step__dot"><span class="icon">{{ status() !== null ? 'check' : 'description' }}</span></span>
+              <div>
+                <div class="step__title">Dossier soumis</div>
+                <p class="step__text">
+                  @if (status()) {
+                    Transmis le {{ formatDate(status()?.date_soumission ?? null) }}.
+                  } @else {
+                    Aucun document transmis pour le moment.
+                  }
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="step"
+              [class.step--done]="status()?.statut === 'validee'"
+              [class.step--current]="status()?.statut === 'en_cours'"
+              [class.step--rejected]="status()?.statut === 'rejetee'"
+            >
+              <span class="step__dot">
+                <span class="icon">
+                  {{ status()?.statut === 'validee' ? 'check' : status()?.statut === 'rejetee' ? 'close' : 'sync' }}
+                </span>
+              </span>
+              <div>
+                <div class="step__title">
+                  Revue de conformité
+                  @if (status()?.statut === 'en_cours') {
+                    <span class="badge badge--warning">En cours</span>
+                  } @else if (status()?.statut === 'rejetee') {
+                    <span class="badge badge--danger">Refusé</span>
+                  }
+                </div>
+                <p class="step__text">Audit manuel par l'officier de conformité Accommity.</p>
+              </div>
+            </div>
+
+            <div class="step" [class.step--done]="status()?.statut === 'validee'" [class.step--rejected]="status()?.statut === 'rejetee'">
+              <span class="step__dot"><span class="icon">{{ status()?.statut === 'validee' ? 'verified' : 'workspace_premium' }}</span></span>
+              <div>
+                <div class="step__title">Accréditation finale</div>
+                <p class="step__text">Délivrance de l'insigne « Hôte vérifié » et activation de la publication.</p>
+              </div>
+            </div>
+          </div>
+
+          @if (status()?.statut === 'rejetee' && status()?.motif_rejet) {
+            <div class="alert alert--danger" style="margin-top: 1.25rem">
+              <span class="icon icon--sm">priority_high</span>
+              <span>
+                <strong>Motif de rejet transmis par l'administrateur :</strong><br />
+                {{ status()?.motif_rejet }}
+              </span>
+            </div>
+          }
+
+          @if (status()?.statut === 'validee') {
+            <div class="alert alert--success" style="margin-top: 1.25rem">
+              <span class="icon icon--sm">check_circle</span>
+              <span>Votre identité est vérifiée. Vous pouvez publier vos annonces.</span>
+            </div>
+          }
+
+          @if (status()?.statut === 'en_cours') {
+            <div class="alert alert--info" style="margin-top: 1.25rem">
+              <span class="icon icon--sm">schedule</span>
+              <span>Votre dossier est en cours d'audit. Vous serez notifié dès la décision.</span>
+            </div>
+          }
+        }
+      </section>
+
+      @if (canSubmit() && !loading()) {
+        <section class="card section">
+          <div class="section__head">
+            <h3 class="section__title"><span class="icon">upload_file</span> Déposer une pièce d'identité</h3>
+            <p class="section__desc">Document officiel du Royaume du Maroc, en cours de validité.</p>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 1.25rem">
+            <div class="field">
+              <span class="field__label">1. Type de document</span>
+              <div class="doc-picker">
+                <button type="button" class="doc-option" [class.doc-option--active]="typePiece() === 'cin'" (click)="typePiece.set('cin')">
+                  <span class="icon">badge</span>
+                  <span>
+                    <strong>Carte Nationale (CIN)</strong>
+                    <span>Format carte biométrique</span>
+                  </span>
+                </button>
+                <button type="button" class="doc-option" [class.doc-option--active]="typePiece() === 'passeport'" (click)="typePiece.set('passeport')">
+                  <span class="icon">menu_book</span>
+                  <span>
+                    <strong>Passeport biométrique</strong>
+                    <span>Hôtes résidents ou MRE</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div class="field">
+              <span class="field__label">2. Téléversement</span>
+              <label class="dropzone">
+                <span class="icon">cloud_upload</span>
+                <strong>Recto de votre pièce d'identité</strong>
+                <span>JPG, PNG ou PDF · 5 Mo maximum · scan net et à plat</span>
+                <input type="file" accept="image/jpeg,image/png,application/pdf" (change)="onFileSelected($event)" />
+              </label>
+            </div>
+
+            @if (file()) {
+              <div class="file-chip">
+                <span class="icon">attach_file</span>
+                <span>
+                  {{ fileName() }}
+                  <span class="file-chip__meta">{{ fileSize() }}</span>
+                </span>
+                <button type="button" class="file-chip__remove" (click)="removeFile()" aria-label="Retirer le fichier">
+                  <span class="icon icon--sm">close</span>
+                </button>
+              </div>
+            }
+
+            @if (error()) {
+              <div class="alert alert--danger">
+                <span class="icon icon--sm">error</span>
+                <span>{{ error() }}</span>
+              </div>
+            }
+
+            <div class="alert alert--info">
+              <span class="icon icon--sm">encrypted</span>
+              <span>
+                Chiffrement conforme à la loi n° 09-08 (CNDP). Vos pièces ne sont
+                visibles que par l'équipe de conformité, jamais sur vos fiches.
+              </span>
+            </div>
+
+            <button type="button" class="btn btn--primary" [disabled]="submitting() || !file()" (click)="submit()">
+              {{ submitting() ? 'Envoi…' : 'Soumettre pour validation' }}
+              <span class="icon icon--sm">arrow_forward</span>
+            </button>
+          </div>
+        </section>
+      }
+    </div>
+
+    <aside class="card section" style="position: sticky; top: 96px">
+      <div class="section__head">
+        <h3 class="section__title"><span class="icon">shield_person</span> Privilèges Hôte Vérifié</h3>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1.1rem">
+        <div style="display: flex; gap: 0.7rem">
+          <span class="icon" style="color: var(--clay)">hotel_class</span>
+          <div>
+            <strong class="small">Confiance clientèle</strong>
+            <p class="small muted">Les riads certifiés inspirent davantage de réservations.</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.7rem">
+          <span class="icon" style="color: var(--clay)">account_balance</span>
+          <div>
+            <strong class="small">Virements MAD / EUR</strong>
+            <p class="small muted">Déblocage des versements vers les banques marocaines et internationales.</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.7rem">
+          <span class="icon" style="color: var(--clay)">health_and_safety</span>
+          <div>
+            <strong class="small">Protection intégrale</strong>
+            <p class="small muted">Couverture d'assurance et assistance dédiée 7j/7.</p>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <p class="small muted">
+        Des difficultés à numériser votre CIN ? Notre conciergerie vous accompagne
+        du lundi au samedi, de 9 h à 19 h.
+      </p>
+      <a routerLink="/notifications" class="btn btn--ghost btn--sm" style="margin-top: 0.75rem">
+        <span class="icon icon--sm">support_agent</span> Contacter l'assistance
+      </a>
+    </aside>
+  </div>
 </div>

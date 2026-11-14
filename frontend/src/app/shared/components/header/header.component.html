@@ -1,2 +1,91 @@
-<div class="header-container">
-</div>
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a routerLink="/" class="brand">
+      <span class="icon icon--lg">villa</span>
+      Accommity
+    </a>
+
+    <nav class="nav">
+      <a routerLink="/" routerLinkActive="nav__link--active" [routerLinkActiveOptions]="{ exact: true }" class="nav__link">Accueil</a>
+      <a routerLink="/annonces" routerLinkActive="nav__link--active" class="nav__link">Découvrir</a>
+      @if (isAuthenticated()) {
+        <a routerLink="/reservations/mes-voyages" routerLinkActive="nav__link--active" class="nav__link">Mes voyages</a>
+      }
+      @if (isHote()) {
+        <a routerLink="/profil/verification-identite" routerLinkActive="nav__link--active" class="nav__link">Espace hôte</a>
+      }
+      @if (isAdmin()) {
+        <a routerLink="/admin" routerLinkActive="nav__link--active" class="nav__link">Administration</a>
+      }
+    </nav>
+
+    <div class="header-actions">
+      @if (isAuthenticated()) {
+        <div class="bell">
+          <button type="button" class="btn btn--icon" (click)="toggleBell()" aria-label="Notifications">
+            <span class="icon">notifications</span>
+            @if (unread() > 0) {
+              <span class="bell__dot">{{ unread() > 9 ? '9+' : unread() }}</span>
+            }
+          </button>
+
+          @if (bellOpen()) {
+            <div class="bell__backdrop" (click)="closeBell()"></div>
+            <div class="bell__panel">
+              <div class="bell__head">
+                <strong>Notifications</strong>
+                <button type="button" class="link-btn" (click)="markAllAsRead()">Tout marquer lu</button>
+              </div>
+
+              @if (loading()) {
+                <div class="bell__empty">Chargement…</div>
+              } @else if (latest().length === 0) {
+                <div class="bell__empty">Aucune notification pour le moment.</div>
+              } @else {
+                @for (item of latest(); track item.id_notification) {
+                  <button
+                    type="button"
+                    class="bell__item"
+                    [class.bell__item--unread]="!item.est_lue"
+                    (click)="openNotification(item)"
+                  >
+                    <span class="icon icon--sm">{{ iconFor(item.type_alerte) }}</span>
+                    <span>
+                      <span class="bell__item-title">{{ item.titre }}</span>
+                      <span class="bell__item-text">{{ item.contenu }}</span>
+                      <span class="bell__item-time">{{ timeAgo(item.date_creation) }}</span>
+                    </span>
+                  </button>
+                }
+              }
+
+              <a routerLink="/notifications" class="bell__all" (click)="closeBell()">
+                Voir toutes les notifications
+              </a>
+            </div>
+          }
+        </div>
+
+        <a routerLink="/profil" class="user-chip" title="Mon profil">
+          <span class="avatar">
+            @if (user()?.profil?.photo_url) {
+              <img [src]="user()?.profil?.photo_url" [alt]="fullName()" />
+            } @else {
+              {{ initials() }}
+            }
+          </span>
+          <span class="user-chip__name">{{ user()?.prenom }}</span>
+        </a>
+
+        <button type="button" class="btn btn--icon" (click)="logout()" title="Déconnexion">
+          <span class="icon">logout</span>
+        </button>
+      } @else {
+        <div class="header-cta">
+          <a routerLink="/auth/login" class="btn btn--ghost">Connexion</a>
+          <a routerLink="/auth/register" class="btn btn--primary">Inscription</a>
+        </div>
+      }
+    </div>
+  </div>
+</header>

@@ -1,3 +1,116 @@
-<div class="profile-edit-page">
-  <h2>Profile Edit</h2>
-</div>
+@if (user(); as u) {
+  <div class="container page">
+    <div class="page-head">
+      <span class="eyebrow">Mon compte</span>
+      <h1>Modifier mon profil</h1>
+      <p class="muted">Mettez à jour votre photo et votre présentation. L'identité et le contact sont gérés par la conciergerie.</p>
+    </div>
+
+    <div class="profile-layout">
+      <nav class="side-nav">
+        <a routerLink="/profil" routerLinkActive="side-nav__item--active" [routerLinkActiveOptions]="{ exact: true }" class="side-nav__item">
+          <span class="icon">person</span> Informations personnelles
+        </a>
+        <a routerLink="/profil/modifier" routerLinkActive="side-nav__item--active" class="side-nav__item">
+          <span class="icon">edit</span> Modifier mon profil
+        </a>
+        <a routerLink="/profil/verification-identite" routerLinkActive="side-nav__item--active" class="side-nav__item">
+          <span class="icon">verified_user</span> Vérification d'identité
+        </a>
+        <a routerLink="/notifications" routerLinkActive="side-nav__item--active" class="side-nav__item">
+          <span class="icon">notifications</span> Notifications
+        </a>
+      </nav>
+
+      <div class="profile-main">
+        <section class="card profile-hero">
+          <div class="photo-upload">
+            <span class="avatar avatar--lg">
+              @if (u.profil?.photo_url) {
+                <img [src]="u.profil?.photo_url" [alt]="u.prenom" />
+              } @else {
+                {{ initials() }}
+              }
+            </span>
+            <button
+              type="button"
+              class="photo-upload__btn"
+              (click)="photoInput.click()"
+              [disabled]="uploading()"
+              title="Changer la photo"
+            >
+              <span class="icon">{{ uploading() ? 'hourglass_top' : 'photo_camera' }}</span>
+            </button>
+            <input #photoInput type="file" accept="image/jpeg,image/png,image/webp" hidden (change)="onFileSelected($event)" />
+          </div>
+
+          <div class="profile-hero__meta">
+            <h2 class="profile-hero__name">{{ u.prenom }} {{ u.nom }}</h2>
+            <p class="muted small">Format JPG, PNG ou WEBP · 2 Mo maximum.</p>
+          </div>
+        </section>
+
+        <section class="card section">
+          <div class="section__head">
+            <h3 class="section__title"><span class="icon">badge</span> Informations personnelles</h3>
+            <p class="section__desc">Ces champs ne sont pas modifiables en ligne (vérification d'identité obligatoire).</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <span class="field__label">Prénom</span>
+              <input class="field__input" [value]="u.prenom" disabled />
+            </div>
+            <div class="field">
+              <span class="field__label">Nom de famille</span>
+              <input class="field__input" [value]="u.nom" disabled />
+            </div>
+            <div class="field">
+              <span class="field__label">Adresse e-mail</span>
+              <input class="field__input" [value]="u.email" disabled />
+            </div>
+            <div class="field">
+              <span class="field__label">Numéro de téléphone</span>
+              <input class="field__input" [value]="u.telephone ?? 'Non renseigné'" disabled />
+            </div>
+          </div>
+        </section>
+
+        <section class="card section">
+          <div class="section__head">
+            <h3 class="section__title"><span class="icon">menu_book</span> Biographie &amp; philosophie d'accueil</h3>
+            <p class="section__desc">Présentez votre style d'hospitalité. 600 caractères recommandés.</p>
+          </div>
+
+          <form [formGroup]="form" (ngSubmit)="save()">
+            <div class="field" [class.field--invalid]="form.controls.description.invalid && form.controls.description.touched">
+              <textarea formControlName="description" maxlength="1000" placeholder="Architecte d'intérieur passionnée par l'artisanat marocain…"></textarea>
+              <div style="display: flex; justify-content: space-between" class="small muted">
+                <span>{{ count() }} / 1000 caractères</span>
+                @if (form.controls.description.hasError('maxlength')) {
+                  <span class="field__error">Trop long.</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <a routerLink="/profil" class="btn btn--ghost">Annuler</a>
+              <button type="submit" class="btn btn--primary" [disabled]="saving()">
+                <span class="icon icon--sm">save</span>
+                {{ saving() ? 'Enregistrement…' : 'Enregistrer les modifications' }}
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="container page">
+    <div class="empty-state">
+      <span class="icon">person_off</span>
+      <strong>Session indisponible</strong>
+      <span>Veuillez vous reconnecter.</span>
+    </div>
+  </div>
+}

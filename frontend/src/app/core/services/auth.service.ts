@@ -1,49 +1,83 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { catchError, finalize, map, Observable, of, tap } from 'rxjs';
 import { ApiService } from './api.service';
 import { TokenService } from './token.service';
-import { User, LoginCredentials, RegisterData } from '../../shared/models/user.model';
+import { AuthData, LoginPayload, RegisterPayload, User } from '../../shared/models/user.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+/**
+ * Source de vérité de la session côté Angular.
+ *
+ * `bootstrap()` est appelé au démarrage (provideAppInitializer) : il recharge
+ * l'utilisateur depuis /auth/me si un token existe, ce qui permet aux guards
+ * de fonctionner après un rafraîchissement de page.
+ */
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private api = inject(ApiService);
-  private tokenService = inject(TokenService);
+  private readonly api = inject(ApiService);
+  private readonly tokens = inject(TokenService);
 
-  currentUser = signal<User | null>(null);
+  private readonly _user = signal<User | null>(null);
 
-  login(credentials: LoginCredentials): Observable<{ token: string; user: User }> {
-    return this.api.post<{ token: string; user: User }>('auth/login', credentials).pipe(
-      tap(res => {
-        this.tokenService.saveToken(res.token);
-        this.currentUser.set(res.user);
-      })
+  readonly currentUser = this._user.asReadonly();
+  readonly isAuthenticated = computed(() => this._user() !== null);
+  readonly isAdmin = computed(() => this._user()?.est_admin === true);
+  readonly isHote = computed(() => this._user()?.est_hote === true);
+  readonly isHoteVerifie = computed(() => this._user()?.est_hote_verifie === true);
+
+  login(payload: LoginPayload): Observable<AuthData> {
+    return this.api
+      .post<AuthData>('auth/login', payload)
+      .pipe(tap((data) => this.setSession(data)));
+  }
+
+  register(payload: RegisterPayload): Observable<AuthData> {
+    return this.api
+      .post<AuthData>('auth/register', payload)
+      .pipe(tap((data) => this.setSession(data)));
+  }
+
+  /** Recharge la session au démarrage de l'application. */
+  bootstrap(): Observable<User | null> {
+    if (!this.tokens.hasToken()) {
+      return of(null);
+    }
+
+    return this.api.get<{ user: User }>('auth/me').pipe(
+      tap((res) => this._user.set(res.user)),
+      map((res) => res.user),
+      catchError(() => {
+        this.clearSession();
+        return of(null);
+      }),
     );
   }
 
-  register(data: RegisterData): Observable<{ user: User }> {
-    return this.api.post<{ user: User }>('auth/register', data);
+  refreshUser(): Observable<User> {
+    return this.api.get<{ user: User }>('auth/me').pipe(
+      tap((res) => this._user.set(res.user)),
+      map((res) => res.user),
+    );
   }
 
-  logout(): void {
-    this.tokenService.removeToken();
-    this.currentUser.set(null);
+  logout(): Observable<void> {
+    return this.api.post<void>('auth/logout').pipe(
+      catchError(() => of(undefined)),
+      finalize(() => this.clearSession()),
+      map(() => undefined),
+    );
   }
 
-  isAuthenticated(): boolean {
-    return !!this.tokenService.getToken();
+  clearSession(): void {
+    this.tokens.removeToken();
+    this._user.set(null);
   }
 
-  hasRole(role: string): boolean {
-    return this.currentUser()?.role === role;
+  setUser(user: User): void {
+    this._user.set(user);
   }
 
-  isHoteVerifie(): boolean {
-    return this.currentUser()?.is_hote_verifie ?? false;
-  }
-
-  isAdmin(): boolean {
-    return this.currentUser()?.role === 'admin';
+  private setSession(data: AuthData): void {
+    this.tokens.saveToken(data.token);
+    this._user.set(data.user);
   }
 }

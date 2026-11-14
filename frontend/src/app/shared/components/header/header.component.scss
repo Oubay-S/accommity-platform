@@ -1,1 +1,15 @@
-.header-container { display: block; }
+.bell__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+}
+
+.bell__panel {
+  z-index: 60;
+}
+
+.bell__item-title,
+.bell__item-text,
+.bell__item-time {
+  display: block;
+}

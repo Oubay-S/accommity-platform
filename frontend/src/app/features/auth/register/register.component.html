@@ -1,3 +1,209 @@
-<div class="register-page">
-  <h2>Register</h2>
-</div>
+<section class="auth">
+  <aside class="auth__visual">
+    <a routerLink="/" class="auth__brand">
+      <span class="icon icon--lg">villa</span>
+      Accommity
+    </a>
+
+    <div class="auth__quote">
+      <span class="eyebrow" style="color: var(--cedar)">Hospitalité Marocaine</span>
+      <h2>Confiez votre demeure d'exception à nos experts</h2>
+      <p>
+        Vérification sur place, sécurisation des règlements en dirhams et accueil
+        soigné de voyageurs respectueux.
+      </p>
+
+      <div class="auth__proof">
+        <span class="auth__proof-item"><span class="icon icon--sm">workspace_premium</span> Hôte vérifié</span>
+        <span class="auth__proof-item"><span class="icon icon--sm">payments</span> Virements MAD / EUR</span>
+        <span class="auth__proof-item"><span class="icon icon--sm">shield_person</span> Protection intégrale</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="auth__panel">
+    <div class="auth__card">
+      <div class="auth__tabs">
+        <a routerLink="/auth/login" class="auth__tab">
+          <span class="icon">lock_open</span> Connexion
+        </a>
+        <span class="auth__tab auth__tab--active">
+          <span class="icon">person_add</span> Inscription
+        </span>
+      </div>
+
+      <div class="auth__head">
+        <span class="eyebrow">Nouveau membre</span>
+        <h1>Rejoindre le cercle Accommity</h1>
+        <p>Créez votre compte en quelques secondes et commencez votre expérience.</p>
+      </div>
+
+      @if (error()) {
+        <div class="alert alert--danger" style="margin-bottom: 1.25rem">
+          <span class="icon icon--sm">error</span>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <form class="auth__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <span class="field__label">Vous êtes</span>
+          <div class="role-picker">
+            <button
+              type="button"
+              class="role-option"
+              [class.role-option--active]="role.value === 'voyageur'"
+              (click)="role.setValue('voyageur')"
+            >
+              <span class="icon">explore</span>
+              <strong>Voyageur</strong>
+              <span>Séjours &amp; riads d'exception</span>
+            </button>
+            <button
+              type="button"
+              class="role-option"
+              [class.role-option--active]="role.value === 'hote'"
+              (click)="role.setValue('hote')"
+            >
+              <span class="icon">villa</span>
+              <strong>Hôte d'exception</strong>
+              <span>Valoriser une demeure</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field" [class.field--invalid]="prenom.invalid && (prenom.touched || submitted())">
+            <label class="field__label" for="reg-prenom">Prénom</label>
+            <input id="reg-prenom" class="field__input" type="text" formControlName="prenom" placeholder="Amina" autocomplete="given-name" />
+            @if (prenom.hasError('server')) {
+              <span class="field__error">{{ prenom.getError('server') }}</span>
+            } @else if ((prenom.touched || submitted()) && prenom.invalid) {
+              <span class="field__error">Le prénom est requis.</span>
+            }
+          </div>
+
+          <div class="field" [class.field--invalid]="nom.invalid && (nom.touched || submitted())">
+            <label class="field__label" for="reg-nom">Nom</label>
+            <input id="reg-nom" class="field__input" type="text" formControlName="nom" placeholder="El Alami" autocomplete="family-name" />
+            @if (nom.hasError('server')) {
+              <span class="field__error">{{ nom.getError('server') }}</span>
+            } @else if ((nom.touched || submitted()) && nom.invalid) {
+              <span class="field__error">Le nom est requis.</span>
+            }
+          </div>
+
+          <div class="field field--full" [class.field--invalid]="email.invalid && (email.touched || submitted())">
+            <label class="field__label" for="reg-email">Adresse e-mail</label>
+            <input id="reg-email" class="field__input" type="email" formControlName="email" placeholder="amina.elalami@example.com" autocomplete="email" />
+            @if (email.hasError('server')) {
+              <span class="field__error">{{ email.getError('server') }}</span>
+            } @else if ((email.touched || submitted()) && email.hasError('required')) {
+              <span class="field__error">L'adresse e-mail est requise.</span>
+            } @else if ((email.touched || submitted()) && email.hasError('email')) {
+              <span class="field__error">Adresse e-mail invalide.</span>
+            }
+          </div>
+
+          <div class="field field--full" [class.field--invalid]="telephone.invalid && (telephone.touched || submitted())">
+            <label class="field__label" for="reg-tel">
+              Numéro de téléphone
+              @if (role.value === 'hote') {
+                <span>· requis pour les hôtes</span>
+              }
+            </label>
+            <input id="reg-tel" class="field__input" type="tel" formControlName="telephone" placeholder="06 12 34 56 78" autocomplete="tel" />
+            @if (telephone.hasError('server')) {
+              <span class="field__error">{{ telephone.getError('server') }}</span>
+            } @else if ((telephone.touched || submitted()) && telephone.hasError('required')) {
+              <span class="field__error">Le numéro de téléphone est requis pour une demande d'hôte (RG03).</span>
+            } @else if ((telephone.touched || submitted()) && telephone.hasError('pattern')) {
+              <span class="field__error">Numéro de téléphone invalide.</span>
+            } @else {
+              <span class="field__hint">Utilisé pour la vérification d'identité et les rappels de séjour.</span>
+            }
+          </div>
+
+          <div class="field field--full" [class.field--invalid]="password.invalid && (password.touched || submitted())">
+            <label class="field__label" for="reg-password">Mot de passe</label>
+            <div class="input-wrap">
+              <input
+                id="reg-password"
+                class="field__input"
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="8 caractères minimum"
+                autocomplete="new-password"
+              />
+              <button type="button" class="input-wrap__action" (click)="showPassword.set(!showPassword())" aria-label="Afficher ou masquer">
+                <span class="icon icon--sm">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            <div class="password-meter" [class.password-meter--ok]="strength() >= 70">
+              <div class="password-meter__track">
+                <div class="password-meter__bar" [style.width.%]="strength()"></div>
+              </div>
+              <span>{{ strengthLabel() }}</span>
+            </div>
+            @if (password.hasError('server')) {
+              <span class="field__error">{{ password.getError('server') }}</span>
+            } @else if ((password.touched || submitted()) && password.hasError('minlength')) {
+              <span class="field__error">Le mot de passe doit contenir au moins 8 caractères.</span>
+            } @else if ((password.touched || submitted()) && password.hasError('required')) {
+              <span class="field__error">Le mot de passe est requis.</span>
+            }
+          </div>
+
+          <div
+            class="field field--full"
+            [class.field--invalid]="(confirmation.touched || submitted()) && (form.hasError('passwordsMismatch') || confirmation.invalid)"
+          >
+            <label class="field__label" for="reg-confirmation">Confirmation</label>
+            <div class="input-wrap">
+              <input
+                id="reg-confirmation"
+                class="field__input"
+                [type]="showConfirmation() ? 'text' : 'password'"
+                formControlName="password_confirmation"
+                placeholder="Répétez le mot de passe"
+                autocomplete="new-password"
+              />
+              <button type="button" class="input-wrap__action" (click)="showConfirmation.set(!showConfirmation())" aria-label="Afficher ou masquer">
+                <span class="icon icon--sm">{{ showConfirmation() ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            @if ((confirmation.touched || submitted()) && form.hasError('passwordsMismatch')) {
+              <span class="field__error">Les mots de passe ne correspondent pas.</span>
+            }
+          </div>
+        </div>
+
+        <label class="checkbox" [class.field--invalid]="cgu.invalid && (cgu.touched || submitted())">
+          <input type="checkbox" formControlName="cgu" />
+          <span>
+            J'accepte les <a href="#" style="text-decoration: underline">Conditions Générales d'Accommity</a>
+            et consens au traitement de mes données conformément à la
+            <a href="#" style="text-decoration: underline">loi marocaine n° 09-08</a> (CNDP).
+          </span>
+        </label>
+        @if ((cgu.touched || submitted()) && cgu.invalid) {
+          <span class="field__error" style="margin-top: -0.5rem">Vous devez accepter les conditions.</span>
+        }
+
+        <button type="submit" class="btn btn--primary btn--block" [disabled]="loading()">
+          @if (loading()) {
+            Création du compte…
+          } @else {
+            Créer mon compte
+            <span class="icon icon--sm">how_to_reg</span>
+          }
+        </button>
+      </form>
+
+      <p class="auth__foot">
+        Déjà membre ?
+        <a routerLink="/auth/login" style="color: var(--clay); font-weight: 600">Se connecter</a>
+      </p>
+    </div>
+  </div>
+</section>

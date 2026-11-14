@@ -1,3 +1,82 @@
-<div class="home-page">
-  <h2>Home</h2>
-</div>
+<section class="home-hero">
+  <div class="container home-hero__inner">
+    <span class="eyebrow">Morocco Escapes</span>
+    <h1>Réservez des riads historiques et villas privées au Maroc</h1>
+    <p>
+      Des demeures séculaires dans la Médina aux villas contemporaines avec vue sur
+      l'Atlas et appartements en front de mer.
+    </p>
+
+    <div class="home-hero__actions">
+      <a routerLink="/annonces" class="btn btn--primary">
+        Explorer les hébergements
+        <span class="icon icon--sm">arrow_forward</span>
+      </a>
+      @if (!isAuthenticated() || !isHote()) {
+        <a routerLink="/auth/register" class="btn btn--ghost">Devenir hôte</a>
+      } @else {
+        <a routerLink="/profil/verification-identite" class="btn btn--ghost">Espace hôte</a>
+      }
+    </div>
+
+    <div class="home-proof">
+      <div class="home-proof__item">
+        <span class="icon">verified_user</span>
+        <div>
+          <strong>Paiement 100 % sécurisé</strong>
+          <span>En Dirham Marocain (MAD)</span>
+        </div>
+      </div>
+      <div class="home-proof__item">
+        <span class="icon">villa</span>
+        <div>
+          <strong>Riads &amp; villas vérifiés</strong>
+          <span>Audits et photos conformes</span>
+        </div>
+      </div>
+      <div class="home-proof__item">
+        <span class="icon">support_agent</span>
+        <div>
+          <strong>Assistance locale 24/7</strong>
+          <span>Équipe bilingue FR &amp; Darija</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container home-section">
+  <div class="page-head">
+    <span class="eyebrow">Sélection</span>
+    <h2>Explorez par style d'hébergement</h2>
+    <p class="muted">Choisissez le cadre architectural parfait pour votre prochain séjour.</p>
+  </div>
+
+  <div class="home-styles">
+    <a routerLink="/annonces" class="home-style">
+      <span class="icon">mosque</span>
+      <strong>Riads traditionnels</strong>
+      <span>Marrakech &amp; Fès</span>
+    </a>
+    <a routerLink="/annonces" class="home-style">
+      <span class="icon">pool</span>
+      <strong>Villas avec piscine</strong>
+      <span>Palmeraie &amp; Essaouira</span>
+    </a>
+    <a routerLink="/annonces" class="home-style">
+      <span class="icon">water</span>
+      <strong>Apparts vue océan</strong>
+      <span>Taghazout &amp; Tanger</span>
+    </a>
+    <a routerLink="/annonces" class="home-style">
+      <span class="icon">landscape</span>
+      <strong>Kasbahs de l'Atlas</strong>
+      <span>Atlas &amp; Dadès</span>
+    </a>
+    <a routerLink="/annonces" class="home-style">
+      <span class="icon">apartment</span>
+      <strong>Studios citadins</strong>
+      <span>Casablanca &amp; Rabat</span>
+    </a>
+  </div>
+</section>

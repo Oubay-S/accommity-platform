@@ -1,3 +1,82 @@
-<div class="notification-list-page">
-  <h2>Notification List</h2>
+<div class="container page">
+  <div class="page-head">
+    <span class="eyebrow">Espace membre</span>
+    <div class="page-head__row">
+      <div>
+        <h1>Notifications</h1>
+        <p class="muted" style="margin-top: 0.4rem">
+          Réservations, paiements, avis et rappels de séjour.
+        </p>
+      </div>
+      @if (unread() > 0) {
+        <span class="badge badge--clay">{{ unread() }} non lue{{ unread() > 1 ? 's' : '' }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="notif-toolbar">
+    <div class="notif-filters">
+      <button type="button" class="chip" [class.chip--active]="filter() === 'toutes'" (click)="setFilter('toutes')">
+        Toutes ({{ total() }})
+      </button>
+      <button type="button" class="chip" [class.chip--active]="filter() === 'non_lues'" (click)="setFilter('non_lues')">
+        Non lues ({{ unread() }})
+      </button>
+    </div>
+
+    <button type="button" class="btn btn--ghost btn--sm" (click)="markAll()" [disabled]="unread() === 0">
+      <span class="icon icon--sm">done_all</span> Tout marquer lu
+    </button>
+  </div>
+
+  @if (loading() && items().length === 0) {
+    <div class="notif-list">
+      <div class="bell__empty" style="padding: 3rem">Chargement des notifications…</div>
+    </div>
+  } @else if (items().length === 0) {
+    <div class="card empty-state">
+      <span class="icon">notifications_off</span>
+      <strong>Aucune notification</strong>
+      <span>
+        @if (filter() === 'non_lues') {
+          Vous avez lu toutes vos notifications. Rien de nouveau pour le moment.
+        } @else {
+          Vos alertes de réservation, paiement et rappels apparaîtront ici.
+        }
+      </span>
+    </div>
+  } @else {
+    <div class="notif-list">
+      @for (item of items(); track item.id_notification) {
+        <button
+          type="button"
+          class="notif-item"
+          [class.notif-item--unread]="!item.est_lue"
+          (click)="open(item)"
+        >
+          <span class="notif-item__icon">
+            <span class="icon">{{ iconFor(item.type_alerte) }}</span>
+          </span>
+
+          <span class="notif-item__body">
+            <span class="notif-item__title">{{ item.titre }}</span>
+            <span class="notif-item__text">{{ item.contenu }}</span>
+            <span class="notif-item__time">{{ timeAgo(item.date_creation) }}</span>
+          </span>
+
+          @if (!item.est_lue) {
+            <span class="notif-item__dot" aria-label="Non lue"></span>
+          }
+        </button>
+      }
+    </div>
+
+    @if (page() < lastPage()) {
+      <div style="display: flex; justify-content: center; margin-top: 1.5rem">
+        <button type="button" class="btn btn--ghost" (click)="loadMore()" [disabled]="loading()">
+          {{ loading() ? 'Chargement…' : 'Charger plus' }}
+        </button>
+      </div>
+    }
+  }
 </div>
