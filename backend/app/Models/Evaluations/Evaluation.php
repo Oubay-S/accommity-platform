@@ -2,19 +2,33 @@
 
 namespace App\Models\Evaluations;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Utilisateurs\User;
-use App\Models\Annonces\Annonce;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
 
 class Evaluation extends Model
 {
+    use HasUuids;
+
+    protected $table = 'evaluations';
+    protected $primaryKey = 'id_evaluation';
+
+    const CREATED_AT = 'date_creation';
+    const UPDATED_AT = 'date_modification';
+
     protected $fillable = [
-        'auteur_id', 'cible_id', 'annonce_id', 'note_globale', 'commentaire',
-        'est_signale', 'est_modere'
+        'id_reservation', 'id_auteur', 'id_cible', 'id_annonce',
+        'type_auteur', 'note', 'commentaire', 'est_signale',
+        'motif_signalement',
+    ];
+
+    protected $casts = [
+        'note' => 'decimal:2',
+        'est_signale' => 'boolean',
     ];
 
     public function auteur()
     {
-        return $this->belongsTo(User::class, 'auteur_id');
+        return $this->belongsTo(User::class, 'id_auteur');
     }
 }
