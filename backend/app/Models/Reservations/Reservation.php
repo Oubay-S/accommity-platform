@@ -24,7 +24,7 @@ class Reservation extends Model
         'date_arrivee', 'date_depart', 'nb_voyageurs', 'statut',
         'mode_reservation', 'montant_total', 'frais_service',
         'message_optionnel', 'motif_refus', 'motif_annulation',
-        'date_annulation', 'acteur_annulation',
+        'date_confirmation', 'date_annulation', 'acteur_annulation',
     ];
 
     protected $casts = [
@@ -34,6 +34,7 @@ class Reservation extends Model
         'mode_reservation' => ModeReservation::class,
         'montant_total' => 'decimal:2',
         'frais_service' => 'decimal:2',
+        'date_confirmation' => 'datetime',
         'date_annulation' => 'datetime',
     ];
 

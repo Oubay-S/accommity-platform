@@ -153,6 +153,7 @@ return new class extends Migration {
             $table->text('message_optionnel')->nullable();
             $table->text('motif_refus')->nullable();
             $table->text('motif_annulation')->nullable();
+            $table->timestamp('date_confirmation')->nullable();
             $table->timestamp('date_annulation')->nullable();
             $table->enum('acteur_annulation', ['voyageur', 'hote', 'systeme'])->nullable();
             $table->timestamp('date_creation')->useCurrent();
