@@ -29,6 +29,7 @@ class Annonce extends Model
         'statut' => StatutAnnonce::class,
         'mode_reservation' => ModeReservation::class,
         'tarif_nuit' => 'decimal:2',
+        'photo_url' => 'array',
     ];
 
     public function hote()

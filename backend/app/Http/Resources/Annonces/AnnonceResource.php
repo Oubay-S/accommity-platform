@@ -13,6 +13,7 @@ class AnnonceResource extends JsonResource
             'id_annonce' => $this->getKey(),
             'titre' => $this->titre,
             'description' => $this->description,
+            'photos' => $this->photo_url ?? [],
             'tarif_nuit' => $this->tarif_nuit,
             'statut' => $this->statut,
         ];
