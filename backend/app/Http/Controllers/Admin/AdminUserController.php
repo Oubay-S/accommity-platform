@@ -3,12 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Utilisateurs\VerificationIdentiteResource;
+use App\Http\Responses\ApiResponse;
+use App\Models\Utilisateurs\VerificationIdentite;
 use App\Services\Administration\AdminService;
+use App\Services\Utilisateurs\VerificationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminUserController extends Controller
 {
-    public function __construct(protected AdminService $adminService) {}
+    public function __construct(
+        protected AdminService $adminService,
+        protected VerificationService $verificationService,
+    ) {}
 
     public function index(): JsonResponse
     {
@@ -20,18 +29,75 @@ class AdminUserController extends Controller
         return response()->json(['message' => 'Statut utilisateur modifié']);
     }
 
-    public function verifications(): JsonResponse
+    /** GET /api/admin/verifications?statut=en_cours */
+    public function verifications(Request $request): JsonResponse
     {
-        return response()->json(['verifications' => []]);
+        $statut = $request->string('statut', VerificationIdentite::STATUT_EN_COURS)->toString();
+        $autorises = [
+            VerificationIdentite::STATUT_EN_COURS,
+            VerificationIdentite::STATUT_VALIDEE,
+            VerificationIdentite::STATUT_REJETEE,
+        ];
+
+        $query = VerificationIdentite::query()
+            ->with('utilisateur')
+            ->latest('date_soumission');
+
+        if (in_array($statut, $autorises, true)) {
+            $query->where('statut', $statut);
+        }
+
+        $parPage = max(1, min($request->integer('par_page', 15), 50));
+        $paginator = $query->paginate($parPage);
+
+        return ApiResponse::success([
+            'items' => VerificationIdentiteResource::collection($paginator->getCollection())->resolve(),
+            'pagination' => [
+                'total' => $paginator->total(),
+                'per_page' => $paginator->perPage(),
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+            ],
+        ], 'Demandes de vérification récupérées.');
     }
 
-    public function validerVerification(string $id): JsonResponse
+    /** PUT /api/admin/verifications/{id}/valider */
+    public function validerVerification(Request $request, string $id): JsonResponse
     {
-        return response()->json(['message' => 'Identité validée']);
+        $verification = $this->verificationService->valider($id, $request->user());
+        $verification->loadMissing('utilisateur');
+
+        return ApiResponse::success(
+            ['verification' => (new VerificationIdentiteResource($verification))->resolve()],
+            'Identité validée.',
+        );
     }
 
-    public function rejeterVerification(string $id): JsonResponse
+    /** PUT /api/admin/verifications/{id}/rejeter */
+    public function rejeterVerification(Request $request, string $id): JsonResponse
     {
-        return response()->json(['message' => 'Identité rejetée']);
+        $validated = $request->validate([
+            'motif' => ['required', 'string', 'max:500'],
+        ]);
+
+        $verification = $this->verificationService->rejeter(
+            $id,
+            $validated['motif'],
+            $request->user(),
+        );
+        $verification->loadMissing('utilisateur');
+
+        return ApiResponse::success(
+            ['verification' => (new VerificationIdentiteResource($verification))->resolve()],
+            'Identité rejetée.',
+        );
+    }
+
+    /** GET /api/admin/verifications/{id}/document — document privé (loi 09-08) */
+    public function document(string $id): StreamedResponse
+    {
+        return $this->verificationService->telecharger(
+            VerificationIdentite::findOrFail($id),
+        );
     }
 }

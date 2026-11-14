@@ -58,3 +58,17 @@ export interface AuthData {
   token: string;
   token_type: string;
 }
+
+export interface UpdateProfilPayload {
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone: string | null;
+  description: string | null;
+}
+
+export interface ChangePasswordPayload {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+}

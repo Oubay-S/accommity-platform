@@ -1,12 +1,26 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { ApiError } from '../../../shared/models/api-response.model';
 import { Profil } from '../../../shared/models/user.model';
 import { ProfilService } from '../services/profil.service';
+
+function passwordsMatch(group: AbstractControl): ValidationErrors | null {
+  const password = group.get('password')?.value as string;
+  const confirmation = group.get('password_confirmation')?.value as string;
+
+  return password === confirmation ? null : { passwordsMismatch: true };
+}
 
 @Component({
   selector: 'app-profile-edit',
@@ -20,25 +34,53 @@ export class ProfileEditComponent {
   private readonly auth = inject(AuthService);
   private readonly profils = inject(ProfilService);
   private readonly toast = inject(ToastService);
-  private readonly router = inject(Router);
 
   readonly user = this.auth.currentUser;
   readonly saving = signal(false);
   readonly uploading = signal(false);
+  readonly changingPassword = signal(false);
   readonly count = signal(0);
+  readonly showCurrent = signal(false);
+  readonly showNew = signal(false);
 
-  readonly form = this.fb.nonNullable.group({
+  readonly identity = this.fb.nonNullable.group({
+    nom: ['', [Validators.required, Validators.maxLength(255)]],
+    prenom: ['', [Validators.required, Validators.maxLength(255)]],
+    email: ['', [Validators.required, Validators.email]],
+    telephone: [''],
     description: ['', [Validators.maxLength(1000)]],
   });
 
-  constructor() {
-    const description = this.auth.currentUser()?.profil?.description ?? '';
-    this.form.setValue({ description });
-    this.count.set(description.length);
+  readonly password = this.fb.nonNullable.group(
+    {
+      current_password: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      password_confirmation: ['', [Validators.required]],
+    },
+    { validators: [passwordsMatch] },
+  );
 
-    this.form.controls.description.valueChanges
+  constructor() {
+    const user = this.auth.currentUser();
+
+    if (user) {
+      this.identity.setValue({
+        nom: user.nom,
+        prenom: user.prenom,
+        email: user.email,
+        telephone: user.telephone ?? '',
+        description: user.profil?.description ?? '',
+      });
+      this.count.set(user.profil?.description?.length ?? 0);
+    }
+
+    this.identity.controls.description.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe((value) => this.count.set(value.length));
+  }
+
+  get description() {
+    return this.identity.controls.description;
   }
 
   initials(): string {
@@ -83,25 +125,55 @@ export class ProfileEditComponent {
     });
   }
 
-  save(): void {
-    if (this.form.invalid || this.saving()) {
-      this.form.markAllAsTouched();
+  saveIdentity(): void {
+    if (this.identity.invalid || this.saving()) {
+      this.identity.markAllAsTouched();
       return;
     }
 
     this.saving.set(true);
-    const description = this.form.controls.description.value.trim();
+    const value = this.identity.getRawValue();
 
-    this.profils.update(description || null).subscribe({
-      next: (profil) => {
-        this.applyProfil(profil);
-        this.saving.set(false);
-        this.toast.success('Profil enregistré.');
-        void this.router.navigate(['/profil']);
+    this.profils
+      .update({
+        nom: value.nom.trim(),
+        prenom: value.prenom.trim(),
+        email: value.email.trim(),
+        telephone: value.telephone.trim() || null,
+        description: value.description.trim() || null,
+      })
+      .subscribe({
+        next: (res) => {
+          this.auth.setUser(res.user);
+          this.saving.set(false);
+          this.toast.success('Profil enregistré.');
+        },
+        error: (err: ApiError) => {
+          this.saving.set(false);
+          this.toast.error(err.message);
+          this.applyErrors(this.identity, err);
+        },
+      });
+  }
+
+  changePassword(): void {
+    if (this.password.invalid || this.changingPassword()) {
+      this.password.markAllAsTouched();
+      return;
+    }
+
+    this.changingPassword.set(true);
+
+    this.profils.changePassword(this.password.getRawValue()).subscribe({
+      next: () => {
+        this.changingPassword.set(false);
+        this.password.reset();
+        this.toast.success('Mot de passe mis à jour. Les autres sessions ont été déconnectées.');
       },
       error: (err: ApiError) => {
-        this.saving.set(false);
+        this.changingPassword.set(false);
         this.toast.error(err.message);
+        this.applyErrors(this.password, err);
       },
     });
   }
@@ -111,6 +183,12 @@ export class ProfileEditComponent {
 
     if (user) {
       this.auth.setUser({ ...user, profil });
+    }
+  }
+
+  private applyErrors(form: FormGroup, err: ApiError): void {
+    for (const [field, messages] of Object.entries(err.errors ?? {})) {
+      form.get(field)?.setErrors({ server: messages[0] });
     }
   }
 }

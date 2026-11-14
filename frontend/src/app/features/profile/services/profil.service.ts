@@ -1,7 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
-import { Profil } from '../../../shared/models/user.model';
+import {
+  ChangePasswordPayload,
+  Profil,
+  UpdateProfilPayload,
+  User,
+} from '../../../shared/models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProfilService {
@@ -13,10 +18,12 @@ export class ProfilService {
       .pipe(map((res) => res.profil));
   }
 
-  update(description: string | null): Observable<Profil> {
-    return this.api
-      .put<{ profil: Profil }>('profil', { description })
-      .pipe(map((res) => res.profil));
+  update(payload: UpdateProfilPayload): Observable<{ user: User; profil: Profil | null }> {
+    return this.api.put<{ user: User; profil: Profil | null }>('profil', payload);
+  }
+
+  changePassword(payload: ChangePasswordPayload): Observable<void> {
+    return this.api.put<void>('profil/password', payload);
   }
 
   uploadPhoto(file: File): Observable<Profil> {

@@ -7,6 +7,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Ne JAMAIS exposer `chemin_document` (loi 09-08).
+ *
+ * Le bloc `utilisateur` n'apparaît que lorsque la relation est chargée
+ * (listes et actions du back-office admin).
  */
 class VerificationIdentiteResource extends JsonResource
 {
@@ -19,6 +22,15 @@ class VerificationIdentiteResource extends JsonResource
             'date_soumission' => $this->date_soumission?->toIso8601String(),
             'date_traitement' => $this->date_traitement?->toIso8601String(),
             'motif_rejet' => $this->motif_rejet,
+
+            'utilisateur' => $this->whenLoaded('utilisateur', fn () => $this->utilisateur === null ? null : [
+                'id_utilisateur' => $this->utilisateur->id_utilisateur,
+                'nom' => $this->utilisateur->nom,
+                'prenom' => $this->utilisateur->prenom,
+                'email' => $this->utilisateur->email,
+                'telephone' => $this->utilisateur->telephone,
+                'est_hote' => (bool) $this->utilisateur->est_hote,
+            ]),
         ];
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Utilisateurs\Profil;
 use App\Models\Utilisateurs\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -132,5 +133,107 @@ class ProfilTest extends TestCase
             ->assertStatus(401)
             ->assertJsonPath('success', false)
             ->assertJsonPath('error_code', 'NON_AUTHENTIFIE');
+    }
+
+    public function test_mise_a_jour_de_l_identite(): void
+    {
+        $user = User::factory()->create([
+            'nom' => 'Ancien',
+            'prenom' => 'Nom',
+            'email' => 'ancien@example.com',
+        ]);
+
+        $this->actingAs($user, 'sanctum')
+            ->putJson('/api/profil', [
+                'nom' => 'Nouveau',
+                'prenom' => 'Prénom',
+                'email' => 'Nouveau@Example.com',
+                'telephone' => '0611111111',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.user.nom', 'Nouveau')
+            ->assertJsonPath('data.user.prenom', 'Prénom')
+            ->assertJsonPath('data.user.email', 'nouveau@example.com')
+            ->assertJsonPath('data.user.telephone', '0611111111');
+
+        $this->assertDatabaseHas('utilisateurs', [
+            'id_utilisateur' => $user->getKey(),
+            'nom' => 'Nouveau',
+            'email' => 'nouveau@example.com',
+        ]);
+    }
+
+    public function test_l_email_doit_rester_unique(): void
+    {
+        User::factory()->create(['email' => 'pris@example.com']);
+        $user = User::factory()->create();
+
+        $this->actingAs($user, 'sanctum')
+            ->putJson('/api/profil', ['email' => 'pris@example.com'])
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['email']]);
+    }
+
+    public function test_l_utilisateur_peut_conserver_son_email_actuel(): void
+    {
+        $user = User::factory()->create(['email' => 'moi@example.com']);
+
+        $this->actingAs($user, 'sanctum')
+            ->putJson('/api/profil', ['email' => 'moi@example.com'])
+            ->assertOk();
+    }
+
+    public function test_changement_de_mot_de_passe(): void
+    {
+        $user = User::factory()->create(['mot_de_passe' => 'Password123']);
+        $token = $user->createToken('current')->plainTextToken;
+
+        $this->withToken($token)
+            ->putJson('/api/profil/password', [
+                'current_password' => 'Password123',
+                'password' => 'NouveauPass123',
+                'password_confirmation' => 'NouveauPass123',
+            ])
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $fresh = $user->fresh();
+        $this->assertTrue(Hash::check('NouveauPass123', $fresh->getAuthPassword()));
+        $this->assertFalse(Hash::check('Password123', $fresh->getAuthPassword()));
+    }
+
+    public function test_changement_de_mot_de_passe_refuse_un_mauvais_mot_de_passe_actuel(): void
+    {
+        $user = User::factory()->create(['mot_de_passe' => 'Password123']);
+        $token = $user->createToken('current')->plainTextToken;
+
+        $this->withToken($token)
+            ->putJson('/api/profil/password', [
+                'current_password' => 'Mauvais',
+                'password' => 'NouveauPass123',
+                'password_confirmation' => 'NouveauPass123',
+            ])
+            ->assertStatus(422)
+            ->assertJsonPath('error_code', 'MOT_DE_PASSE_ACTUEL_INVALIDE');
+    }
+
+    public function test_le_changement_de_mot_de_passe_revoque_les_autres_sessions(): void
+    {
+        $user = User::factory()->create(['mot_de_passe' => 'Password123']);
+        $current = $user->createToken('current')->plainTextToken;
+        $user->createToken('autre-session');
+
+        $this->assertSame(2, $user->tokens()->count());
+
+        $this->withToken($current)
+            ->putJson('/api/profil/password', [
+                'current_password' => 'Password123',
+                'password' => 'NouveauPass123',
+                'password_confirmation' => 'NouveauPass123',
+            ])
+            ->assertOk();
+
+        $this->assertSame(1, $user->tokens()->count());
+        $this->assertSame('current', $user->tokens()->first()->name);
     }
 }

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Utilisateurs;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Utilisateurs\ChangePasswordRequest;
 use App\Http\Requests\Utilisateurs\UpdateProfilPhotoRequest;
 use App\Http\Requests\Utilisateurs\UpdateProfilRequest;
 use App\Http\Resources\Utilisateurs\ProfilResource;
+use App\Http\Resources\Utilisateurs\UserResource;
 use App\Http\Responses\ApiResponse;
 use App\Services\Utilisateurs\UserService;
 use Illuminate\Http\JsonResponse;
@@ -29,14 +31,31 @@ class ProfilController extends Controller
         );
     }
 
-    /** PUT /api/profil */
+    /** PUT /api/profil — identité (nom, prénom, email, téléphone) + biographie */
     public function update(UpdateProfilRequest $request): JsonResponse
     {
-        $profil = $this->userService->mettreAJourProfil($request->user(), $request->validated());
+        $user = $this->userService->mettreAJourProfil($request->user(), $request->validated());
+
+        return ApiResponse::success([
+            'user' => (new UserResource($user))->resolve(),
+            'profil' => $user->profil === null
+                ? null
+                : (new ProfilResource($user->profil))->resolve(),
+        ], 'Profil mis à jour.');
+    }
+
+    /** PUT /api/profil/password */
+    public function changerMotDePasse(ChangePasswordRequest $request): JsonResponse
+    {
+        $this->userService->changerMotDePasse(
+            $request->user(),
+            $request->string('current_password')->toString(),
+            $request->string('password')->toString(),
+        );
 
         return ApiResponse::success(
-            ['profil' => (new ProfilResource($profil))->resolve()],
-            'Profil mis à jour.',
+            null,
+            'Mot de passe mis à jour. Les autres sessions ont été déconnectées.',
         );
     }
 

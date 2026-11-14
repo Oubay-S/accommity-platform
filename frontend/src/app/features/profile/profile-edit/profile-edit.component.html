@@ -3,7 +3,7 @@
     <div class="page-head">
       <span class="eyebrow">Mon compte</span>
       <h1>Modifier mon profil</h1>
-      <p class="muted">Mettez à jour votre photo et votre présentation. L'identité et le contact sont gérés par la conciergerie.</p>
+      <p class="muted">Mettez à jour votre photo, vos coordonnées et votre présentation.</p>
     </div>
 
     <div class="profile-layout">
@@ -53,43 +53,60 @@
         <section class="card section">
           <div class="section__head">
             <h3 class="section__title"><span class="icon">badge</span> Informations personnelles</h3>
-            <p class="section__desc">Ces champs ne sont pas modifiables en ligne (vérification d'identité obligatoire).</p>
+            <p class="section__desc">Ces informations apparaissent sur vos contrats de séjour et vos fiches d'accueil.</p>
           </div>
 
-          <div class="form-grid">
-            <div class="field">
-              <span class="field__label">Prénom</span>
-              <input class="field__input" [value]="u.prenom" disabled />
-            </div>
-            <div class="field">
-              <span class="field__label">Nom de famille</span>
-              <input class="field__input" [value]="u.nom" disabled />
-            </div>
-            <div class="field">
-              <span class="field__label">Adresse e-mail</span>
-              <input class="field__input" [value]="u.email" disabled />
-            </div>
-            <div class="field">
-              <span class="field__label">Numéro de téléphone</span>
-              <input class="field__input" [value]="u.telephone ?? 'Non renseigné'" disabled />
-            </div>
-          </div>
-        </section>
-
-        <section class="card section">
-          <div class="section__head">
-            <h3 class="section__title"><span class="icon">menu_book</span> Biographie &amp; philosophie d'accueil</h3>
-            <p class="section__desc">Présentez votre style d'hospitalité. 600 caractères recommandés.</p>
-          </div>
-
-          <form [formGroup]="form" (ngSubmit)="save()">
-            <div class="field" [class.field--invalid]="form.controls.description.invalid && form.controls.description.touched">
-              <textarea formControlName="description" maxlength="1000" placeholder="Architecte d'intérieur passionnée par l'artisanat marocain…"></textarea>
-              <div style="display: flex; justify-content: space-between" class="small muted">
-                <span>{{ count() }} / 1000 caractères</span>
-                @if (form.controls.description.hasError('maxlength')) {
-                  <span class="field__error">Trop long.</span>
+          <form [formGroup]="identity" (ngSubmit)="saveIdentity()" novalidate>
+            <div class="form-grid">
+              <div class="field" [class.field--invalid]="identity.controls.prenom.invalid && identity.controls.prenom.touched">
+                <label class="field__label" for="profil-prenom">Prénom *</label>
+                <input id="profil-prenom" class="field__input" type="text" formControlName="prenom" autocomplete="given-name" />
+                @if (identity.controls.prenom.hasError('server')) {
+                  <span class="field__error">{{ identity.controls.prenom.getError('server') }}</span>
+                } @else if (identity.controls.prenom.touched && identity.controls.prenom.invalid) {
+                  <span class="field__error">Le prénom est requis.</span>
                 }
+              </div>
+
+              <div class="field" [class.field--invalid]="identity.controls.nom.invalid && identity.controls.nom.touched">
+                <label class="field__label" for="profil-nom">Nom de famille *</label>
+                <input id="profil-nom" class="field__input" type="text" formControlName="nom" autocomplete="family-name" />
+                @if (identity.controls.nom.hasError('server')) {
+                  <span class="field__error">{{ identity.controls.nom.getError('server') }}</span>
+                } @else if (identity.controls.nom.touched && identity.controls.nom.invalid) {
+                  <span class="field__error">Le nom est requis.</span>
+                }
+              </div>
+
+              <div class="field" [class.field--invalid]="identity.controls.email.invalid && identity.controls.email.touched">
+                <label class="field__label" for="profil-email">Adresse e-mail *</label>
+                <input id="profil-email" class="field__input" type="email" formControlName="email" autocomplete="email" />
+                @if (identity.controls.email.hasError('server')) {
+                  <span class="field__error">{{ identity.controls.email.getError('server') }}</span>
+                } @else if (identity.controls.email.touched && identity.controls.email.invalid) {
+                  <span class="field__error">Adresse e-mail invalide.</span>
+                } @else {
+                  <span class="field__hint">Sert d'identifiant de connexion.</span>
+                }
+              </div>
+
+              <div class="field" [class.field--invalid]="identity.controls.telephone.invalid && identity.controls.telephone.touched">
+                <label class="field__label" for="profil-tel">Numéro de téléphone portable</label>
+                <input id="profil-tel" class="field__input" type="tel" formControlName="telephone" autocomplete="tel" placeholder="06 12 34 56 78" />
+                @if (identity.controls.telephone.hasError('server')) {
+                  <span class="field__error">{{ identity.controls.telephone.getError('server') }}</span>
+                }
+              </div>
+
+              <div class="field field--full">
+                <label class="field__label" for="profil-bio">Biographie &amp; philosophie d'accueil</label>
+                <textarea id="profil-bio" formControlName="description" maxlength="1000" placeholder="Présentez votre style d'hospitalité…"></textarea>
+                <div style="display: flex; justify-content: space-between" class="small muted">
+                  <span>{{ count() }} / 1000 caractères</span>
+                  @if (description.hasError('maxlength')) {
+                    <span class="field__error">Trop long.</span>
+                  }
+                </div>
               </div>
             </div>
 
@@ -98,6 +115,87 @@
               <button type="submit" class="btn btn--primary" [disabled]="saving()">
                 <span class="icon icon--sm">save</span>
                 {{ saving() ? 'Enregistrement…' : 'Enregistrer les modifications' }}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="card section">
+          <div class="section__head">
+            <h3 class="section__title"><span class="icon">lock_reset</span> Sécurité &amp; mot de passe</h3>
+            <p class="section__desc">
+              Après modification, toutes vos autres sessions seront déconnectées.
+            </p>
+          </div>
+
+          <form [formGroup]="password" (ngSubmit)="changePassword()" novalidate>
+            <div class="form-grid">
+              <div class="field field--full" [class.field--invalid]="password.controls.current_password.invalid && password.controls.current_password.touched">
+                <label class="field__label" for="pwd-current">Mot de passe actuel</label>
+                <div class="input-wrap">
+                  <input
+                    id="pwd-current"
+                    class="field__input"
+                    [type]="showCurrent() ? 'text' : 'password'"
+                    formControlName="current_password"
+                    autocomplete="current-password"
+                  />
+                  <button type="button" class="input-wrap__action" (click)="showCurrent.set(!showCurrent())" aria-label="Afficher ou masquer">
+                    <span class="icon icon--sm">{{ showCurrent() ? 'visibility_off' : 'visibility' }}</span>
+                  </button>
+                </div>
+                @if (password.controls.current_password.hasError('server')) {
+                  <span class="field__error">{{ password.controls.current_password.getError('server') }}</span>
+                } @else if (password.controls.current_password.touched && password.controls.current_password.invalid) {
+                  <span class="field__error">Le mot de passe actuel est requis.</span>
+                }
+              </div>
+
+              <div class="field" [class.field--invalid]="password.controls.password.invalid && password.controls.password.touched">
+                <label class="field__label" for="pwd-new">Nouveau mot de passe</label>
+                <div class="input-wrap">
+                  <input
+                    id="pwd-new"
+                    class="field__input"
+                    [type]="showNew() ? 'text' : 'password'"
+                    formControlName="password"
+                    autocomplete="new-password"
+                    placeholder="8 caractères minimum"
+                  />
+                  <button type="button" class="input-wrap__action" (click)="showNew.set(!showNew())" aria-label="Afficher ou masquer">
+                    <span class="icon icon--sm">{{ showNew() ? 'visibility_off' : 'visibility' }}</span>
+                  </button>
+                </div>
+                @if (password.controls.password.hasError('server')) {
+                  <span class="field__error">{{ password.controls.password.getError('server') }}</span>
+                } @else if (password.controls.password.touched && password.controls.password.hasError('minlength')) {
+                  <span class="field__error">Au moins 8 caractères.</span>
+                }
+              </div>
+
+              <div class="field" [class.field--invalid]="password.controls.password_confirmation.touched && password.hasError('passwordsMismatch')">
+                <label class="field__label" for="pwd-confirm">Confirmer le mot de passe</label>
+                <input
+                  id="pwd-confirm"
+                  class="field__input"
+                  [type]="showNew() ? 'text' : 'password'"
+                  formControlName="password_confirmation"
+                  autocomplete="new-password"
+                />
+                @if (password.controls.password_confirmation.touched && password.hasError('passwordsMismatch')) {
+                  <span class="field__error">Les mots de passe ne correspondent pas.</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <span class="small muted">
+                <span class="icon icon--sm">shield</span>
+                Chiffré et stocké de façon sécurisée.
+              </span>
+              <button type="submit" class="btn btn--dark" [disabled]="changingPassword()">
+                <span class="icon icon--sm">lock</span>
+                {{ changingPassword() ? 'Mise à jour…' : 'Mettre à jour le mot de passe' }}
               </button>
             </div>
           </form>
