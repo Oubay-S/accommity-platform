@@ -3,11 +3,12 @@
 namespace App\Models\Utilisateurs;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Profil extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
 
     protected $table = 'profils';
     protected $primaryKey = 'id_profil';
