@@ -303,7 +303,7 @@ return new class extends Migration {
         // 19. TICKET_LITIGES
         Schema::create('ticket_litiges', function (Blueprint $table) {
             $table->uuid('id_ticket')->primary();
-            $table->uuid('id_evaluation');
+            $table->uuid('id_evaluation')->nullable();
             $table->uuid('id_declarant');
             $table->uuid('id_admin')->nullable();
             $table->uuid('id_reservation')->nullable();
@@ -339,6 +339,7 @@ return new class extends Migration {
         if (DB::getDriverName() === 'pgsql') {
             DB::statement('ALTER TABLE utilisateurs ADD CONSTRAINT utilisateurs_role_check CHECK (est_hote OR est_voyageur)');
             DB::statement('ALTER TABLE evaluations ADD CONSTRAINT evaluations_note_check CHECK (note BETWEEN 1 AND 5)');
+            DB::statement('ALTER TABLE ticket_litiges ADD CONSTRAINT ticket_litiges_cible_check CHECK (id_evaluation IS NOT NULL OR id_reservation IS NOT NULL)');
         }
     }
 
