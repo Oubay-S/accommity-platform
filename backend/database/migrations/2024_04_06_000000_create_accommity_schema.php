@@ -23,7 +23,7 @@ return new class extends Migration {
             $table->boolean('est_hote');
             $table->boolean('est_voyageur');
             $table->boolean('est_actif')->default(true);
-            $table->timestamp('date_creation');
+            $table->timestamp('date_creation')->useCurrent();
         });
 
         // 2. PROFILS
@@ -52,7 +52,7 @@ return new class extends Migration {
             $table->uuid('id_utilisateur');
             $table->string('type_piece');
             $table->enum('statut', ['en_cours', 'validee', 'rejetee'])->default('en_cours');
-            $table->timestamp('date_soumission');
+            $table->timestamp('date_soumission')->useCurrent();
             $table->string('motif_rejet')->nullable();
             $table->string('chemin_document')->nullable();
             $table->uuid('id_admin_traitant')->nullable();
@@ -113,7 +113,7 @@ return new class extends Migration {
             $table->text('motif_moderation')->nullable();
             $table->text('equipements');
             $table->text('reglement_interieur')->nullable();
-            $table->timestamp('date_creation');
+            $table->timestamp('date_creation')->useCurrent();
 
             $table->index('id_hote');
             $table->index('id_categorie');
@@ -155,7 +155,7 @@ return new class extends Migration {
             $table->text('motif_annulation')->nullable();
             $table->timestamp('date_annulation')->nullable();
             $table->enum('acteur_annulation', ['voyageur', 'hote', 'systeme'])->nullable();
-            $table->timestamp('date_creation');
+            $table->timestamp('date_creation')->useCurrent();
             $table->timestamp('date_modification')->nullable();
 
             $table->index('id_annonce');
@@ -190,7 +190,7 @@ return new class extends Migration {
             $table->decimal('montant_hote', 10, 2);
             $table->text('coordonnees_voyageur');
             $table->text('coordonnees_hote');
-            $table->timestamp('date_generation');
+            $table->timestamp('date_generation')->useCurrent();
 
             $table->foreign('id_reservation')->references('id_reservation')->on('reservations')->onDelete('cascade');
         });
@@ -201,7 +201,7 @@ return new class extends Migration {
             $table->uuid('id_reservation')->unique();
             $table->uuid('id_voyageur');
             $table->decimal('montant', 10, 2);
-            $table->timestamp('date_transaction');
+            $table->timestamp('date_transaction')->useCurrent();
             $table->enum('methode_paiement', ['carte_bancaire', 'paypal', 'autre']);
             $table->enum('statut', ['en_attente', 'reussi', 'echoue', 'rembourse']);
 
@@ -235,7 +235,7 @@ return new class extends Migration {
             $table->uuid('id_paiement');
             $table->decimal('montant', 10, 2);
             $table->decimal('taux_applique', 5, 2);
-            $table->timestamp('date_remboursement');
+            $table->timestamp('date_remboursement')->useCurrent();
             $table->enum('motif', ['annulation_voyageur', 'annulation_hote', 'expiration_demande']);
 
             $table->index('id_reservation');
@@ -252,7 +252,7 @@ return new class extends Migration {
             $table->uuid('id_paiement');
             $table->string('numero_facture');
             $table->string('chemin_pdf')->nullable();
-            $table->timestamp('date_generation');
+            $table->timestamp('date_generation')->useCurrent();
 
             $table->index('id_paiement');
             $table->foreign('id_paiement')->references('id_paiement')->on('paiements')->onDelete('cascade');
@@ -270,7 +270,7 @@ return new class extends Migration {
             $table->text('commentaire');
             $table->boolean('est_signale')->default(false);
             $table->string('motif_signalement')->nullable();
-            $table->timestamp('date_creation');
+            $table->timestamp('date_creation')->useCurrent();
             $table->timestamp('date_modification')->nullable();
 
             $table->unique(['id_reservation', 'id_auteur']);
@@ -306,7 +306,7 @@ return new class extends Migration {
             $table->uuid('id_reservation')->nullable();
             $table->string('motif');
             $table->enum('statut', ['en_cours', 'cloture'])->default('en_cours');
-            $table->timestamp('date_creation');
+            $table->timestamp('date_creation')->useCurrent();
             $table->timestamp('date_cloture')->nullable();
 
             $table->index('id_evaluation');
@@ -327,7 +327,7 @@ return new class extends Migration {
             $table->text('contenu');
             $table->enum('type_alerte', ['reservation', 'paiement', 'avis', 'rappel', 'systeme']);
             $table->boolean('est_lue')->default(false);
-            $table->timestamp('date_creation');
+            $table->timestamp('date_creation')->useCurrent();
 
             $table->index('id_utilisateur');
             $table->foreign('id_utilisateur')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
