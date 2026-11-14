@@ -14,13 +14,11 @@ class Administrateur extends Model
     protected $primaryKey = 'id_admin';
     public $timestamps = false;
 
-    protected $fillable = ['id_utilisateur', 'email', 'mot_de_passe', 'derniere_connexion'];
-    protected $hidden = ['mot_de_passe'];
+    protected $fillable = ['id_utilisateur', 'derniere_connexion'];
 
     protected function casts(): array
     {
         return [
-            'mot_de_passe' => 'hashed',
             'derniere_connexion' => 'datetime',
         ];
     }

@@ -40,12 +40,9 @@ return new class extends Migration {
         // 3. ADMINISTRATEURS
         Schema::create('administrateurs', function (Blueprint $table) {
             $table->uuid('id_admin')->primary();
-            $table->uuid('id_utilisateur');
-            $table->string('email')->unique();
-            $table->string('mot_de_passe');
+            $table->uuid('id_utilisateur')->unique();
             $table->timestamp('derniere_connexion')->nullable();
 
-            $table->index('id_utilisateur');
             $table->foreign('id_utilisateur')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
         });
 

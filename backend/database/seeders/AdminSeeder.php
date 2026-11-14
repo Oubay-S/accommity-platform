@@ -25,11 +25,6 @@ class AdminSeeder extends Seeder
             ]
         );
 
-        // administrateurs.email / mot_de_passe are still NOT NULL (removal pending approval),
-        // so they are duplicated here. Login always uses the utilisateurs row.
-        Administrateur::updateOrCreate(
-            ['id_utilisateur' => $user->getKey()],
-            ['email' => $email, 'mot_de_passe' => $motDePasse]
-        );
+        Administrateur::firstOrCreate(['id_utilisateur' => $user->getKey()]);
     }
 }
