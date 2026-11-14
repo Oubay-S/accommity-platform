@@ -9,11 +9,14 @@ class ReservationPolicy
 {
     public function view(User $user, Reservation $reservation): bool
     {
-        return $user->id === $reservation->voyageur_id || $user->id === $reservation->annonce->hote_id || $user->estAdmin();
+        return $user->getKey() === $reservation->id_voyageur
+            || $user->getKey() === $reservation->id_hote
+            || $user->estAdmin();
     }
 
     public function cancel(User $user, Reservation $reservation): bool
     {
-        return $user->id === $reservation->voyageur_id || $user->id === $reservation->annonce->hote_id;
+        return $user->getKey() === $reservation->id_voyageur
+            || $user->getKey() === $reservation->id_hote;
     }
 }
