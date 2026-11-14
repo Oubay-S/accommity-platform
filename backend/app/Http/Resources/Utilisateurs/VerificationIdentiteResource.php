@@ -4,6 +4,7 @@ namespace App\Http\Resources\Utilisateurs;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Ne JAMAIS exposer `chemin_document` (loi 09-08).
@@ -22,6 +23,8 @@ class VerificationIdentiteResource extends JsonResource
             'date_soumission' => $this->date_soumission?->toIso8601String(),
             'date_traitement' => $this->date_traitement?->toIso8601String(),
             'motif_rejet' => $this->motif_rejet,
+            'document_disponible' => $this->chemin_document !== null
+                && Storage::disk('local')->exists($this->chemin_document),
 
             'utilisateur' => $this->whenLoaded('utilisateur', fn () => $this->utilisateur === null ? null : [
                 'id_utilisateur' => $this->utilisateur->id_utilisateur,

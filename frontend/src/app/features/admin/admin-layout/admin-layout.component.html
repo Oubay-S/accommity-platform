@@ -1,0 +1,65 @@
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a routerLink="/" class="admin-brand">
+      <span class="icon icon--lg">villa</span>
+      <span>
+        Accommity
+        <small>Portail Admin</small>
+      </span>
+    </a>
+
+    <span class="admin-sidebar__label">Supervision</span>
+
+    <nav class="admin-nav">
+      <a routerLink="/admin" routerLinkActive="admin-nav__item--active" [routerLinkActiveOptions]="{ exact: true }" class="admin-nav__item">
+        <span class="icon">dashboard</span> Tableau de bord
+      </a>
+      <a routerLink="/admin/utilisateurs" routerLinkActive="admin-nav__item--active" class="admin-nav__item">
+        <span class="icon">group</span> Utilisateurs
+      </a>
+      <a routerLink="/admin/verifications" routerLinkActive="admin-nav__item--active" class="admin-nav__item">
+        <span class="icon">verified_user</span> Vérifications d'identité
+      </a>
+      <a routerLink="/admin/annonces" routerLinkActive="admin-nav__item--active" class="admin-nav__item">
+        <span class="icon">villa</span> Annonces
+      </a>
+      <a routerLink="/admin/avis" routerLinkActive="admin-nav__item--active" class="admin-nav__item">
+        <span class="icon">flag</span> Avis signalés
+      </a>
+      <a routerLink="/admin/litiges" routerLinkActive="admin-nav__item--active" class="admin-nav__item">
+        <span class="icon">gavel</span> Litiges
+      </a>
+    </nav>
+
+    <div class="admin-sidebar__foot">
+      <span class="avatar">{{ initials() }}</span>
+      <span style="min-width: 0">
+        <strong>{{ fullName() }}</strong>
+        <span>Super Admin</span>
+      </span>
+      <button type="button" class="btn btn--icon" style="margin-left: auto; background: transparent; border-color: rgba(255,255,255,.2); color: #fff" (click)="logout()" title="Déconnexion">
+        <span class="icon icon--sm">logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-topbar__crumb">
+        Portail Admin
+        <span class="icon icon--sm">chevron_right</span>
+        <strong>{{ section() }}</strong>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.5rem">
+        <a routerLink="/" class="btn btn--ghost btn--sm">
+          <span class="icon icon--sm">open_in_new</span> Voir le site
+        </a>
+      </div>
+    </header>
+
+    <main class="admin-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

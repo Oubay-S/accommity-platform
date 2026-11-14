@@ -47,11 +47,57 @@ class AdminVerificationTest extends TestCase
         $this->dossier(User::factory()->hote()->create(), VerificationIdentite::STATUT_VALIDEE);
 
         $this->actingAs($admin, 'sanctum')
-            ->getJson('/api/admin/verifications')
+            ->getJson('/api/admin/verifications?statut=en_cours')
             ->assertOk()
             ->assertJsonPath('data.pagination.total', 1)
             ->assertJsonPath('data.items.0.statut', 'en_cours')
-            ->assertJsonPath('data.items.0.utilisateur.email', $hote->email);
+            ->assertJsonPath('data.items.0.utilisateur.email', $hote->email)
+            ->assertJsonPath('data.stats.tous', 2)
+            ->assertJsonPath('data.stats.en_cours', 1)
+            ->assertJsonPath('data.stats.validee', 1)
+            ->assertJsonPath('data.stats.rejetee', 0);
+    }
+
+    public function test_la_recherche_filtre_par_nom_ou_email(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $cible = User::factory()->hote()->create([
+            'nom' => 'El Amrani',
+            'email' => 'fatima@riad.ma',
+        ]);
+        $this->dossier($cible);
+        $this->dossier(User::factory()->hote()->create(['nom' => 'Autre']));
+
+        $this->actingAs($admin, 'sanctum')
+            ->getJson('/api/admin/verifications?statut=tous&recherche=amrani')
+            ->assertOk()
+            ->assertJsonPath('data.pagination.total', 1)
+            ->assertJsonPath('data.items.0.utilisateur.email', 'fatima@riad.ma');
+    }
+
+    public function test_le_drapeau_document_disponible_reflete_le_fichier(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $hote = User::factory()->hote()->create();
+        $present = VerificationIdentite::factory()->enCours()->create([
+            'id_utilisateur' => $hote->getKey(),
+            'chemin_document' => 'verifications/present.pdf',
+        ]);
+        VerificationIdentite::factory()->enCours()->create([
+            'id_utilisateur' => User::factory()->hote()->create()->getKey(),
+            'chemin_document' => 'verifications/absent.pdf',
+        ]);
+        Storage::disk('local')->put('verifications/present.pdf', 'contenu');
+
+        $items = $this->actingAs($admin, 'sanctum')
+            ->getJson('/api/admin/verifications?statut=tous')
+            ->assertOk()
+            ->json('data.items');
+
+        $byId = collect($items)->keyBy('id_verification');
+
+        $this->assertTrue($byId[$present->id_verification]['document_disponible']);
+        $this->assertNotNull($byId->firstWhere('document_disponible', false));
     }
 
     public function test_un_administrateur_valide_une_identite_et_notifie_l_hote(): void

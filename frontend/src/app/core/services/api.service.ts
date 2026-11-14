@@ -39,6 +39,11 @@ export class ApiService {
       .pipe(map((res) => this.unwrap(res)));
   }
 
+  /** Téléchargement binaire (documents privés) : pas d'enveloppe JSON. */
+  getBlob(endpoint: string): Observable<Blob> {
+    return this.http.get(this.url(endpoint), { responseType: 'blob' });
+  }
+
   private url(endpoint: string): string {
     return `${this.baseUrl}/${endpoint.replace(/^\//, '')}`;
   }

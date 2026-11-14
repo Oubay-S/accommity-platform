@@ -16,8 +16,8 @@ import { ToastComponent } from './shared/components/toast/toast.component';
 export class AppComponent {
   private readonly router = inject(Router);
 
-  /** Les pages d'authentification sont plein écran (sans header/footer). */
-  readonly showChrome = signal(!this.router.url.startsWith('/auth'));
+  /** Les pages d'authentification et le portail admin sont plein écran. */
+  readonly showChrome = signal(!this.isBare(this.router.url));
 
   constructor() {
     this.router.events
@@ -25,6 +25,10 @@ export class AppComponent {
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
         takeUntilDestroyed(),
       )
-      .subscribe(() => this.showChrome.set(!this.router.url.startsWith('/auth')));
+      .subscribe(() => this.showChrome.set(!this.isBare(this.router.url)));
+  }
+
+  private isBare(url: string): boolean {
+    return url.startsWith('/auth') || url.startsWith('/admin');
   }
 }

@@ -29,17 +29,37 @@ class AdminUserController extends Controller
         return response()->json(['message' => 'Statut utilisateur modifié']);
     }
 
-    /** GET /api/admin/verifications?statut=en_cours */
+    /** GET /api/admin/verifications?statut=en_cours&recherche=amina */
     public function verifications(Request $request): JsonResponse
     {
-        $statut = $request->string('statut', VerificationIdentite::STATUT_EN_COURS)->toString();
+        $statut = $request->string('statut', 'tous')->toString();
+        $recherche = trim($request->string('recherche')->toString());
         $autorises = [
             VerificationIdentite::STATUT_EN_COURS,
             VerificationIdentite::STATUT_VALIDEE,
             VerificationIdentite::STATUT_REJETEE,
         ];
 
-        $query = VerificationIdentite::query()
+        $base = VerificationIdentite::query();
+
+        if ($recherche !== '') {
+            $like = '%'.mb_strtolower($recherche).'%';
+
+            $base->whereHas('utilisateur', function ($query) use ($like): void {
+                $query->whereRaw('LOWER(nom) LIKE ?', [$like])
+                    ->orWhereRaw('LOWER(prenom) LIKE ?', [$like])
+                    ->orWhereRaw('LOWER(email) LIKE ?', [$like]);
+            });
+        }
+
+        $stats = [
+            'tous' => (clone $base)->count(),
+            'en_cours' => (clone $base)->where('statut', VerificationIdentite::STATUT_EN_COURS)->count(),
+            'validee' => (clone $base)->where('statut', VerificationIdentite::STATUT_VALIDEE)->count(),
+            'rejetee' => (clone $base)->where('statut', VerificationIdentite::STATUT_REJETEE)->count(),
+        ];
+
+        $query = (clone $base)
             ->with('utilisateur')
             ->latest('date_soumission');
 
@@ -47,7 +67,7 @@ class AdminUserController extends Controller
             $query->where('statut', $statut);
         }
 
-        $parPage = max(1, min($request->integer('par_page', 15), 50));
+        $parPage = max(1, min($request->integer('par_page', 10), 50));
         $paginator = $query->paginate($parPage);
 
         return ApiResponse::success([
@@ -58,6 +78,7 @@ class AdminUserController extends Controller
                 'current_page' => $paginator->currentPage(),
                 'last_page' => $paginator->lastPage(),
             ],
+            'stats' => $stats,
         ], 'Demandes de vérification récupérées.');
     }
 
