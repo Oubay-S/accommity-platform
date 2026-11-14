@@ -2,10 +2,13 @@
 
 namespace App\Services\Utilisateurs;
 
+use App\Models\Utilisateurs\Profil;
 use App\Models\Utilisateurs\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserService
 {
@@ -59,5 +62,50 @@ class UserService
     public function chargerProfilComplet(User $user): User
     {
         return $user->loadMissing(['profil', 'verificationIdentite']);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Profil (RG04)
+    |--------------------------------------------------------------------------
+    */
+
+    public function profilOuCreer(User $user): Profil
+    {
+        return $user->profil()->firstOrCreate([]);
+    }
+
+    /** @param array{description?:?string} $data */
+    public function mettreAJourProfil(User $user, array $data): Profil
+    {
+        $profil = $this->profilOuCreer($user);
+
+        $profil->update([
+            'description' => $data['description'] ?? null,
+        ]);
+
+        return $profil->refresh();
+    }
+
+    /**
+     * La photo est stockée sur le disque public (`storage/app/public/profils`)
+     * et servie via `/storage/profils/...`. L'ancienne photo est supprimée.
+     */
+    public function enregistrerPhotoProfil(User $user, UploadedFile $photo): Profil
+    {
+        return DB::transaction(function () use ($user, $photo): Profil {
+            $profil = $this->profilOuCreer($user);
+            $anciennePhoto = $profil->photo_url;
+
+            $chemin = $photo->store('profils', 'public');
+
+            $profil->update(['photo_url' => $chemin]);
+
+            if ($anciennePhoto !== null && $anciennePhoto !== $chemin) {
+                Storage::disk('public')->delete($anciennePhoto);
+            }
+
+            return $profil->refresh();
+        });
     }
 }

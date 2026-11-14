@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Utilisateurs;
 
-use App\Models\Utilisateurs\VerificationIdentite;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -32,26 +31,13 @@ class UserResource extends JsonResource
             'est_hote_verifie' => $this->estHoteVerifie(),
             'date_creation' => $this->date_creation?->toIso8601String(),
 
-            'profil' => $this->whenLoaded('profil', fn () => $this->profil === null ? null : [
-                'id_profil' => $this->profil->id_profil,
-                'photo_url' => $this->profil->photo_url,
-                'description' => $this->profil->description,
-                'note_moyenne' => (float) $this->profil->note_moyenne,
-            ]),
+            'profil' => $this->whenLoaded('profil', fn () => $this->profil === null
+                ? null
+                : (new ProfilResource($this->profil))->resolve()),
 
-            'verification_identite' => $this->whenLoaded('verificationIdentite', function () {
-                /** @var VerificationIdentite|null $verification */
-                $verification = $this->verificationIdentite;
-
-                return $verification === null ? null : [
-                    'id_verification' => $verification->id_verification,
-                    'type_piece' => $verification->type_piece,
-                    'statut' => $verification->statut,
-                    'date_soumission' => $verification->date_soumission?->toIso8601String(),
-                    'date_traitement' => $verification->date_traitement?->toIso8601String(),
-                    'motif_rejet' => $verification->motif_rejet,
-                ];
-            }),
+            'verification_identite' => $this->whenLoaded('verificationIdentite', fn () => $this->verificationIdentite === null
+                ? null
+                : (new VerificationIdentiteResource($this->verificationIdentite))->resolve()),
         ];
     }
 }
