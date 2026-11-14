@@ -2,22 +2,26 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Annonces\CategorieGeographique;
+use Illuminate\Database\Seeder;
 
 class CategoriesGeographiquesSeeder extends Seeder
 {
     public function run(): void
     {
-        $categories = [
-            ['nom' => 'Bord de mer', 'description' => 'Logements proches des plages'],
-            ['nom' => 'Montagne', 'description' => 'Chalets et hébergements en altitude'],
-            ['nom' => 'Centre-ville', 'description' => 'Appartements au cœur des métropoles'],
-            ['nom' => 'Campagne', 'description' => 'Gîtes calmes et reposants'],
+        $villes = [
+            ['ville' => 'Marrakech', 'region' => 'Marrakech-Safi'],
+            ['ville' => 'Fès', 'region' => 'Fès-Meknès'],
+            ['ville' => 'Tanger', 'region' => 'Tanger-Tétouan-Al Hoceïma'],
+            ['ville' => 'Casablanca', 'region' => 'Casablanca-Settat'],
+            ['ville' => 'Rabat', 'region' => 'Rabat-Salé-Kénitra'],
+            ['ville' => 'Essaouira', 'region' => 'Marrakech-Safi'],
+            ['ville' => 'Agadir', 'region' => 'Souss-Massa'],
+            ['ville' => 'Chefchaouen', 'region' => 'Tanger-Tétouan-Al Hoceïma'],
         ];
 
-        foreach ($categories as $cat) {
-            CategorieGeographique::firstOrCreate(['nom' => $cat['nom']], $cat);
+        foreach ($villes as $v) {
+            CategorieGeographique::firstOrCreate(['ville' => $v['ville']], $v + ['pays' => 'Maroc']);
         }
     }
 }

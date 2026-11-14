@@ -12,7 +12,7 @@ class RegisterRequest extends FormRequest
         return [
             'nom' => ['required', 'string', 'max:255'],
             'prenom' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email'],
+            'email' => ['required', 'email', 'unique:utilisateurs,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'in:voyageur,hote'],
         ];

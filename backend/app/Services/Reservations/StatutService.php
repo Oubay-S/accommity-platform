@@ -4,5 +4,5 @@ namespace App\Services\Reservations;
 
 class StatutService
 {
-    public function transitionnerStatut(int $reservationId, string $nouveauStatut) { /* TODO */ }
+    public function transitionnerStatut(string $reservationId, string $nouveauStatut) { /* TODO */ }
 }

@@ -2,50 +2,80 @@
 
 namespace App\Models\Utilisateurs;
 
+use App\Models\Administration\Administrateur;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Enums\RoleUtilisateur;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, HasUuids, Notifiable;
+
+    protected $table = 'utilisateurs';
+    protected $primaryKey = 'id_utilisateur';
+
+    const CREATED_AT = 'date_creation';
+    const UPDATED_AT = null;
+
+    /** The password column is "mot_de_passe" (Laravel 11+ feature). */
+    protected $authPasswordName = 'mot_de_passe';
+
+    /** The table has no remember_token column (API tokens only). */
+    protected $rememberTokenName = '';
 
     protected $fillable = [
-        'nom', 'prenom', 'email', 'password', 'telephone', 'role', 'is_actif'
+        'nom', 'prenom', 'email', 'mot_de_passe', 'telephone',
+        'est_hote', 'est_voyageur', 'est_actif',
     ];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['mot_de_passe'];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'role' => RoleUtilisateur::class,
-        'is_actif' => 'boolean'
-    ];
+    protected function casts(): array
+    {
+        return [
+            'mot_de_passe' => 'hashed',
+            'est_hote' => 'boolean',
+            'est_voyageur' => 'boolean',
+            'est_actif' => 'boolean',
+            'date_creation' => 'datetime',
+        ];
+    }
 
     public function profil()
     {
-        return $this->hasOne(Profil::class, 'user_id');
+        return $this->hasOne(Profil::class, 'id_utilisateur');
     }
 
+    /** Latest identity verification request (a host may resubmit after a rejection). */
     public function verificationIdentite()
     {
-        return $this->hasOne(VerificationIdentite::class, 'user_id');
+        // Not latestOfMany(): it runs MAX() on the UUID primary key, which PostgreSQL doesn't support.
+        return $this->hasOne(VerificationIdentite::class, 'id_utilisateur')->latest('date_soumission');
+    }
+
+    public function administrateur()
+    {
+        return $this->hasOne(Administrateur::class, 'id_utilisateur');
     }
 
     public function estHote(): bool
     {
-        return $this->role === RoleUtilisateur::HOTE;
+        return (bool) $this->est_hote;
+    }
+
+    public function estVoyageur(): bool
+    {
+        return (bool) $this->est_voyageur;
     }
 
     public function estHoteVerifie(): bool
     {
-        return $this->estHote() && $this->verificationIdentite?->estValidee();
+        return $this->estHote() && (bool) $this->verificationIdentite?->estValidee();
     }
 
     public function estAdmin(): bool
     {
-        return $this->role === RoleUtilisateur::ADMIN;
+        return $this->administrateur()->exists();
     }
 }

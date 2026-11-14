@@ -10,9 +10,9 @@ class ReservationResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id_reservation' => $this->getKey(),
             'statut' => $this->statut,
-            'prix_total' => $this->prix_total,
+            'montant_total' => $this->montant_total,
         ];
     }
 }
