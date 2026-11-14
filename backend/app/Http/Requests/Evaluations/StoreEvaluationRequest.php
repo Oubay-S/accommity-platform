@@ -10,7 +10,7 @@ class StoreEvaluationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reservation_id' => ['required', 'exists:reservations,id'],
+            'reservation_id' => ['required', 'exists:reservations,id_reservation'],
             'note_globale' => ['required', 'integer', 'min:1', 'max:5'],
             'commentaire' => ['required', 'string', 'min:10'],
         ];

@@ -10,7 +10,7 @@ class StoreReservationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'annonce_id' => ['required', 'exists:annonces,id'],
+            'annonce_id' => ['required', 'exists:annonces,id_annonce'],
             'date_arrivee' => ['required', 'date', 'after:today'],
             'date_depart' => ['required', 'date', 'after:date_arrivee'],
             'nombre_voyageurs' => ['required', 'integer', 'min:1'],
