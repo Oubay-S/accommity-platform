@@ -4,11 +4,12 @@ namespace App\Models\Administration;
 
 use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Administrateur extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
 
     protected $table = 'administrateurs';
     protected $primaryKey = 'id_admin';

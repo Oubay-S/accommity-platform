@@ -4,13 +4,14 @@ namespace App\Models\Utilisateurs;
 
 use App\Models\Administration\Administrateur;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasUuids, Notifiable;
+    use HasApiTokens, HasFactory, HasUuids, Notifiable;
 
     protected $table = 'utilisateurs';
     protected $primaryKey = 'id_utilisateur';
@@ -54,6 +55,12 @@ class User extends Authenticatable
         return $this->hasOne(VerificationIdentite::class, 'id_utilisateur')->latest('date_soumission');
     }
 
+    /** Toutes les demandes de vérification (historique). */
+    public function verifications()
+    {
+        return $this->hasMany(VerificationIdentite::class, 'id_utilisateur');
+    }
+
     public function administrateur()
     {
         return $this->hasOne(Administrateur::class, 'id_utilisateur');
@@ -71,7 +78,13 @@ class User extends Authenticatable
 
     public function estHoteVerifie(): bool
     {
-        return $this->estHote() && (bool) $this->verificationIdentite?->estValidee();
+        // RG03 : l'hôte est vérifié dès qu'au moins une de ses demandes a été
+        // validée. Se fier à la « dernière » demande serait faux : après une
+        // nouvelle soumission (ou en cas d'égalité de date_soumission), un
+        // dossier en cours masquerait une validation déjà acquise.
+        return $this->estHote() && $this->verifications()
+            ->where('statut', VerificationIdentite::STATUT_VALIDEE)
+            ->exists();
     }
 
     public function estAdmin(): bool

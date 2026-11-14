@@ -3,11 +3,18 @@
 namespace App\Models\Utilisateurs;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class VerificationIdentite extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
+
+    public const STATUT_EN_COURS = 'en_cours';
+
+    public const STATUT_VALIDEE = 'validee';
+
+    public const STATUT_REJETEE = 'rejetee';
 
     protected $table = 'verification_identites';
     protected $primaryKey = 'id_verification';
@@ -22,6 +29,6 @@ class VerificationIdentite extends Model
 
     public function estValidee(): bool
     {
-        return $this->statut === 'validee';
+        return $this->statut === self::STATUT_VALIDEE;
     }
 }

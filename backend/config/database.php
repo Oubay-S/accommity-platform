@@ -39,9 +39,9 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            // Pas d'options PDO spécifiques : le projet utilise PostgreSQL.
+            // (Référencer PDO::MYSQL_ATTR_SSL_CA est déprécié sur PHP 8.5.)
+            'options' => [],
         ],
     ],
     'migrations' => [
