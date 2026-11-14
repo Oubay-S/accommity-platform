@@ -6,11 +6,12 @@ use App\Enums\ModeReservation;
 use App\Enums\StatutAnnonce;
 use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Annonce extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
 
     protected $table = 'annonces';
     protected $primaryKey = 'id_annonce';

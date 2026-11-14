@@ -72,6 +72,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Notifications (in-app)
     Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/non-lues', [NotificationController::class, 'compterNonLues']);
+    Route::put('/notifications/tout-lu', [NotificationController::class, 'marquerToutesCommeLues']);
     Route::put('/notifications/{id}/lue', [NotificationController::class, 'marquerCommeLue']);
 
     // ── 4. Espace Hôte Vérifié (RG03, RG06, RG07, RG08, RG13) ──

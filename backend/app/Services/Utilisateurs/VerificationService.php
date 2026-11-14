@@ -5,6 +5,7 @@ namespace App\Services\Utilisateurs;
 use App\Exceptions\ApiException;
 use App\Models\Utilisateurs\User;
 use App\Models\Utilisateurs\VerificationIdentite;
+use App\Services\Notifications\NotificationService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class VerificationService
 {
+    public function __construct(protected NotificationService $notifications) {}
     /**
      * @param  array{type_piece:string}  $data
      */
@@ -83,7 +85,12 @@ class VerificationService
             'date_traitement' => now(),
         ]);
 
-        return $verification->refresh();
+        $verification->refresh();
+
+        // RG03 / RO06 : notifier l'hôte (in-app + email).
+        $this->notifications->identiteTraitee($verification);
+
+        return $verification;
     }
 
     public function rejeter(string $verificationId, string $motif, User $administrateur): VerificationIdentite
@@ -103,7 +110,12 @@ class VerificationService
             'date_traitement' => now(),
         ]);
 
-        return $verification->refresh();
+        $verification->refresh();
+
+        // RG03 / RO06 : notifier l'hôte du rejet et de son motif.
+        $this->notifications->identiteTraitee($verification);
+
+        return $verification;
     }
 
     /** Téléchargement sécurisé du document (endpoint admin uniquement). */

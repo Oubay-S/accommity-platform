@@ -8,6 +8,7 @@ use App\Models\Utilisateurs\VerificationIdentite;
 use App\Services\Utilisateurs\VerificationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -24,6 +25,7 @@ class VerificationIdentiteTest extends TestCase
 
         Storage::fake('local');
         Storage::fake('public');
+        Mail::fake();
     }
 
     private function service(): VerificationService
@@ -125,6 +127,14 @@ class VerificationIdentiteTest extends TestCase
         $this->assertNotNull($validee->date_traitement);
         $this->assertNull($validee->motif_rejet);
         $this->assertTrue($hote->fresh()->estHoteVerifie());
+
+        // RG03 / RO06 : l'hôte reçoit une notification in-app.
+        $this->assertDatabaseHas('notifications', [
+            'id_utilisateur' => $hote->getKey(),
+            'type_alerte' => 'systeme',
+            'titre' => 'Identité vérifiée',
+            'est_lue' => false,
+        ]);
     }
 
     public function test_valider_exige_un_administrateur(): void
@@ -169,6 +179,12 @@ class VerificationIdentiteTest extends TestCase
         $this->assertSame('rejetee', $rejetee->statut);
         $this->assertSame('Photo floue, merci de renvoyer le document.', $rejetee->motif_rejet);
         $this->assertFalse($hote->fresh()->estHoteVerifie());
+
+        $this->assertDatabaseHas('notifications', [
+            'id_utilisateur' => $hote->getKey(),
+            'type_alerte' => 'systeme',
+            'titre' => 'Vérification d\'identité rejetée',
+        ]);
     }
 
     public function test_une_resoumission_est_possible_apres_un_rejet(): void
