@@ -27,6 +27,14 @@ class VerificationIdentite extends Model
         'chemin_document', 'id_admin_traitant', 'date_traitement',
     ];
 
+    /** Le document d'identité n'est accessible qu'à l'administrateur (loi 09-08). */
+    protected $hidden = ['chemin_document'];
+
+    protected $casts = [
+        'date_traitement' => 'datetime',
+        'date_soumission' => 'datetime',
+    ];
+
     public function estValidee(): bool
     {
         return $this->statut === self::STATUT_VALIDEE;

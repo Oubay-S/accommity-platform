@@ -2,10 +2,15 @@
 
 namespace App\Repositories\Interfaces;
 
+use App\Models\Utilisateurs\User;
+
 interface UserRepositoryInterface
 {
-    public function findById(string $id);
-    public function findByEmail(string $email);
-    public function create(array $data);
-    public function update(string $id, array $data);
+    public function findById(string $id): ?User;
+
+    public function findByEmail(string $email): ?User;
+
+    public function create(array $data): User;
+
+    public function update(string $id, array $data): User;
 }
