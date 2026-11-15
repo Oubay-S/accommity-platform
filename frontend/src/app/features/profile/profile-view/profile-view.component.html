@@ -1,3 +1,134 @@
-<div class="profile-view-page">
-  <h2>Profile View</h2>
-</div>
+@if (user(); as u) {
+  <div class="container page">
+    <div class="page-head">
+      <span class="eyebrow">Mon compte</span>
+      <h1>Mon Profil</h1>
+      <p class="muted">Vos informations personnelles et votre statut de confiance sur Accommity.</p>
+    </div>
+
+    <div class="profile-layout">
+      <nav class="side-nav">
+        <a routerLink="/profil" routerLinkActive="side-nav__item--active" [routerLinkActiveOptions]="{ exact: true }" class="side-nav__item">
+          <span class="icon">person</span> Informations personnelles
+        </a>
+        <a routerLink="/profil/modifier" routerLinkActive="side-nav__item--active" class="side-nav__item">
+          <span class="icon">edit</span> Modifier mon profil
+        </a>
+        <a routerLink="/profil/verification-identite" routerLinkActive="side-nav__item--active" class="side-nav__item">
+          <span class="icon">verified_user</span> Vérification d'identité
+        </a>
+        <a routerLink="/notifications" routerLinkActive="side-nav__item--active" class="side-nav__item">
+          <span class="icon">notifications</span> Notifications
+        </a>
+        @if (isAdmin()) {
+          <a routerLink="/admin" routerLinkActive="side-nav__item--active" class="side-nav__item">
+            <span class="icon">admin_panel_settings</span> Administration
+          </a>
+        }
+      </nav>
+
+      <div class="profile-main">
+        <section class="card profile-hero">
+          <span class="avatar avatar--lg">
+            @if (u.profil?.photo_url) {
+              <img [src]="u.profil?.photo_url" [alt]="fullName()" />
+            } @else {
+              {{ initials() }}
+            }
+          </span>
+
+          <div class="profile-hero__meta">
+            <h2 class="profile-hero__name">{{ fullName() }}</h2>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap">
+              @if (u.est_admin) {
+                <span class="badge badge--clay">Administrateur</span>
+              } @else if (u.est_hote) {
+                <span class="badge">{{ u.est_hote_verifie ? 'Hôte vérifié' : 'Hôte' }}</span>
+              } @else {
+                <span class="badge">Voyageur</span>
+              }
+              @if (u.profil && u.profil.note_moyenne > 0) {
+                <span class="badge badge--warning">
+                  <span class="icon icon--sm icon--filled">star</span>
+                  {{ u.profil.note_moyenne.toFixed(2) }}
+                </span>
+              }
+            </div>
+            <p class="muted small">Membre depuis {{ memberSince() }}</p>
+          </div>
+
+          <div class="profile-hero__actions">
+            <a routerLink="/profil/modifier" class="btn btn--dark">
+              <span class="icon icon--sm">edit</span> Modifier
+            </a>
+          </div>
+        </section>
+
+        <section class="card section">
+          <div class="section__head">
+            <h3 class="section__title"><span class="icon">badge</span> Informations personnelles</h3>
+            <p class="section__desc">Ces informations apparaissent sur vos contrats de séjour et vos fiches d'accueil.</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <span class="field__label">Prénom</span>
+              <div class="field__input" style="background: var(--surface-subdued)">{{ u.prenom }}</div>
+            </div>
+            <div class="field">
+              <span class="field__label">Nom de famille</span>
+              <div class="field__input" style="background: var(--surface-subdued)">{{ u.nom }}</div>
+            </div>
+            <div class="field">
+              <span class="field__label">Adresse e-mail</span>
+              <div class="field__input" style="background: var(--surface-subdued)">{{ u.email }}</div>
+            </div>
+            <div class="field">
+              <span class="field__label">Numéro de téléphone</span>
+              <div class="field__input" style="background: var(--surface-subdued)">{{ u.telephone || 'Non renseigné' }}</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card section">
+          <div class="section__head">
+            <h3 class="section__title"><span class="icon">menu_book</span> Biographie &amp; philosophie d'accueil</h3>
+            <p class="section__desc">Une présentation soignée inspire confiance aux voyageurs.</p>
+          </div>
+          <p [style.color]="u.profil?.description ? 'var(--ink)' : 'var(--muted)'">
+            {{ u.profil?.description || "Vous n'avez pas encore renseigné de biographie." }}
+          </p>
+        </section>
+
+        <section class="card section">
+          <div class="section__head">
+            <h3 class="section__title"><span class="icon">verified_user</span> Vérification d'identité</h3>
+            <p class="section__desc">Obligatoire pour publier des annonces (RG03).</p>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap">
+            <span [class]="verificationClass()">{{ verificationLabel() }}</span>
+            <a routerLink="/profil/verification-identite" class="btn btn--ghost btn--sm">
+              Voir le dossier <span class="icon icon--sm">arrow_forward</span>
+            </a>
+          </div>
+
+          @if (verification()?.motif_rejet) {
+            <div class="alert alert--danger" style="margin-top: 1rem">
+              <span class="icon icon--sm">priority_high</span>
+              <span>{{ verification()?.motif_rejet }}</span>
+            </div>
+          }
+        </section>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="container page">
+    <div class="empty-state">
+      <span class="icon">person_off</span>
+      <strong>Session indisponible</strong>
+      <span>Veuillez vous reconnecter pour consulter votre profil.</span>
+    </div>
+  </div>
+}

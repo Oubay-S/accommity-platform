@@ -3,11 +3,12 @@
 namespace App\Models\Annonces;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PolitiqueAnnulation extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
 
     protected $table = 'politique_annulations';
     protected $primaryKey = 'id_politique';

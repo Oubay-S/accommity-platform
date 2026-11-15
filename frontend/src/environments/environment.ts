@@ -1,4 +1,8 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8000/api'
+  /**
+   * En développement, `/api` est proxifié vers l'API Laravel par le dev-server
+   * Angular (voir proxy.conf.json) : pas de CORS, pas de port en dur.
+   */
+  apiUrl: '/api'
 };

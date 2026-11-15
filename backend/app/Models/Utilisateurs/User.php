@@ -3,15 +3,16 @@
 namespace App\Models\Utilisateurs;
 
 use App\Models\Administration\Administrateur;
+use App\Models\Notifications\Notification;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasUuids, Notifiable;
+    use HasApiTokens, HasFactory, HasUuids;
 
     protected $table = 'utilisateurs';
     protected $primaryKey = 'id_utilisateur';
@@ -64,6 +65,17 @@ class User extends Authenticatable
     public function administrateur()
     {
         return $this->hasOne(Administrateur::class, 'id_utilisateur');
+    }
+
+    /**
+     * Notifications in-app de l'utilisateur.
+     *
+     * Remplace la relation polymorphique de Laravel (`notifiable_*`) :
+     * la table `notifications` du schéma v1 utilise `id_utilisateur`.
+     */
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class, 'id_utilisateur');
     }
 
     public function estHote(): bool

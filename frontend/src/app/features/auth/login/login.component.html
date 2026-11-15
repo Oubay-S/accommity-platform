@@ -1,3 +1,133 @@
-<div class="login-page">
-  <h2>Login</h2>
-</div>
+<section class="auth">
+  <aside class="auth__visual">
+    <a routerLink="/" class="auth__brand">
+      <span class="icon icon--lg">villa</span>
+      Accommity
+    </a>
+
+    <div class="auth__quote">
+      <span class="eyebrow" style="color: var(--cedar)">Morocco Escapes</span>
+      <h2>Réservez des riads historiques et villas privées au Maroc</h2>
+      <p>
+        Des demeures séculaires dans la Médina aux villas contemporaines avec vue
+        sur l'Atlas et appartements en front de mer.
+      </p>
+
+      <div class="auth__proof">
+        <span class="auth__proof-item"><span class="icon icon--sm">verified_user</span> Paiement sécurisé</span>
+        <span class="auth__proof-item"><span class="icon icon--sm">villa</span> Riads vérifiés</span>
+        <span class="auth__proof-item"><span class="icon icon--sm">support_agent</span> Assistance 24/7</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="auth__panel">
+    <div class="auth__card">
+      <div class="auth__tabs">
+        <span class="auth__tab auth__tab--active">
+          <span class="icon">lock_open</span> Connexion
+        </span>
+        <a routerLink="/auth/register" class="auth__tab">
+          <span class="icon">person_add</span> Inscription
+        </a>
+      </div>
+
+      <div class="auth__head">
+        <span class="eyebrow">Espace membre</span>
+        <h1>Rejoindre le cercle Accommity</h1>
+        <p>Accédez à vos réservations, vos coups de cœur et votre espace hôte.</p>
+      </div>
+
+      @if (error()) {
+        <div class="alert alert--danger" style="margin-bottom: 1.25rem">
+          <span class="icon icon--sm">error</span>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <form class="auth__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field" [class.field--invalid]="email.invalid && (email.touched || submitted())">
+          <label class="field__label" for="login-email">Adresse e-mail</label>
+          <div class="input-wrap">
+            <input
+              id="login-email"
+              class="field__input"
+              type="email"
+              formControlName="email"
+              placeholder="amina.elalami@example.com"
+              autocomplete="email"
+            />
+          </div>
+          @if (email.hasError('server')) {
+            <span class="field__error">{{ email.getError('server') }}</span>
+          } @else if ((email.touched || submitted()) && email.hasError('required')) {
+            <span class="field__error">L'adresse e-mail est requise.</span>
+          } @else if ((email.touched || submitted()) && email.hasError('email')) {
+            <span class="field__error">Adresse e-mail invalide.</span>
+          }
+        </div>
+
+        <div class="field" [class.field--invalid]="password.invalid && (password.touched || submitted())">
+          <label class="field__label" for="login-password">Mot de passe</label>
+          <div class="input-wrap">
+            <input
+              id="login-password"
+              class="field__input"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="••••••••••••"
+              autocomplete="current-password"
+            />
+            <button
+              type="button"
+              class="input-wrap__action"
+              (click)="togglePassword()"
+              [attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+            >
+              <span class="icon icon--sm">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          @if (password.hasError('server')) {
+            <span class="field__error">{{ password.getError('server') }}</span>
+          } @else if ((password.touched || submitted()) && password.hasError('required')) {
+            <span class="field__error">Le mot de passe est requis.</span>
+          }
+        </div>
+
+        <div class="auth__row">
+          <label class="checkbox">
+            <input type="checkbox" formControlName="remember" />
+            Se souvenir de moi
+          </label>
+          <button type="button" class="link-btn" (click)="forgotPassword()">Mot de passe oublié ?</button>
+        </div>
+
+        <button type="submit" class="btn btn--primary btn--block" [disabled]="loading()">
+          @if (loading()) {
+            Connexion…
+          } @else {
+            Se connecter
+            <span class="icon icon--sm">arrow_forward</span>
+          }
+        </button>
+      </form>
+
+      <div class="auth__divider">ou continuer avec</div>
+
+      <div class="auth__social">
+        <button type="button" class="auth__social-btn" disabled title="Bientôt disponible">Google</button>
+        <button type="button" class="auth__social-btn" disabled title="Bientôt disponible">Apple</button>
+      </div>
+
+      <p class="auth__foot">
+        Pas encore de compte ?
+        <a routerLink="/auth/register" style="color: var(--clay); font-weight: 600">Créer mon compte</a>
+      </p>
+
+      <p class="auth__legal" style="margin-top: 1rem; display: flex; gap: 0.4rem; align-items: flex-start">
+        <span class="icon icon--sm" style="color: var(--muted-2)">verified_user</span>
+        Accès protégé — vos données sont traitées conformément à la loi marocaine n° 09-08 (CNDP).
+      </p>
+    </div>
+  </div>
+</section>

@@ -1,9 +1,20 @@
+import { Pagination } from './api-response.model';
+
+export type TypeAlerte = 'reservation' | 'paiement' | 'avis' | 'rappel' | 'systeme';
+
 export interface Notification {
-  id: number;
-  type: string;
+  id_notification: string;
   titre: string;
-  message: string;
-  data?: any;
+  contenu: string;
+  type_alerte: TypeAlerte;
   est_lue: boolean;
-  created_at: string;
+  date_creation: string | null;
+  id_reservation: string | null;
+  data: Record<string, unknown> | null;
+}
+
+export interface NotificationPage {
+  items: Notification[];
+  pagination: Pagination;
+  non_lues: number;
 }

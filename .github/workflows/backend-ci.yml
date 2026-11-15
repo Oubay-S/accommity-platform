@@ -64,4 +64,4 @@ jobs:
           DB_DATABASE: accommity_test
           DB_USERNAME: postgres
           DB_PASSWORD: password
-        run: cd backend && ./vendor/bin/phpunit || echo "Tests pending implementation"
+        run: cd backend && ./vendor/bin/phpunit

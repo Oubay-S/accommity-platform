@@ -1,3 +1,245 @@
-<div class="verifications-management-page">
-  <h2>Verifications Management</h2>
+<div class="admin-page">
+  <div class="admin-page__head">
+    <div>
+      <span class="eyebrow">Portail Admin</span>
+      <h1>Validation des identités</h1>
+      <p class="muted" style="margin-top: 0.35rem">
+        Audit en cours :
+        <strong>{{ stats().en_cours }}</strong>
+        dossier{{ stats().en_cours > 1 ? 's' : '' }} prioritaire{{ stats().en_cours > 1 ? 's' : '' }}.
+      </p>
+    </div>
+
+    <button type="button" class="btn btn--ghost btn--sm" (click)="exportCsv()" [disabled]="items().length === 0">
+      <span class="icon icon--sm">file_download</span> Exporter
+    </button>
+  </div>
+
+  <div class="admin-tabs">
+    @for (tab of tabs; track tab.key) {
+      <button
+        type="button"
+        class="admin-tab"
+        [class.admin-tab--active]="filter() === tab.key"
+        (click)="selectFilter(tab.key)"
+      >
+        {{ tab.label }}
+        <span class="admin-tab__count">{{ countFor(tab.key) }}</span>
+      </button>
+    }
+  </div>
+
+  <div class="admin-toolbar">
+    <div class="input-wrap admin-search">
+      <span class="icon icon--sm">search</span>
+      <input
+        class="field__input"
+        type="search"
+        placeholder="Rechercher un hôte (nom, email)…"
+        [value]="recherche()"
+        (input)="onSearch($any($event.target).value)"
+      />
+    </div>
+    <span class="small muted">{{ total() }} dossier{{ total() > 1 ? 's' : '' }}</span>
+  </div>
+
+  @if (loading()) {
+    <div class="admin-card admin-loading">Chargement des dossiers…</div>
+  } @else if (items().length === 0) {
+    <div class="admin-card">
+      <div class="empty-state">
+        <span class="icon">fact_check</span>
+        <strong>Aucun dossier dans cette catégorie</strong>
+        <span>
+          @if (recherche()) {
+            Aucun résultat pour « {{ recherche() }} ».
+          } @else {
+            Les nouvelles demandes de vérification apparaîtront ici.
+          }
+        </span>
+      </div>
+    </div>
+  } @else {
+    <div class="admin-card">
+      <div class="admin-table">
+        <div class="admin-table__head">
+          <span>Hôte &amp; contact</span>
+          <span>Pièce fournie</span>
+          <span>Soumission</span>
+          <span>Statut</span>
+          <span></span>
+        </div>
+
+        @for (item of items(); track item.id_verification) {
+          <div class="admin-table__row" [class.admin-table__row--selected]="selected()?.id_verification === item.id_verification">
+            <div class="admin-user">
+              <span class="avatar">{{ initials(item) }}</span>
+              <span style="min-width: 0">
+                <strong>{{ fullName(item) }}</strong>
+                <span class="admin-user__meta">{{ item.utilisateur?.email }}</span>
+              </span>
+            </div>
+
+            <div>
+              <span class="badge">{{ pieceLabel(item.type_piece) }}</span>
+              @if (!item.document_disponible) {
+                <span class="admin-user__meta">Document indisponible</span>
+              }
+            </div>
+
+            <div>
+              <strong class="small">{{ timeAgo(item.date_soumission) }}</strong>
+              <span class="admin-user__meta">{{ formatDate(item.date_soumission) }}</span>
+            </div>
+
+            <div>
+              <span [class]="statutClass(item.statut)">{{ statutLabel(item.statut) }}</span>
+            </div>
+
+            <div style="text-align: right">
+              <button type="button" class="btn btn--ghost btn--sm" (click)="open(item)">
+                Examiner
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="admin-pagination">
+        <button type="button" class="btn btn--icon" (click)="goTo(page() - 1)" [disabled]="page() <= 1" aria-label="Page précédente">
+          <span class="icon icon--sm">chevron_left</span>
+        </button>
+        <span class="small muted">Page {{ page() }} / {{ lastPage() }}</span>
+        <button type="button" class="btn btn--icon" (click)="goTo(page() + 1)" [disabled]="page() >= lastPage()" aria-label="Page suivante">
+          <span class="icon icon--sm">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  }
 </div>
+
+@if (selected(); as dossier) {
+  <div class="admin-drawer-backdrop" (click)="close()"></div>
+
+  <aside class="admin-drawer" role="dialog" aria-modal="true" [attr.aria-label]="'Dossier de ' + fullName(dossier)">
+    <header class="admin-drawer__head">
+      <div>
+        <span class="eyebrow">Dossier d'audit</span>
+        <h2>{{ fullName(dossier) }}</h2>
+        <span [class]="statutClass(dossier.statut)">{{ statutLabel(dossier.statut) }}</span>
+      </div>
+      <button type="button" class="btn btn--icon" (click)="close()" aria-label="Fermer">
+        <span class="icon">close</span>
+      </button>
+    </header>
+
+    <div class="admin-drawer__body">
+      <div class="admin-facts">
+        <div>
+          <span>Email</span>
+          <strong>{{ dossier.utilisateur?.email || '—' }}</strong>
+        </div>
+        <div>
+          <span>Téléphone</span>
+          <strong>{{ dossier.utilisateur?.telephone || '—' }}</strong>
+        </div>
+        <div>
+          <span>Pièce</span>
+          <strong>{{ pieceLabel(dossier.type_piece) }}</strong>
+        </div>
+        <div>
+          <span>Soumis le</span>
+          <strong>{{ formatDate(dossier.date_soumission) }}</strong>
+        </div>
+      </div>
+
+      <div class="admin-doc">
+        <div class="admin-doc__head">
+          <strong>Document d'identité</strong>
+          <button type="button" class="btn btn--ghost btn--sm" (click)="download()" [disabled]="!documentSrc()">
+            <span class="icon icon--sm">download</span> Télécharger
+          </button>
+        </div>
+
+        @if (documentLoading()) {
+          <div class="admin-doc__empty">Chargement du document…</div>
+        } @else {
+          @if (documentSrc(); as src) {
+            <iframe class="admin-doc__frame" [src]="src" title="Document d'identité de l'hôte"></iframe>
+          } @else {
+            <div class="admin-doc__empty">
+              <span class="icon" style="font-size: 28px; color: var(--muted-2)">visibility_off</span>
+              <p>Document indisponible.</p>
+            </div>
+          }
+        }
+      </div>
+
+      @if (dossier.statut === 'rejetee' && dossier.motif_rejet) {
+        <div class="alert alert--danger">
+          <span class="icon icon--sm">block</span>
+          <span><strong>Motif du rejet :</strong> {{ dossier.motif_rejet }}</span>
+        </div>
+      }
+
+      @if (dossier.statut === 'en_cours' && confirmingValidation()) {
+        <div class="alert alert--success" style="justify-content: space-between; flex-wrap: wrap">
+          <span>Confirmer la validation de cette identité ? L'hôte sera notifié.</span>
+          <span style="display: flex; gap: 0.5rem">
+            <button type="button" class="btn btn--ghost btn--sm" (click)="cancelValidation()">Annuler</button>
+            <button type="button" class="btn btn--primary btn--sm" (click)="confirmValidation()" [disabled]="submitting()">
+              {{ submitting() ? 'Validation…' : 'Oui, valider' }}
+            </button>
+          </span>
+        </div>
+      }
+
+      @if (dossier.statut === 'en_cours' && rejectionOpen()) {
+        <div class="admin-reject">
+          <strong class="small">Motif du rejet (obligatoire)</strong>
+
+          <div class="admin-chips">
+            @for (preset of motifPresets; track preset) {
+              <button type="button" class="chip" [class.chip--active]="motif() === preset" (click)="usePreset(preset)">
+                {{ preset }}
+              </button>
+            }
+          </div>
+
+          <textarea
+            class="admin-reject__text"
+            rows="4"
+            placeholder="Précisez le motif notifié à l'hôte (SMS et email)…"
+            [value]="motif()"
+            (input)="motif.set($any($event.target).value)"
+          ></textarea>
+
+          <div class="admin-reject__actions">
+            <button type="button" class="btn btn--ghost btn--sm" (click)="rejectionOpen.set(false)">Annuler</button>
+            <button type="button" class="btn btn--danger btn--sm" (click)="confirmRejection()" [disabled]="submitting()">
+              {{ submitting() ? 'Rejet…' : 'Confirmer le rejet' }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <footer class="admin-drawer__foot">
+      @if (dossier.statut === 'en_cours') {
+        <button type="button" class="btn btn--danger" (click)="openRejection()">
+          <span class="icon icon--sm">block</span> Rejeter le dossier
+        </button>
+        <button type="button" class="btn btn--primary" (click)="askValidation()">
+          <span class="icon icon--sm">verified_user</span> Valider l'identité
+        </button>
+      } @else {
+        <span class="small muted" style="margin-right: auto">
+          @if (dossier.date_traitement) {
+            Traité le {{ formatDate(dossier.date_traitement) }}
+          }
+        </span>
+        <button type="button" class="btn btn--ghost" (click)="close()">Fermer</button>
+      }
+    </footer>
+  </aside>
+}

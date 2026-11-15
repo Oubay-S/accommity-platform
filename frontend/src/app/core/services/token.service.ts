@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class TokenService {
   private readonly TOKEN_KEY = 'accommity_auth_token';
 
@@ -12,6 +10,10 @@ export class TokenService {
 
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  hasToken(): boolean {
+    return !!this.getToken();
   }
 
   removeToken(): void {

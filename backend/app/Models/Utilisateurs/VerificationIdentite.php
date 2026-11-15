@@ -2,9 +2,11 @@
 
 namespace App\Models\Utilisateurs;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VerificationIdentite extends Model
 {
@@ -38,5 +40,25 @@ class VerificationIdentite extends Model
     public function estValidee(): bool
     {
         return $this->statut === self::STATUT_VALIDEE;
+    }
+
+    public function utilisateur(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_utilisateur');
+    }
+
+    public function scopeEnCours(Builder $query): Builder
+    {
+        return $query->where('statut', self::STATUT_EN_COURS);
+    }
+
+    public function scopeValidees(Builder $query): Builder
+    {
+        return $query->where('statut', self::STATUT_VALIDEE);
+    }
+
+    public function scopeRejetees(Builder $query): Builder
+    {
+        return $query->where('statut', self::STATUT_REJETEE);
     }
 }

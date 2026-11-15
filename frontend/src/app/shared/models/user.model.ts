@@ -1,43 +1,74 @@
-export interface User {
-  id: number;
-  nom: string;
-  prenom: string;
-  email: string;
-  telephone?: string;
-  role: 'voyageur' | 'hote' | 'admin';
-  is_actif: boolean;
-  is_hote_verifie?: boolean;
-  profil?: Profil;
-}
+export type UserRole = 'voyageur' | 'hote' | 'admin';
+
+export type VerificationStatut = 'en_cours' | 'validee' | 'rejetee';
+
+export type TypePiece = 'cin' | 'passeport';
 
 export interface Profil {
-  id: number;
-  photo_url?: string;
-  bio?: string;
-  adresse?: string;
-  ville?: string;
-  pays?: string;
+  id_profil: string;
+  photo_url: string | null;
+  description: string | null;
+  note_moyenne: number;
 }
 
 export interface VerificationIdentite {
-  id: number;
-  type_document: 'cin' | 'passeport';
-  numero_document: string;
-  document_url: string;
-  statut: 'en_attente' | 'validee' | 'rejetee';
-  motif_rejet?: string;
+  id_verification: string;
+  type_piece: TypePiece;
+  statut: VerificationStatut;
+  date_soumission: string | null;
+  date_traitement: string | null;
+  motif_rejet: string | null;
 }
 
-export interface LoginCredentials {
+export interface User {
+  id_utilisateur: string;
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone: string | null;
+  role: UserRole;
+  est_hote: boolean;
+  est_voyageur: boolean;
+  est_admin: boolean;
+  est_actif: boolean;
+  est_hote_verifie: boolean;
+  date_creation: string | null;
+  profil?: Profil | null;
+  verification_identite?: VerificationIdentite | null;
+}
+
+export interface LoginPayload {
   email: string;
   password: string;
 }
 
-export interface RegisterData {
+export interface RegisterPayload {
   nom: string;
   prenom: string;
   email: string;
   password: string;
   password_confirmation: string;
+  telephone?: string | null;
   role: 'voyageur' | 'hote';
+  description?: string | null;
+}
+
+export interface AuthData {
+  user: User;
+  token: string;
+  token_type: string;
+}
+
+export interface UpdateProfilPayload {
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone: string | null;
+  description: string | null;
+}
+
+export interface ChangePasswordPayload {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
 }

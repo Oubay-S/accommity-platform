@@ -45,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('profil')->group(function () {
         Route::get('/', [ProfilController::class, 'show']);
         Route::put('/', [ProfilController::class, 'update']);
+        Route::put('/password', [ProfilController::class, 'changerMotDePasse']);
         Route::post('/photo', [ProfilController::class, 'uploadPhoto']);
         Route::post('/verification', [VerificationIdentiteController::class, 'submit']);
         Route::get('/verification/statut', [VerificationIdentiteController::class, 'status']);
@@ -72,6 +73,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Notifications (in-app)
     Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/non-lues', [NotificationController::class, 'compterNonLues']);
+    Route::put('/notifications/tout-lu', [NotificationController::class, 'marquerToutesCommeLues']);
     Route::put('/notifications/{id}/lue', [NotificationController::class, 'marquerCommeLue']);
 
     // ── 4. Espace Hôte Vérifié (RG03, RG06, RG07, RG08, RG13) ──
@@ -96,6 +99,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users', [AdminUserController::class, 'index']);
         Route::put('/users/{id}/toggle-actif', [AdminUserController::class, 'toggleActif']);
         Route::get('/verifications', [AdminUserController::class, 'verifications']);
+        Route::get('/verifications/{id}/document', [AdminUserController::class, 'document']);
         Route::put('/verifications/{id}/valider', [AdminUserController::class, 'validerVerification']);
         Route::put('/verifications/{id}/rejeter', [AdminUserController::class, 'rejeterVerification']);
 

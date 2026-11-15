@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\ApiException;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -86,6 +87,18 @@ return Application::configure(basePath: dirname(__DIR__))
                 'Ressource introuvable.',
                 404,
                 errorCode: 'INTROUVABLE',
+            );
+        });
+
+        $exceptions->render(function (ApiException $e, Request $request) use ($isApi) {
+            if (! $isApi($request)) {
+                return null;
+            }
+
+            return ApiResponse::error(
+                $e->getMessage(),
+                $e->getStatusCode(),
+                errorCode: $e->apiCode,
             );
         });
 
