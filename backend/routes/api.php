@@ -26,8 +26,8 @@ use App\Http\Controllers\Admin\AdminLitigeController;
 
 // ── 1. Authentification Publique (RG01, RG02) ──
 Route::prefix('auth')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 });
 
 // ── 2. Annonces Publiques & Recherche (RG10, RG11) ──
