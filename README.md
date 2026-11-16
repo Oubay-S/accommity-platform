@@ -74,12 +74,12 @@ accommity-platform/
 git clone https://github.com/Oubay-S/accommity-platform.git
 cd accommity-platform
 
-# Lancer tous les conteneurs (Backend, Frontend, PostgreSQL, pgAdmin, Nginx)
+# Lancer tous les conteneurs (Backend, Frontend, PostgreSQL, Nginx)
 docker-compose up -d --build
 ```
 - Frontend Angular : `http://localhost:4200`
 - API Laravel : `http://localhost:8000/api`
-- pgAdmin : `http://localhost:8080` (identifiants: `admin@accommity.ma` / `admin`)
+- PostgreSQL : `localhost:5433` (exposé sur le port hôte 5433)
 
 ### Sans Docker (Développement local) :
 **Backend :**
