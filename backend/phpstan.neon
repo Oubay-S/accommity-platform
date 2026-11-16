@@ -1,0 +1,13 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app/
+        - routes/
+        - database/migrations/
+
+    # Level 5 checks types, undefined methods, and incorrect parameters
+    level: 5
+
+    ignoreErrors: []

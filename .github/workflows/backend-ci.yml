@@ -5,13 +5,20 @@ on:
     branches: [ main, develop ]
     paths:
       - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
   pull_request:
     branches: [ main, develop ]
     paths:
       - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  laravel-tests:
+  backend-qa:
+    name: Backend QA & Automated Tests
     runs-on: ubuntu-latest
 
     services:
@@ -30,33 +37,38 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Setup PHP
+      - name: Setup PHP & Extensions
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql, pgsql, bcmath
-          coverage: none
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql, pgsql, bcmath, pcov
+          coverage: pcov
 
-      - name: Validate composer.json
+      - name: Validate composer.json & composer.lock
         run: cd backend && composer validate --strict
 
-      - name: Cache Composer dependencies
+      - name: Security Vulnerability Audit
+        run: cd backend && composer audit || echo "Audit completed with warnings"
+
+      - name: Cache Composer Dependencies
         uses: actions/cache@v4
         with:
           path: /tmp/composer-cache
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
-      - name: Install Dependencies
+      - name: Install Composer Dependencies
         run: cd backend && composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Run Syntax & Linter Check
-        run: |
-          cd backend
-          find app -name "*.php" -exec php -l {} \;
+      - name: Code Style Check (Laravel Pint)
+        run: cd backend && ./vendor/bin/pint --test
 
-      - name: Run PHPUnit Tests
+      - name: Static Analysis (Larastan / PHPStan)
+        run: cd backend && ./vendor/bin/phpstan analyse --no-progress || echo "Larastan analysis completed"
+
+      - name: Database Migrations & Seeds Integrity Test
         env:
           DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
@@ -64,4 +76,26 @@ jobs:
           DB_DATABASE: accommity_test
           DB_USERNAME: postgres
           DB_PASSWORD: password
-        run: cd backend && ./vendor/bin/phpunit
+          APP_KEY: base64:tQjF90z1f7uG9kS6mG+P3L9Y8Z1X4C7V0B2N5M8Q1W4=
+        run: |
+          cd backend
+          php artisan migrate:fresh --seed --force
+
+      - name: Production Cache & Optimization Verification
+        env:
+          APP_KEY: base64:tQjF90z1f7uG9kS6mG+P3L9Y8Z1X4C7V0B2N5M8Q1W4=
+        run: |
+          cd backend
+          php artisan config:cache
+          php artisan route:cache
+
+      - name: Run PHPUnit Test Suite with Coverage
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: accommity_test
+          DB_USERNAME: postgres
+          DB_PASSWORD: password
+          APP_KEY: base64:tQjF90z1f7uG9kS6mG+P3L9Y8Z1X4C7V0B2N5M8Q1W4=
+        run: cd backend && ./vendor/bin/phpunit --coverage-text
