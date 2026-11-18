@@ -13,5 +13,9 @@ class DatabaseSeeder extends Seeder
             CategoriesGeographiquesSeeder::class,
             PolitiquesAnnulationSeeder::class,
         ]);
+
+        if (app()->environment('local')) {
+            $this->call(AnnoncesDemoSeeder::class);
+        }
     }
 }
