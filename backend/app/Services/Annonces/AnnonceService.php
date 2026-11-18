@@ -21,10 +21,12 @@ class AnnonceService
 {
     public function __construct(protected AnnonceRepositoryInterface $annonceRepository) {}
 
-    public function rechercherAnnonces(array $criteres) { /* TODO */ }
+    public function rechercherAnnonces(array $criteres)
+    { /* TODO */
+    }
 
     /* --------------------------------------------------------------------- */
-    /* Espace hôte (RG06, RG07)                                              */
+    /* Espace hôte (RG06, RG07) */
     /* --------------------------------------------------------------------- */
 
     /**
@@ -211,7 +213,7 @@ class AnnonceService
     }
 
     /* --------------------------------------------------------------------- */
-    /* Catalogue public (Reda) — ne pas modifier                              */
+    /* Catalogue public (Reda) — ne pas modifier */
     /* --------------------------------------------------------------------- */
 
     // DS1 [PORTED]
@@ -230,7 +232,7 @@ class AnnonceService
     // Exception "Annonce non disponible ou inexistante.")
     public function getDetailsAnnonce(string $id): ?Annonce
     {
-        if (!Str::isUuid($id)) {
+        if (! Str::isUuid($id)) {
             return null; // évite une erreur SQL 500 sur la colonne uuid PostgreSQL
         }
         $annonce = $this->annonceRepository->findDetailsById($id);
@@ -270,7 +272,7 @@ class AnnonceService
     }
 
     /* --------------------------------------------------------------------- */
-    /* Helpers                                                               */
+    /* Helpers */
     /* --------------------------------------------------------------------- */
 
     private function chargerAnnonce(string $id): Annonce

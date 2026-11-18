@@ -59,7 +59,7 @@ class AnnonceController extends Controller
     public function show(string $id): JsonResponse
     {
         $annonce = $this->annonceService->getDetailsAnnonce($id);
-        if (!$annonce) {
+        if (! $annonce) {
             return ApiResponse::error('Annonce non disponible ou inexistante.', 404, null, 'ANNONCE_INTROUVABLE');
         }
 
@@ -93,7 +93,7 @@ class AnnonceController extends Controller
     {
         $annonce = $this->annonceService->getAnnonceHote($id, $request->user()->getKey());
 
-        if (!$annonce) {
+        if (! $annonce) {
             return ApiResponse::error('Annonce introuvable.', 404, null, 'ANNONCE_INTROUVABLE');
         }
 
@@ -124,7 +124,7 @@ class AnnonceController extends Controller
     {
         $annonce = $this->annonceService->getAnnoncePourGestion($id);
 
-        if (!$annonce) {
+        if (! $annonce) {
             return ApiResponse::error('Annonce introuvable.', 404, null, 'ANNONCE_INTROUVABLE');
         }
 
@@ -142,7 +142,7 @@ class AnnonceController extends Controller
     {
         $annonce = $this->annonceService->getAnnoncePourGestion($id);
 
-        if (!$annonce) {
+        if (! $annonce) {
             return ApiResponse::error('Annonce introuvable.', 404, null, 'ANNONCE_INTROUVABLE');
         }
 
@@ -157,7 +157,7 @@ class AnnonceController extends Controller
     {
         $annonce = $this->annonceService->getAnnoncePourGestion($id);
 
-        if (!$annonce) {
+        if (! $annonce) {
             return ApiResponse::error('Annonce introuvable.', 404, null, 'ANNONCE_INTROUVABLE');
         }
 
@@ -179,7 +179,7 @@ class AnnonceController extends Controller
 
         $annonce = $this->annonceService->getAnnoncePourGestion($id);
 
-        if (!$annonce) {
+        if (! $annonce) {
             return ApiResponse::error('Annonce introuvable.', 404, null, 'ANNONCE_INTROUVABLE');
         }
 

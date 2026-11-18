@@ -22,7 +22,7 @@ class AnnonceDetailResource extends JsonResource
             )),
             'politique_annulation' => $this->whenLoaded('politiqueAnnulation', function () {
                 $p = $this->politiqueAnnulation;
-                if (!$p) {
+                if (! $p) {
                     return null;
                 }
 
@@ -36,7 +36,7 @@ class AnnonceDetailResource extends JsonResource
             }),
             'hote' => $this->whenLoaded('hote', function () {
                 $h = $this->hote;
-                if (!$h) {
+                if (! $h) {
                     return null;
                 }
 

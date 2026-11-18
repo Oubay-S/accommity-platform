@@ -25,7 +25,7 @@ class CalendrierController extends Controller
     public function show(string $annonceId): JsonResponse
     {
         $annonce = $this->annonceService->getDetailsAnnonce($annonceId);
-        if (!$annonce) {
+        if (! $annonce) {
             return ApiResponse::error('Annonce non disponible ou inexistante.', 404, null, 'ANNONCE_INTROUVABLE');
         }
 
@@ -38,7 +38,7 @@ class CalendrierController extends Controller
     {
         $annonce = $this->annonceHote($request, $annonceId);
 
-        if (!$annonce) {
+        if (! $annonce) {
             return ApiResponse::error('Annonce introuvable.', 404, null, 'ANNONCE_INTROUVABLE');
         }
 
@@ -59,7 +59,7 @@ class CalendrierController extends Controller
     {
         $annonce = $this->annonceHote($request, $annonceId);
 
-        if (!$annonce) {
+        if (! $annonce) {
             return ApiResponse::error('Annonce introuvable.', 404, null, 'ANNONCE_INTROUVABLE');
         }
 
@@ -82,7 +82,7 @@ class CalendrierController extends Controller
     {
         $annonce = $this->annonceHote($request, $annonceId);
 
-        if (!$annonce) {
+        if (! $annonce) {
             return ApiResponse::error('Annonce introuvable.', 404, null, 'ANNONCE_INTROUVABLE');
         }
 

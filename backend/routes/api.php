@@ -1,22 +1,21 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Utilisateurs\UserController;
-use App\Http\Controllers\Utilisateurs\ProfilController;
-use App\Http\Controllers\Utilisateurs\VerificationIdentiteController;
-use App\Http\Controllers\Annonces\AnnonceController;
-use App\Http\Controllers\Annonces\CalendrierController;
-use App\Http\Controllers\Reservations\ReservationController;
-use App\Http\Controllers\Paiements\PaiementController;
-use App\Http\Controllers\Paiements\RemboursementController;
-use App\Http\Controllers\Evaluations\EvaluationController;
-use App\Http\Controllers\Notifications\NotificationController;
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminAnnonceController;
 use App\Http\Controllers\Admin\AdminAvisController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminLitigeController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Annonces\AnnonceController;
+use App\Http\Controllers\Annonces\CalendrierController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Evaluations\EvaluationController;
+use App\Http\Controllers\Notifications\NotificationController;
+use App\Http\Controllers\Paiements\PaiementController;
+use App\Http\Controllers\Paiements\RemboursementController;
+use App\Http\Controllers\Reservations\ReservationController;
+use App\Http\Controllers\Utilisateurs\ProfilController;
+use App\Http\Controllers\Utilisateurs\VerificationIdentiteController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------

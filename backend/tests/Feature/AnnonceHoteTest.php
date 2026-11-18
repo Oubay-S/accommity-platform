@@ -21,7 +21,9 @@ class AnnonceHoteTest extends TestCase
     use RefreshDatabase;
 
     private User $hote;
+
     private CategorieGeographique $categorie;
+
     private PolitiqueAnnulation $politique;
 
     protected function setUp(): void

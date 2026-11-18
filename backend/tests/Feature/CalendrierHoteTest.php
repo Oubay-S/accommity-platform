@@ -16,6 +16,7 @@ class CalendrierHoteTest extends TestCase
     use RefreshDatabase;
 
     private User $hote;
+
     private Annonce $annonce;
 
     protected function setUp(): void

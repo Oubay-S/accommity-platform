@@ -12,11 +12,30 @@ use Illuminate\Database\Eloquent\Collection;
 
 class AnnonceRepository implements AnnonceRepositoryInterface
 {
-    public function findById(string $id) { return Annonce::find($id); }
-    public function search(array $criteres) { return Annonce::query()->paginate(15); }
-    public function create(array $data) { return Annonce::create($data); }
-    public function update(string $id, array $data) { return tap(Annonce::findOrFail($id))->update($data); }
-    public function delete(string $id) { return Annonce::destroy($id); }
+    public function findById(string $id)
+    {
+        return Annonce::find($id);
+    }
+
+    public function search(array $criteres)
+    {
+        return Annonce::query()->paginate(15);
+    }
+
+    public function create(array $data)
+    {
+        return Annonce::create($data);
+    }
+
+    public function update(string $id, array $data)
+    {
+        return tap(Annonce::findOrFail($id))->update($data);
+    }
+
+    public function delete(string $id)
+    {
+        return Annonce::destroy($id);
+    }
 
     public function rechercherAnnoncesDisponibles(array $criteres, int $parPage): LengthAwarePaginator
     {
@@ -24,49 +43,49 @@ class AnnonceRepository implements AnnonceRepositoryInterface
         $query = Annonce::query()->where('statut', StatutAnnonce::PUBLIEE->value);
 
         // [PORTED] catégorie exacte
-        if (!empty($criteres['id_categorie'])) {
+        if (! empty($criteres['id_categorie'])) {
             $query->where('id_categorie', $criteres['id_categorie']);
         }
 
         // [PORTED] type de logement (insensible à la casse : la colonne est un texte libre)
-        if (!empty($criteres['type_logement'])) {
+        if (! empty($criteres['type_logement'])) {
             $query->whereRaw('LOWER(type_logement) = ?', [mb_strtolower($criteres['type_logement'])]);
         }
 
         // [PORTED] localisation : ville, région ou pays (ancien `location`).
         // L'ancien LIKE était insensible à la casse sous MySQL ; LOWER() garde ce
         // comportement sous PostgreSQL et SQLite (tests).
-        if (!empty($criteres['ville'])) {
-            $loc = '%' . mb_strtolower($criteres['ville']) . '%';
+        if (! empty($criteres['ville'])) {
+            $loc = '%'.mb_strtolower($criteres['ville']).'%';
             $query->whereHas('categorie', function ($q) use ($loc) {
                 $q->whereRaw('LOWER(ville) LIKE ?', [$loc])
-                  ->orWhereRaw('LOWER(region) LIKE ?', [$loc])
-                  ->orWhereRaw('LOWER(pays) LIKE ?', [$loc]);
+                    ->orWhereRaw('LOWER(region) LIKE ?', [$loc])
+                    ->orWhereRaw('LOWER(pays) LIKE ?', [$loc]);
             });
         }
 
         // [PORTED] capacité
-        if (!empty($criteres['voyageurs'])) {
+        if (! empty($criteres['voyageurs'])) {
             $query->where('capacite', '>=', (int) $criteres['voyageurs']);
         }
 
         // [PORTED] dates : exclut les annonces ayant une réservation confirmée ou en
         // cours qui chevauche l'intervalle (3 cas, recopiés de l'ancien code).
-        if (!empty($criteres['date_arrivee']) && !empty($criteres['date_depart'])) {
+        if (! empty($criteres['date_arrivee']) && ! empty($criteres['date_depart'])) {
             $checkin = $criteres['date_arrivee'];
             $checkout = $criteres['date_depart'];
 
             $query->whereDoesntHave('reservations', function ($q) use ($checkin, $checkout) {
                 $q->whereIn('statut', [StatutReservation::CONFIRMEE->value, StatutReservation::EN_COURS->value])
-                  ->where(function ($sub) use ($checkin, $checkout) {
-                      $sub->where(function ($sq) use ($checkin, $checkout) {
-                          $sq->whereDate('date_arrivee', '>=', $checkin)->whereDate('date_arrivee', '<', $checkout);
-                      })->orWhere(function ($sq) use ($checkin, $checkout) {
-                          $sq->whereDate('date_depart', '>', $checkin)->whereDate('date_depart', '<=', $checkout);
-                      })->orWhere(function ($sq) use ($checkin, $checkout) {
-                          $sq->whereDate('date_arrivee', '<=', $checkin)->whereDate('date_depart', '>=', $checkout);
-                      });
-                  });
+                    ->where(function ($sub) use ($checkin, $checkout) {
+                        $sub->where(function ($sq) use ($checkin, $checkout) {
+                            $sq->whereDate('date_arrivee', '>=', $checkin)->whereDate('date_arrivee', '<', $checkout);
+                        })->orWhere(function ($sq) use ($checkin, $checkout) {
+                            $sq->whereDate('date_depart', '>', $checkin)->whereDate('date_depart', '<=', $checkout);
+                        })->orWhere(function ($sq) use ($checkin, $checkout) {
+                            $sq->whereDate('date_arrivee', '<=', $checkin)->whereDate('date_depart', '>=', $checkout);
+                        });
+                    });
             });
         }
 
@@ -80,7 +99,7 @@ class AnnonceRepository implements AnnonceRepositoryInterface
 
         // [ADDED] équipements : chaque équipement demandé doit figurer dans la colonne texte
         foreach ($criteres['equipements'] ?? [] as $equipement) {
-            $query->whereRaw('LOWER(equipements) LIKE ?', ['%' . mb_strtolower(trim($equipement)) . '%']);
+            $query->whereRaw('LOWER(equipements) LIKE ?', ['%'.mb_strtolower(trim($equipement)).'%']);
         }
 
         // [ADDED] tri + ordre stable pour la pagination
@@ -125,15 +144,15 @@ class AnnonceRepository implements AnnonceRepositoryInterface
             ]),
         ]);
 
-        if (!empty($criteres['statut'])) {
+        if (! empty($criteres['statut'])) {
             $query->where('statut', $criteres['statut']);
         }
 
-        if (!empty($criteres['recherche'])) {
-            $recherche = '%' . mb_strtolower(trim($criteres['recherche'])) . '%';
+        if (! empty($criteres['recherche'])) {
+            $recherche = '%'.mb_strtolower(trim($criteres['recherche'])).'%';
             $query->where(function ($q) use ($recherche) {
                 $q->whereRaw('LOWER(titre) LIKE ?', [$recherche])
-                  ->orWhereRaw('LOWER(adresse) LIKE ?', [$recherche]);
+                    ->orWhereRaw('LOWER(adresse) LIKE ?', [$recherche]);
             });
         }
 
