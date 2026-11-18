@@ -157,4 +157,4 @@ Rappels planifiés : `php artisan reminders:send` (hôte 48 h, voyageur 24 h), i
 ## 7. Angular
 
 - `ApiService` déballe automatiquement `data` et normalise les erreurs en `ApiError` (`status`, `message`, `errors`, `errorCode`).
-- En développement, `/api` est proxifié vers Laravel (`frontend/proxy.conf.json`).
+- En développement, `/api` est proxifié vers Laravel (`frontend/proxy.conf.mjs`, cible surchargeable par `API_PROXY_TARGET`).
