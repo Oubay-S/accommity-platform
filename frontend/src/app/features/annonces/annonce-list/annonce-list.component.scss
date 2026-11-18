@@ -246,7 +246,7 @@
 
 @media (max-width: 1024px) {
   .list-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .list-mobile-bar {
@@ -296,6 +296,6 @@
 
 @media (max-width: 640px) {
   .results-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }

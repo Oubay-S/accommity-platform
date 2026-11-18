@@ -11,9 +11,10 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { EMPTY, catchError, forkJoin, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, EMPTY, catchError, combineLatest, forkJoin, map, switchMap, tap } from 'rxjs';
 import { RatingStarsComponent } from '../../../shared/components/rating-stars/rating-stars.component';
 import { AnnonceDetail } from '../../../shared/models/annonce.model';
+import { ApiError } from '../../../shared/models/api-response.model';
 import { CurrencyMadPipe } from '../../../shared/pipes/currency-mad.pipe';
 import { AnnonceService } from '../services/annonce.service';
 
@@ -42,11 +43,15 @@ export class AnnonceDetailComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   @ViewChild('lightboxCloseBtn') lightboxCloseBtn?: ElementRef<HTMLButtonElement>;
+  @ViewChild('lightboxPanel') lightboxPanel?: ElementRef<HTMLElement>;
 
   readonly annonce = signal<AnnonceDetail | null>(null);
   readonly unavailableDates = signal<Set<string>>(new Set());
   readonly loading = signal(true);
   readonly notFound = signal(false);
+  /** Erreur réseau / serveur : distincte d'une annonce introuvable (404). */
+  readonly loadError = signal(false);
+  private readonly reload$ = new BehaviorSubject<void>(undefined);
 
   // Paramètres transmis depuis la recherche vers /reservations/creer/:id
   readonly forwardQueryParams = signal<Record<string, string>>({});
@@ -99,22 +104,27 @@ export class AnnonceDetailComponent implements OnInit {
         this.forwardQueryParams.set(forwarded);
       });
 
-    this.route.paramMap
+    combineLatest([this.route.paramMap, this.reload$])
       .pipe(
+        map(([params]) => params.get('id') ?? ''),
         tap(() => {
           this.loading.set(true);
           this.notFound.set(false);
+          this.loadError.set(false);
           this.annonce.set(null);
         }),
-        switchMap((params) => {
-          const id = params.get('id') ?? '';
+        switchMap((id) => {
           return forkJoin({
             annonce: this.annonceService.getAnnonce(id),
             dispo: this.annonceService.getDisponibilites(id),
           }).pipe(
-            catchError(() => {
+            catchError((err: unknown) => {
               this.loading.set(false);
-              this.notFound.set(true);
+              if (err instanceof ApiError && err.status === 404) {
+                this.notFound.set(true);
+              } else {
+                this.loadError.set(true);
+              }
               return EMPTY;
             }),
           );
@@ -126,6 +136,10 @@ export class AnnonceDetailComponent implements OnInit {
         this.unavailableDates.set(new Set(dispo?.dates_indisponibles ?? []));
         this.loading.set(false);
       });
+  }
+
+  recharger(): void {
+    this.reload$.next();
   }
 
   getEquipementIcon(eq: string): string {
@@ -200,7 +214,9 @@ export class AnnonceDetailComponent implements OnInit {
   @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {
     if (!this.lightboxOpen()) return;
-    if (event.key === 'Escape') {
+    if (event.key === 'Tab') {
+      this.trapFocus(event);
+    } else if (event.key === 'Escape') {
       event.preventDefault();
       this.closeLightbox();
     } else if (event.key === 'ArrowLeft') {
@@ -212,6 +228,33 @@ export class AnnonceDetailComponent implements OnInit {
     }
   }
 
+  /** Garde le focus clavier dans la visionneuse (Tab / Maj+Tab bouclent). */
+  private trapFocus(event: KeyboardEvent): void {
+    const panel = this.lightboxPanel?.nativeElement;
+    if (!panel) return;
+    const focusables = Array.from(
+      panel.querySelectorAll<HTMLElement>('button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'),
+    );
+    if (!focusables.length) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement as HTMLElement | null;
+    if (event.shiftKey && (active === first || !panel.contains(active))) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && (active === last || !panel.contains(active))) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  /** Date du jour au format AAAA-MM-JJ en heure locale (toISOString() est en UTC). */
+  private localIso(d: Date): string {
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${d.getFullYear()}-${mm}-${dd}`;
+  }
+
   private startOfMonth(d: Date): Date {
     return new Date(d.getFullYear(), d.getMonth(), 1);
   }
@@ -219,7 +262,7 @@ export class AnnonceDetailComponent implements OnInit {
   private buildMonth(firstDay: Date): CalendarMonth {
     const year = firstDay.getFullYear();
     const month = firstDay.getMonth();
-    const todayIso = new Date().toISOString().slice(0, 10);
+    const todayIso = this.localIso(new Date());
     const blocked = this.unavailableDates();
 
     // Lundi = 0 ... Dimanche = 6

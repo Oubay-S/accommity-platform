@@ -22,7 +22,14 @@ export class SearchBarComponent implements OnChanges {
   voyageurs: number | null = null;
 
   readonly erreur = signal<string | null>(null);
-  readonly today = new Date().toISOString().slice(0, 10);
+  /** Date du jour en heure locale (toISOString() est en UTC). */
+  readonly today = SearchBarComponent.localIso(new Date());
+
+  private static localIso(d: Date): string {
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${d.getFullYear()}-${mm}-${dd}`;
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['initial'] && this.initial) {
@@ -51,18 +58,22 @@ export class SearchBarComponent implements OnChanges {
       return;
     }
 
-    const queryParams: Record<string, string | number | undefined> = {};
-    if (this.ville.trim()) {
-      queryParams['ville'] = this.ville.trim();
-    }
-    if (this.date_arrivee) {
-      queryParams['date_arrivee'] = this.date_arrivee;
-    }
-    if (this.date_depart) {
-      queryParams['date_depart'] = this.date_depart;
-    }
-    if (this.voyageurs && this.voyageurs >= 1) {
-      queryParams['voyageurs'] = this.voyageurs;
+    // null = paramètre retiré de l'URL lors d'une fusion
+    const queryParams: Record<string, string | number | null> = {
+      ville: this.ville.trim() || null,
+      date_arrivee: this.date_arrivee || null,
+      date_depart: this.date_depart || null,
+      voyageurs: this.voyageurs && this.voyageurs >= 1 ? this.voyageurs : null,
+    };
+
+    if (this.compact) {
+      // Page résultats : on garde les filtres latéraux (prix, type, équipements, tri)
+      // et on revient à la première page.
+      this.router.navigate(['/annonces'], {
+        queryParams: { ...queryParams, page: null },
+        queryParamsHandling: 'merge',
+      });
+      return;
     }
 
     this.router.navigate(['/annonces'], { queryParams });

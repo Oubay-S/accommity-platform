@@ -79,9 +79,20 @@
 
 .gallery-grid__side {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 10px;
+  min-height: 0;
+}
+
+/* 2 miniatures : empilées sur toute la hauteur */
+.gallery-grid__side[data-thumbs='2'] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* 3 miniatures : la première occupe toute la ligne du haut */
+.gallery-grid__side[data-thumbs='3'] .gallery-grid__thumb:first-child {
+  grid-column: span 2;
 }
 
 .gallery-single {
@@ -322,21 +333,26 @@
   gap: 6px;
 }
 
-.legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: var(--r-full);
-  display: inline-block;
-}
-
-.legend-dot--available {
+/* Échantillons de légende : mêmes styles que les jours du calendrier */
+.legend-sample {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  padding: 3px 4px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
   background: var(--surface);
-  border: 1px solid var(--border-strong);
+  color: var(--ink);
+  font-style: normal;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
-.legend-dot--unavailable {
+.legend-sample--unavailable {
+  text-decoration: line-through;
   background: var(--surface-subdued);
-  border: 1px solid var(--muted-2);
+  color: var(--muted);
 }
 
 .detail-booking {
@@ -464,7 +480,7 @@
 
 @media (max-width: 1024px) {
   .detail-body {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .detail-booking {
@@ -525,11 +541,11 @@
   }
 
   .equipements-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .calendar-months {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .calendar-month--second {

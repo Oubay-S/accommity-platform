@@ -55,24 +55,24 @@
           <label for="f-prix-min">Min</label>
           <input
             id="f-prix-min"
+            class="field__input tabular"
             type="number"
             min="0"
             placeholder="0"
             [(ngModel)]="prixMin"
             (change)="applySidebarNumbers()"
-            class="tabular"
           />
         </div>
         <div class="field">
           <label for="f-prix-max">Max</label>
           <input
             id="f-prix-max"
+            class="field__input tabular"
             type="number"
             min="0"
             placeholder="5000"
             [(ngModel)]="prixMax"
             (change)="applySidebarNumbers()"
-            class="tabular"
           />
         </div>
       </div>
@@ -100,13 +100,13 @@
         <label for="f-voyageurs" class="sr-only">Nombre de voyageurs</label>
         <input
           id="f-voyageurs"
+          class="field__input tabular"
           type="number"
           min="1"
           max="50"
           placeholder="Ex : 2"
           [(ngModel)]="voyageurs"
           (change)="applySidebarNumbers()"
-          class="tabular"
         />
       </div>
     </div>

@@ -3,6 +3,15 @@
     <div class="detail-skeleton-title"></div>
     <div class="detail-skeleton-gallery"></div>
   </div>
+} @else if (loadError()) {
+  <div class="container detail-page">
+    <div class="empty-state" role="alert">
+      <span class="icon" aria-hidden="true">cloud_off</span>
+      <h2>Impossible de charger l'annonce</h2>
+      <p class="muted">Vérifiez votre connexion puis réessayez.</p>
+      <button type="button" class="btn btn--dark" (click)="recharger()">Réessayer</button>
+    </div>
+  </div>
 } @else if (notFound() || !annonce()) {
   <div class="container detail-page">
     <div class="empty-state">
@@ -48,7 +57,7 @@
             >
               <img [src]="item.photos[0]" [alt]="item.titre" />
             </button>
-            <div class="gallery-grid__side">
+            <div class="gallery-grid__side" [attr.data-thumbs]="item.photos.slice(1, 5).length">
               @for (photo of item.photos.slice(1, 5); track $index) {
                 <button
                   type="button"
@@ -221,8 +230,8 @@
           </div>
 
           <div class="calendar-legend">
-            <span><i class="legend-dot legend-dot--available"></i> Disponible</span>
-            <span><i class="legend-dot legend-dot--unavailable"></i> Indisponible</span>
+            <span><i class="legend-sample" aria-hidden="true">12</i> Disponible</span>
+            <span><i class="legend-sample legend-sample--unavailable" aria-hidden="true">12</i> Indisponible</span>
           </div>
         </section>
 
@@ -272,7 +281,7 @@
       aria-label="Visionneuse de photos"
       (click)="closeLightbox()"
     >
-      <div class="lightbox__panel" (click)="$event.stopPropagation()">
+      <div #lightboxPanel class="lightbox__panel" (click)="$event.stopPropagation()">
         <button
           #lightboxCloseBtn
           type="button"
