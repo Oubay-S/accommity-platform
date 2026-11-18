@@ -52,4 +52,14 @@ class Annonce extends Model
     {
         return $this->hasMany(Calendrier::class, 'id_annonce');
     }
+
+    public function reservations()
+    {
+        return $this->hasMany(\App\Models\Reservations\Reservation::class, 'id_annonce');
+    }
+
+    public function evaluations()
+    {
+        return $this->hasMany(\App\Models\Evaluations\Evaluation::class, 'id_annonce');
+    }
 }

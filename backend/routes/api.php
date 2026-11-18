@@ -32,6 +32,7 @@ Route::prefix('auth')->group(function () {
 
 // ── 2. Annonces Publiques & Recherche (RG10, RG11) ──
 Route::get('/annonces', [AnnonceController::class, 'index']);
+Route::get('/annonces/en-vedette', [AnnonceController::class, 'enVedette']);
 Route::get('/annonces/{id}', [AnnonceController::class, 'show']);
 Route::get('/annonces/{id}/disponibilites', [CalendrierController::class, 'show']);
 Route::get('/annonces/{id}/avis', [EvaluationController::class, 'annonceAvis']);
