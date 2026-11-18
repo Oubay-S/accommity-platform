@@ -1,3 +1,222 @@
-<div class="litiges-management-page">
-  <h2>Litiges Management</h2>
+<div class="admin-page">
+  <div class="admin-page__head">
+    <div>
+      <span class="eyebrow">Portail Admin</span>
+      <h1>Gestion des litiges</h1>
+      <p class="muted" style="margin-top: 0.35rem">
+        Arbitrage officiel des réclamations entre voyageurs et hébergeurs et clôture des dossiers.
+      </p>
+    </div>
+  </div>
+
+  <!-- Barre d'outils & Filtres -->
+  <div class="admin-toolbar">
+    <div class="admin-tabs" style="margin-bottom: 0">
+      <button type="button" class="admin-tab" [class.admin-tab--active]="statutFilter() === 'tous'" (click)="setStatutFilter('tous')">
+        Tous les litiges
+      </button>
+      <button type="button" class="admin-tab" [class.admin-tab--active]="statutFilter() === 'en_cours'" (click)="setStatutFilter('en_cours')">
+        <span class="icon icon--sm" style="font-size: 13px; color: var(--clay)">pending_actions</span> En cours
+      </button>
+      <button type="button" class="admin-tab" [class.admin-tab--active]="statutFilter() === 'cloture'" (click)="setStatutFilter('cloture')">
+        <span class="icon icon--sm" style="font-size: 13px; color: var(--success)">task_alt</span> Clôturés
+      </button>
+    </div>
+
+    <div class="input-wrap admin-search" style="margin-bottom: 0">
+      <span class="icon icon--sm">search</span>
+      <input type="search" class="field__input" placeholder="Motif, nom du déclarant..." (input)="onSearch($any($event.target).value)" />
+    </div>
+  </div>
+
+  <!-- Tableau des litiges -->
+  <div class="admin-card">
+    <div class="admin-table__head" style="grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1.1fr">
+      <span>Motif du litige</span>
+      <span>Déclarant</span>
+      <span>Élément ciblé</span>
+      <span>Statut</span>
+      <span style="text-align: right">Actions</span>
+    </div>
+
+    @if (loading()) {
+      <div class="admin-loading">Chargement des litiges...</div>
+    } @else if (litiges().length === 0) {
+      <div style="padding: 3rem; text-align: center; color: var(--muted)">
+        <span class="icon icon--lg" style="color: var(--success); display: block; margin-bottom: 0.5rem">verified_user</span>
+        Aucun litige enregistré dans cette catégorie.
+      </div>
+    } @else {
+      @for (l of litiges(); track l.id_ticket) {
+        <div class="admin-table__row" style="grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1.1fr">
+          <div>
+            <strong style="display: block; font-size: 13px; color: var(--ink)">{{ l.motif }}</strong>
+            <span class="muted" style="font-size: 11px">Enregistré le {{ l.date_creation | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+
+          <div>
+            <strong style="display: block; font-size: 12.5px">{{ l.declarant?.prenom }} {{ l.declarant?.nom }}</strong>
+            <span class="muted" style="font-size: 11px">{{ l.declarant?.email }}</span>
+          </div>
+
+          <div>
+            @if (l.reservation) {
+              <span class="badge badge--neutral" style="font-size: 10px">Réservation</span>
+              <div class="muted" style="font-size: 11px; margin-top: 2px">
+                {{ l.reservation.annonce?.titre || 'Hébergement' }}
+              </div>
+            } @else if (l.evaluation) {
+              <span class="badge badge--neutral" style="font-size: 10px">Avis contesté</span>
+              <div class="muted" style="font-size: 11px; margin-top: 2px">
+                "{{ l.evaluation.commentaire | slice:0:30 }}..."
+              </div>
+            } @else {
+              <span class="muted" style="font-size: 11px">Autre différend</span>
+            }
+          </div>
+
+          <div>
+            @if (l.statut === 'en_cours') {
+              <span class="badge badge--warning" style="font-size: 10px">En cours</span>
+            } @else {
+              <span class="badge badge--success" style="font-size: 10px">Clôturé</span>
+              @if (l.date_cloture) {
+                <div class="muted" style="font-size: 10px; margin-top: 2px">Le {{ l.date_cloture | date:'dd/MM/yyyy' }}</div>
+              }
+            }
+          </div>
+
+          <div style="text-align: right">
+            <button type="button" class="btn btn--sm" [ngClass]="l.statut === 'en_cours' ? 'btn--primary' : 'btn--outline'" style="padding: 4px 10px; font-size: 11.5px" (click)="openManageModal(l)">
+              <span class="icon icon--sm" style="font-size: 12px">{{ l.statut === 'en_cours' ? 'gavel' : 'visibility' }}</span>
+              {{ l.statut === 'en_cours' ? 'Gérer / Arbitrer' : 'Gérer' }}
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (lastPage() > 1) {
+    <div class="admin-pagination">
+      <span class="small muted">Page {{ page() }} sur {{ lastPage() }} (Total : {{ total() }})</span>
+      <div style="display: flex; gap: 0.25rem">
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="page() <= 1" (click)="setPage(page() - 1)">Précédent</button>
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="page() >= lastPage()" (click)="setPage(page() + 1)">Suivant</button>
+      </div>
+    </div>
+  }
+
+  <!-- Modale "Gérer" (détails complets + arbitrage) -->
+  @if (modalOpen() && selectedLitige(); as litige) {
+    <div class="admin-drawer-backdrop" (click)="closeModal()"></div>
+    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(840px, 95vw); max-height: 90vh; overflow-y: auto; background: var(--canvas); border-radius: var(--r-lg); box-shadow: var(--shadow-3); z-index: 100">
+      <div style="background: #fff; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10">
+        <div>
+          <span class="eyebrow" style="font-size: 10px">Gestion du litige</span>
+          <strong style="display: block; font-size: 15px">Ticket #{{ litige.id_ticket | slice:0:8 }}</strong>
+        </div>
+        <button type="button" class="btn btn--icon btn--ghost" (click)="closeModal()" aria-label="Fermer">
+          <span class="icon icon--sm">close</span>
+        </button>
+      </div>
+
+      <div style="padding: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem">
+        <!-- Colonne 1 : Motif, Déclarant, Élément ciblé -->
+        <div style="display: flex; flex-direction: column; gap: 1rem">
+          <div class="admin-card" style="padding: 1rem">
+            <span style="display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.25rem">Motif rapporté</span>
+            <strong style="display: block; font-size: 14px; color: var(--ink)">{{ litige.motif }}</strong>
+            <span class="muted" style="font-size: 11.5px">Ouvert le {{ litige.date_creation | date:'dd/MM/yyyy à HH:mm' }}</span>
+          </div>
+
+          <div class="admin-card" style="padding: 1rem">
+            <h4 style="margin: 0 0 0.65rem; font-size: 12.5px; text-transform: uppercase; color: var(--muted)">Déclarant (Auteur du ticket)</h4>
+            @if (litige.declarant; as decl) {
+              <div style="display: flex; align-items: center; gap: 0.75rem; background: var(--surface-subdued); padding: 0.65rem 0.85rem; border-radius: var(--r-sm)">
+                <span class="avatar" style="width: 36px; height: 36px; font-size: 12px">{{ decl.prenom.charAt(0) }}{{ decl.nom.charAt(0) }}</span>
+                <div>
+                  <strong style="display: block; font-size: 13px">{{ decl.prenom }} {{ decl.nom }}</strong>
+                  <span class="muted" style="font-size: 11.5px">{{ decl.email }}</span>
+                </div>
+              </div>
+            } @else {
+              <span class="muted" style="font-size: 12px">Déclarant introuvable</span>
+            }
+          </div>
+
+          @if (litige.evaluation; as ev) {
+            <div class="admin-card" style="padding: 1rem">
+              <span style="display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem">
+                Évaluation contestée @if (ev.annonce) { · {{ ev.annonce.titre }} }
+              </span>
+              <p style="font-style: italic; font-size: 12.5px; color: var(--ink); margin-bottom: 0.35rem">"{{ ev.commentaire }}"</p>
+              @if (ev.cible) {
+                <span class="muted" style="font-size: 11.5px">Cible : <strong>{{ ev.cible.prenom }} {{ ev.cible.nom }}</strong> ({{ ev.cible.email }})</span>
+              }
+            </div>
+          }
+
+          @if (litige.reservation; as resa) {
+            <div class="admin-card" style="padding: 1rem">
+              <span style="display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem">
+                Réservation concernée
+              </span>
+              <strong style="display: block; font-size: 13px">{{ resa.annonce?.titre || 'Hébergement' }}</strong>
+              <span class="muted" style="display: block; font-size: 11.5px; font-variant-numeric: tabular-nums">
+                Du {{ resa.date_arrivee | date:'dd/MM/yyyy' }} au {{ resa.date_depart | date:'dd/MM/yyyy' }}
+              </span>
+              @if (resa.voyageur || resa.hote) {
+                <div class="muted" style="font-size: 11.5px; margin-top: 0.35rem">
+                  Voyageur : {{ resa.voyageur?.prenom }} {{ resa.voyageur?.nom }} · Hôte : {{ resa.hote?.prenom }} {{ resa.hote?.nom }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Colonne 2 : Panneau d'Arbitrage et Résolution -->
+        <div class="admin-card" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: center">
+          <h3 style="margin: 0 0 1rem; font-size: 15px; font-weight: 600">Arbitrage et Résolution</h3>
+
+          @if (litige.statut === 'en_cours') {
+            <p class="muted" style="font-size: 12.5px; margin-bottom: 0.75rem">
+              Votre décision sera notifiée simultanément au déclarant et à la partie adverse.
+            </p>
+            <div class="field" style="margin-bottom: 1.25rem">
+              <label class="field__label">Décision de l'administrateur *</label>
+              <textarea
+                class="field__input"
+                rows="4"
+                placeholder="Ex: Remboursement partiel ordonné, annulation sans frais conformément à la politique convenue..."
+                [ngModel]="decision()"
+                (ngModelChange)="decision.set($event)"></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 0.5rem">
+              <button type="button" class="btn btn--ghost btn--sm" [disabled]="submitting()" (click)="closeModal()">Annuler</button>
+              <button type="button" class="btn btn--primary btn--sm" [disabled]="submitting() || !decision().trim()" (click)="confirmResolution()">
+                {{ submitting() ? 'Clôture en cours...' : 'Clôturer le litige' }}
+              </button>
+            </div>
+          } @else {
+            <div style="text-align: center; padding: 1.5rem 0.5rem">
+              <span class="icon icon--lg" style="color: var(--success); font-size: 40px; display: block; margin-bottom: 0.5rem">task_alt</span>
+              <strong style="display: block; font-size: 15px; margin-bottom: 0.25rem">Litige Résolu et Clôturé</strong>
+              <p class="muted" style="font-size: 12.5px; margin-bottom: 1rem">L'administration a examiné et clôturé ce ticket.</p>
+
+              <div style="border-top: 1px solid var(--border); padding-top: 0.85rem; font-size: 12px">
+                <div class="muted">Date de clôture</div>
+                <strong style="font-variant-numeric: tabular-nums">{{ litige.date_cloture ? (litige.date_cloture | date:'dd/MM/yyyy à HH:mm') : 'Non définie' }}</strong>
+                @if (litige.admin?.utilisateur; as adm) {
+                  <div class="muted" style="margin-top: 0.35rem">Traité par : {{ adm.prenom }} {{ adm.nom }}</div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
 </div>

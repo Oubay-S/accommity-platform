@@ -1,3 +1,266 @@
-<div class="annonces-moderation-page">
-  <h2>Annonces Moderation</h2>
+<div class="admin-page">
+  <div class="admin-page__head">
+    <div>
+      <span class="eyebrow">Portail Admin</span>
+      <h1>Modération des annonces</h1>
+      <p class="muted" style="margin-top: 0.35rem">
+        Validation préalable des hébergements soumis par les hôtes et gestion des suspensions.
+      </p>
+    </div>
+  </div>
+
+  <!-- Filtres par statut -->
+  <div class="admin-toolbar">
+    <div class="admin-tabs" style="margin-bottom: 0">
+      <button type="button" class="admin-tab" [class.admin-tab--active]="statutFilter() === 'tous'" (click)="setStatutFilter('tous')">
+        Toutes
+      </button>
+      <button type="button" class="admin-tab" [class.admin-tab--active]="statutFilter() === 'en_attente'" (click)="setStatutFilter('en_attente')">
+        <span class="icon icon--sm" style="font-size: 13px; color: var(--clay)">hourglass_top</span> En attente
+      </button>
+      <button type="button" class="admin-tab" [class.admin-tab--active]="statutFilter() === 'publiee'" (click)="setStatutFilter('publiee')">
+        Publiées
+      </button>
+      <button type="button" class="admin-tab" [class.admin-tab--active]="statutFilter() === 'suspendue'" (click)="setStatutFilter('suspendue')">
+        Suspendues
+      </button>
+      <button type="button" class="admin-tab" [class.admin-tab--active]="statutFilter() === 'rejetee'" (click)="setStatutFilter('rejetee')">
+        Rejetées
+      </button>
+    </div>
+
+    <div class="input-wrap admin-search" style="margin-bottom: 0">
+      <span class="icon icon--sm">search</span>
+      <input type="search" class="field__input" placeholder="Titre, ville, hôte..." (input)="onSearch($any($event.target).value)" />
+    </div>
+  </div>
+
+  <!-- Liste des annonces -->
+  <div class="admin-card">
+    <div class="admin-table__head" style="grid-template-columns: 2.3fr 1fr 1fr 0.9fr 1.6fr">
+      <span>Logement / Hôte</span>
+      <span>Ville & Type</span>
+      <span>Tarif & Capacité</span>
+      <span>Statut</span>
+      <span style="text-align: right">Actions</span>
+    </div>
+
+    @if (loading()) {
+      <div class="admin-loading">Chargement des annonces...</div>
+    } @else if (annonces().length === 0) {
+      <div style="padding: 3rem; text-align: center; color: var(--muted)">
+        <span class="icon icon--lg" style="color: var(--muted-2); display: block; margin-bottom: 0.5rem">villa</span>
+        Aucune annonce ne correspond aux filtres actifs.
+      </div>
+    } @else {
+      @for (a of annonces(); track a.id_annonce) {
+        <div class="admin-table__row" style="grid-template-columns: 2.3fr 1fr 1fr 0.9fr 1.6fr">
+          <div style="display: flex; gap: 0.75rem; align-items: center; min-width: 0">
+            <div style="width: 48px; height: 40px; border-radius: var(--r-sm); background: var(--surface-subdued); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden">
+              @if (firstPhoto(a); as photo) {
+                <img [src]="photo" [alt]="a.titre" style="width: 100%; height: 100%; object-fit: cover" />
+              } @else {
+                <span class="icon" style="color: var(--muted-2); font-size: 18px">apartment</span>
+              }
+            </div>
+            <div style="min-width: 0">
+              <strong style="display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ a.titre }}</strong>
+              <span class="muted" style="font-size: 11px">
+                Hôte : {{ a.hote?.prenom }} {{ a.hote?.nom }}
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <strong style="display: block; font-size: 12px">{{ a.categorie?.ville || a.adresse }}</strong>
+            <span class="muted" style="font-size: 11px">{{ a.type_logement }}</span>
+          </div>
+
+          <div>
+            <strong style="font-size: 13px; font-variant-numeric: tabular-nums">{{ a.tarif_nuit }} DH</strong> <small class="muted" style="font-size: 10px">/ nuit</small>
+            <div class="muted" style="font-size: 11px">{{ a.capacite }} voyageurs</div>
+          </div>
+
+          <div>
+            @if (a.statut === 'en_attente') {
+              <span class="badge badge--warning" style="font-size: 10px">En attente</span>
+            } @else if (a.statut === 'publiee') {
+              <span class="badge badge--success" style="font-size: 10px">Publiée</span>
+            } @else if (a.statut === 'suspendue') {
+              <span class="badge badge--error" style="font-size: 10px">Suspendue</span>
+            } @else if (a.statut === 'rejetee') {
+              <span class="badge badge--error" style="font-size: 10px">Rejetée</span>
+            } @else {
+              <span class="badge badge--neutral" style="font-size: 10px">{{ a.statut }}</span>
+            }
+            @if (a.motif_moderation) {
+              <div style="font-size: 10px; color: var(--danger); margin-top: 2px" [title]="a.motif_moderation">
+                Motif : {{ a.motif_moderation | slice:0:22 }}...
+              </div>
+            }
+          </div>
+
+          <div style="text-align: right; display: flex; gap: 0.35rem; justify-content: flex-end">
+            <button type="button" class="btn btn--outline btn--sm" style="padding: 4px 8px; font-size: 11.5px" (click)="openDetail(a)">
+              Consulter
+            </button>
+            @if (a.statut !== 'publiee') {
+              <button type="button" class="btn btn--primary btn--sm" style="padding: 4px 8px; font-size: 11.5px" (click)="approuver(a)">
+                <span class="icon icon--sm" style="font-size: 13px">check</span> Approuver
+              </button>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (lastPage() > 1) {
+    <div class="admin-pagination">
+      <span class="small muted">Page {{ page() }} sur {{ lastPage() }} (Total : {{ total() }})</span>
+      <div style="display: flex; gap: 0.25rem">
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="page() <= 1" (click)="setPage(page() - 1)">Précédent</button>
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="page() >= lastPage()" (click)="setPage(page() + 1)">Suivant</button>
+      </div>
+    </div>
+  }
+
+  <!-- Modale "Consulter" 2 colonnes (comme base_project) -->
+  @if (detailAnnonce(); as d) {
+    <div class="admin-drawer-backdrop" (click)="closeDetail()"></div>
+    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(860px, 95vw); max-height: 90vh; overflow-y: auto; background: var(--canvas); border-radius: var(--r-lg); box-shadow: var(--shadow-3); z-index: 95">
+      <div style="background: #fff; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10">
+        <div>
+          <span class="eyebrow" style="font-size: 10px">Audit hébergement</span>
+          <strong style="display: block; font-size: 15px">Détails de l'annonce</strong>
+        </div>
+        <button type="button" class="btn btn--icon btn--ghost" (click)="closeDetail()" aria-label="Fermer">
+          <span class="icon icon--sm">close</span>
+        </button>
+      </div>
+
+      <div style="padding: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem">
+        <!-- Colonne 1 : Infos Annonce -->
+        <div>
+          <div style="background: var(--surface-subdued); border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--border); min-height: 210px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem">
+            @if (firstPhoto(d); as photo) {
+              <img [src]="photo" [alt]="d.titre" style="width: 100%; max-height: 260px; object-fit: cover" />
+            } @else {
+              <span class="icon" style="font-size: 48px; color: var(--muted-2)">image</span>
+            }
+          </div>
+
+          <h2 style="font-size: 1.45rem; margin-bottom: 0.35rem">{{ d.titre }}</h2>
+          <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.85rem">
+            <span class="badge badge--neutral" style="font-size: 10.5px">{{ d.type_logement }}</span>
+            <span class="muted" style="font-size: 12px">Capacité max : {{ d.capacite }} voyageurs</span>
+          </div>
+
+          <div class="admin-card" style="padding: 1rem; margin-bottom: 1rem; font-size: 13px; line-height: 1.6">
+            {{ d.description || 'Aucune description fournie.' }}
+          </div>
+
+          <div class="admin-card" style="padding: 0.9rem 1rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem">
+            <span class="muted" style="font-size: 12.5px">Tarif de base</span>
+            <strong style="font-size: 1.25rem; color: var(--clay); font-variant-numeric: tabular-nums">{{ d.tarif_nuit | number:'1.2-2' }} DH <small class="muted" style="font-size: 11px">/ nuit</small></strong>
+          </div>
+
+          <p class="muted" style="font-size: 12px">
+            <strong>Adresse :</strong> {{ d.adresse }}@if (d.categorie?.ville) { — {{ d.categorie?.ville }} }
+          </p>
+        </div>
+
+        <!-- Colonne 2 : Hôte & Panneau de Modération -->
+        <div style="display: flex; flex-direction: column; gap: 1rem">
+          <!-- Mini Profil de l'hôte -->
+          <div class="admin-card" style="padding: 1.15rem; display: flex; align-items: center; gap: 1rem">
+            <span class="avatar" style="width: 48px; height: 48px; font-size: 15px; background: rgba(194, 94, 48, 0.12); color: var(--clay)">
+              {{ d.hote?.prenom?.charAt(0) || '?' }}{{ d.hote?.nom?.charAt(0) || '' }}
+            </span>
+            <div style="min-width: 0; flex: 1">
+              <span style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted)">Propriétaire</span>
+              <strong style="display: block; font-size: 14px">{{ d.hote?.prenom }} {{ d.hote?.nom }}</strong>
+              <span class="muted" style="display: block; font-size: 12px; margin-bottom: 0.4rem">{{ d.hote?.email }}</span>
+
+              @if (d.hote?.verification_identite?.statut === 'validee') {
+                <span class="badge badge--success" style="font-size: 10.5px">Identité Validée ✓</span>
+              } @else if (d.hote?.verification_identite?.statut === 'en_cours') {
+                <span class="badge badge--warning" style="font-size: 10.5px">Identité En Cours...</span>
+              } @else {
+                <span class="badge badge--error" style="font-size: 10.5px">Identité Non Validée ⚠</span>
+              }
+            </div>
+          </div>
+
+          <!-- Panneau de Modération -->
+          <div class="admin-card" style="padding: 1.25rem; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 0.85rem">
+            <h3 style="margin: 0; font-size: 15px; font-weight: 600; text-align: center">Panneau de Modération</h3>
+
+            <div style="text-align: center">
+              @if (d.statut === 'en_attente') {
+                <span class="badge badge--warning" style="font-size: 12px; padding: 6px 14px">En attente d'approbation</span>
+              } @else if (d.statut === 'publiee') {
+                <span class="badge badge--success" style="font-size: 12px; padding: 6px 14px">État Actuel : PUBLIÉE</span>
+              } @else if (d.statut === 'suspendue') {
+                <span class="badge badge--error" style="font-size: 12px; padding: 6px 14px">État Actuel : SUSPENDUE</span>
+              } @else {
+                <span class="badge badge--error" style="font-size: 12px; padding: 6px 14px">État Actuel : REJETÉE</span>
+              }
+            </div>
+
+            @if (d.motif_moderation) {
+              <div style="background: rgba(186,26,26,0.06); padding: 0.75rem; border-radius: var(--r-sm); font-size: 12px; color: var(--danger)">
+                <strong>Motif enregistré :</strong> {{ d.motif_moderation }}
+              </div>
+            }
+
+            @if (d.statut === 'en_attente') {
+              <button type="button" class="btn btn--primary" style="width: 100%" (click)="approuver(d)">
+                Approuver et Publier cette annonce
+              </button>
+              <button type="button" class="btn btn--outline" style="width: 100%; color: var(--danger); border-color: rgba(186,26,26,0.3)" (click)="openSuspendModal(d, 'rejetee')">
+                Rejeter l'Annonce
+              </button>
+            } @else if (d.statut === 'publiee') {
+              <p class="muted" style="font-size: 12px; text-align: center">L'annonce est visible en ligne. Vous pouvez la suspendre en cas d'infraction constatée.</p>
+              <button type="button" class="btn btn--outline" style="width: 100%; color: var(--danger); border-color: rgba(186,26,26,0.3)" (click)="openSuspendModal(d, 'suspendue')">
+                Suspendre Temporairement l'Annonce
+              </button>
+            } @else if (d.statut === 'suspendue' || d.statut === 'rejetee') {
+              <p class="muted" style="font-size: 12px; text-align: center">Pour remettre l'annonce visible sur la plateforme, cliquez ci-dessous.</p>
+              <button type="button" class="btn btn--primary" style="width: 100%" (click)="approuver(d)">
+                Rétablir et Publier l'Annonce
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modale de suspension / rejet (avec motif obligatoire) -->
+  @if (modalOpen() && selectedAnnonce(); as annonce) {
+    <div class="admin-drawer-backdrop" style="z-index: 105" (click)="closeModal()"></div>
+    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(480px, 95vw); background: #fff; border-radius: var(--r-lg); padding: 1.5rem; box-shadow: var(--shadow-3); z-index: 110">
+      <h3 style="margin-top: 0; font-size: 16px; font-weight: 600">
+        {{ actionType() === 'rejetee' ? 'Rejeter l\'annonce' : 'Suspendre l\'annonce' }}
+      </h3>
+      <p class="muted" style="font-size: 12.5px; margin-bottom: 1rem">
+        Action sur : <strong>{{ annonce.titre }}</strong>. L'hôte sera immédiatement notifié.
+      </p>
+
+      <div class="field" style="margin-bottom: 1.25rem">
+        <label class="field__label">Motif de la décision *</label>
+        <textarea class="field__input" rows="3" placeholder="Ex: Photos non conformes, adresse incomplète, critères non respectés..." [ngModel]="motif()" (ngModelChange)="motif.set($event)"></textarea>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem">
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="submitting()" (click)="closeModal()">Annuler</button>
+        <button type="button" class="btn btn--primary btn--sm" style="background: var(--danger); border-color: var(--danger)" [disabled]="submitting() || !motif().trim()" (click)="confirmSuspension()">
+          {{ submitting() ? 'Traitement...' : 'Confirmer' }}
+        </button>
+      </div>
+    </div>
+  }
 </div>

@@ -2,6 +2,8 @@
 
 namespace App\Models\Paiements;
 
+use App\Models\Reservations\Reservation;
+use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,5 +25,21 @@ class Remboursement extends Model
     protected $casts = [
         'montant' => 'decimal:2',
         'taux_applique' => 'decimal:2',
+        'date_remboursement' => 'datetime',
     ];
+
+    public function reservation()
+    {
+        return $this->belongsTo(Reservation::class, 'id_reservation');
+    }
+
+    public function voyageur()
+    {
+        return $this->belongsTo(User::class, 'id_voyageur');
+    }
+
+    public function paiement()
+    {
+        return $this->belongsTo(Paiement::class, 'id_paiement');
+    }
 }

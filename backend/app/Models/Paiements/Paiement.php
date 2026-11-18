@@ -3,6 +3,7 @@
 namespace App\Models\Paiements;
 
 use App\Models\Reservations\Reservation;
+use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,10 +23,16 @@ class Paiement extends Model
 
     protected $casts = [
         'montant' => 'decimal:2',
+        'date_transaction' => 'datetime',
     ];
 
     public function reservation()
     {
         return $this->belongsTo(Reservation::class, 'id_reservation');
+    }
+
+    public function voyageur()
+    {
+        return $this->belongsTo(User::class, 'id_voyageur');
     }
 }

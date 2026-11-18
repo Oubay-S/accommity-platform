@@ -1,0 +1,198 @@
+<div class="admin-page">
+  <div class="admin-page__head">
+    <div>
+      <span class="eyebrow">Portail Admin</span>
+      <h1>Transactions financières</h1>
+      <p class="muted" style="margin-top: 0.35rem">
+        Supervision des paiements voyageurs, versements aux hôtes et remboursements suite aux annulations.
+      </p>
+    </div>
+  </div>
+
+  <!-- Onglets Type & Sous-filtres -->
+  <div class="admin-toolbar">
+    <div class="admin-tabs" style="margin-bottom: 0">
+      <button type="button" class="admin-tab" [class.admin-tab--active]="activeType() === 'paiements'" (click)="setType('paiements')">
+        <span class="icon icon--sm" style="font-size: 14px">arrow_downward</span> Paiements (Voyageurs)
+      </button>
+      <button type="button" class="admin-tab" [class.admin-tab--active]="activeType() === 'versements'" (click)="setType('versements')">
+        <span class="icon icon--sm" style="font-size: 14px">arrow_upward</span> Versements (Hôtes)
+      </button>
+      <button type="button" class="admin-tab" [class.admin-tab--active]="activeType() === 'remboursements'" (click)="setType('remboursements')">
+        <span class="icon icon--sm" style="font-size: 14px">replay</span> Remboursements
+      </button>
+    </div>
+
+    <div>
+      @if (activeType() === 'paiements') {
+        <select class="field__input" style="width: auto; padding: 7px 12px; font-size: 13px" [ngModel]="statutFilter()" (ngModelChange)="onStatutChange($event)">
+          <option value="tous">Tous les statuts</option>
+          <option value="en_attente">En attente</option>
+          <option value="reussi">Réussi</option>
+          <option value="echoue">Échoué</option>
+          <option value="rembourse">Remboursé</option>
+        </select>
+      } @else if (activeType() === 'versements') {
+        <select class="field__input" style="width: auto; padding: 7px 12px; font-size: 13px" [ngModel]="statutFilter()" (ngModelChange)="onStatutChange($event)">
+          <option value="tous">Tous les statuts</option>
+          <option value="en_attente">En attente</option>
+          <option value="traite">Traité</option>
+          <option value="echoue">Échoué</option>
+        </select>
+      } @else {
+        <select class="field__input" style="width: auto; padding: 7px 12px; font-size: 13px" [ngModel]="motifFilter()" (ngModelChange)="onMotifChange($event)">
+          <option value="tous">Tous les motifs</option>
+          <option value="annulation_voyageur">Annulation (Voyageur)</option>
+          <option value="annulation_hote">Annulation (Hôte)</option>
+          <option value="expiration_demande">Expiration demande</option>
+        </select>
+      }
+    </div>
+  </div>
+
+  <!-- Tableau selon l'onglet -->
+  <div class="admin-card">
+    @if (activeType() === 'paiements') {
+      <div class="admin-table__head" style="grid-template-columns: 1.1fr 1.6fr 1.8fr 1fr 0.9fr 0.8fr">
+        <span>Date transaction</span>
+        <span>Voyageur</span>
+        <span>Annonce / Réf</span>
+        <span style="text-align: right">Montant</span>
+        <span style="text-align: center">Méthode</span>
+        <span>Statut</span>
+      </div>
+
+      @if (loading()) {
+        <div class="admin-loading">Chargement des paiements...</div>
+      } @else if (items().length === 0) {
+        <div style="padding: 3rem; text-align: center; color: var(--muted)">
+          <span class="icon icon--lg" style="color: var(--muted-2); display: block; margin-bottom: 0.5rem">payments</span>
+          Aucun paiement trouvé pour ce statut.
+        </div>
+      } @else {
+        @for (p of items(); track p.id_paiement || $index) {
+          <div class="admin-table__row" style="grid-template-columns: 1.1fr 1.6fr 1.8fr 1fr 0.9fr 0.8fr">
+            <div style="font-size: 12px; font-variant-numeric: tabular-nums">{{ p.date_transaction | date:'dd/MM/yyyy HH:mm' }}</div>
+            <div style="min-width: 0">
+              <strong style="display: block; font-size: 12.5px">{{ p.voyageur?.prenom }} {{ p.voyageur?.nom }}</strong>
+              <span class="muted" style="font-size: 11px">{{ p.voyageur?.email }}</span>
+            </div>
+            <div style="min-width: 0">
+              <strong style="display: block; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+                {{ p.reservation?.annonce?.titre || 'Introuvable' }}
+              </strong>
+              <span class="muted" style="font-size: 10.5px; font-family: monospace">{{ p.id_reservation | slice:0:8 }}...</span>
+            </div>
+            <div style="text-align: right; font-weight: 700; color: var(--success); font-variant-numeric: tabular-nums">
+              +{{ p.montant | number:'1.2-2' }} DH
+            </div>
+            <div style="text-align: center; font-size: 11.5px; text-transform: uppercase">{{ formatLabel(p.methode_paiement) }}</div>
+            <div>
+              <span class="badge" [ngClass]="p.statut === 'reussi' ? 'badge--success' : (p.statut === 'en_attente' ? 'badge--warning' : (p.statut === 'echoue' ? 'badge--error' : 'badge--neutral'))" style="font-size: 10px">
+                {{ formatLabel(p.statut) }}
+              </span>
+            </div>
+          </div>
+        }
+      }
+    } @else if (activeType() === 'versements') {
+      <div class="admin-table__head" style="grid-template-columns: 1.3fr 1.8fr 1.3fr 1.1fr 0.9fr">
+        <span>Date versement / prévue</span>
+        <span>Hôte bénéficiaire</span>
+        <span>Réf bancaire</span>
+        <span style="text-align: right">Montant versé</span>
+        <span>Statut</span>
+      </div>
+
+      @if (loading()) {
+        <div class="admin-loading">Chargement des versements...</div>
+      } @else if (items().length === 0) {
+        <div style="padding: 3rem; text-align: center; color: var(--muted)">
+          <span class="icon icon--lg" style="color: var(--muted-2); display: block; margin-bottom: 0.5rem">account_balance</span>
+          Aucun versement trouvé pour ce statut.
+        </div>
+      } @else {
+        @for (v of items(); track v.id_versement || $index) {
+          <div class="admin-table__row" style="grid-template-columns: 1.3fr 1.8fr 1.3fr 1.1fr 0.9fr">
+            <div style="font-size: 12px; font-variant-numeric: tabular-nums">
+              @if (v.date_versement) {
+                <div>{{ v.date_versement | date:'dd/MM/yyyy HH:mm' }}</div>
+              } @else {
+                <span class="muted">Prévue : {{ v.date_liberation_prevue | date:'dd/MM/yyyy' }}</span>
+              }
+            </div>
+            <div style="min-width: 0">
+              <strong style="display: block; font-size: 12.5px">{{ v.hote?.prenom }} {{ v.hote?.nom }}</strong>
+              <span class="muted" style="font-size: 11px">{{ v.hote?.email }}</span>
+            </div>
+            <div>
+              <span style="font-family: monospace; font-size: 11.5px; background: var(--surface-subdued); padding: 3px 8px; border-radius: var(--r-sm)">
+                {{ v.reference_bancaire || 'N/A' }}
+              </span>
+            </div>
+            <div style="text-align: right; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums">
+              -{{ v.montant | number:'1.2-2' }} DH
+            </div>
+            <div>
+              <span class="badge" [ngClass]="v.statut === 'traite' ? 'badge--success' : (v.statut === 'en_attente' ? 'badge--warning' : 'badge--error')" style="font-size: 10px">
+                {{ formatLabel(v.statut) }}
+              </span>
+            </div>
+          </div>
+        }
+      }
+    } @else {
+      <div class="admin-table__head" style="grid-template-columns: 1.2fr 1.6fr 1.4fr 1.1fr 1.2fr">
+        <span>Date remboursement</span>
+        <span>Voyageur remboursé</span>
+        <span>Annonce / Taux</span>
+        <span style="text-align: right">Montant retourné</span>
+        <span>Motif</span>
+      </div>
+
+      @if (loading()) {
+        <div class="admin-loading">Chargement des remboursements...</div>
+      } @else if (items().length === 0) {
+        <div style="padding: 3rem; text-align: center; color: var(--muted)">
+          <span class="icon icon--lg" style="color: var(--muted-2); display: block; margin-bottom: 0.5rem">currency_exchange</span>
+          Aucun remboursement trouvé pour ce motif.
+        </div>
+      } @else {
+        @for (r of items(); track r.id_remboursement || $index) {
+          <div class="admin-table__row" style="grid-template-columns: 1.2fr 1.6fr 1.4fr 1.1fr 1.2fr">
+            <div style="font-size: 12px; font-variant-numeric: tabular-nums">{{ r.date_remboursement | date:'dd/MM/yyyy HH:mm' }}</div>
+            <div style="min-width: 0">
+              <strong style="display: block; font-size: 12.5px">{{ r.voyageur?.prenom }} {{ r.voyageur?.nom }}</strong>
+              <span class="muted" style="font-size: 11px">{{ r.voyageur?.email }}</span>
+            </div>
+            <div style="min-width: 0">
+              <strong style="display: block; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+                {{ r.reservation?.annonce?.titre || 'Séjour' }}
+              </strong>
+              @if (r.taux_applique !== undefined && r.taux_applique !== null) {
+                <span class="muted" style="font-size: 11px">Taux : {{ r.taux_applique }} %</span>
+              }
+            </div>
+            <div style="text-align: right; font-weight: 700; color: var(--danger); font-variant-numeric: tabular-nums">
+              -{{ r.montant | number:'1.2-2' }} DH
+            </div>
+            <div>
+              <span class="badge badge--neutral" style="font-size: 10px">{{ formatLabel(r.motif) }}</span>
+            </div>
+          </div>
+        }
+      }
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (lastPage() > 1) {
+    <div class="admin-pagination">
+      <span class="small muted">Page {{ page() }} sur {{ lastPage() }} (Total : {{ total() }})</span>
+      <div style="display: flex; gap: 0.25rem">
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="page() <= 1" (click)="setPage(page() - 1)">Précédent</button>
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="page() >= lastPage()" (click)="setPage(page() + 1)">Suivant</button>
+      </div>
+    </div>
+  }
+</div>

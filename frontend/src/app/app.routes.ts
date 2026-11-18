@@ -139,12 +139,20 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/annonces-moderation/annonces-moderation.component').then(m => m.AnnoncesModerationComponent)
       },
       {
+        path: 'reservations',
+        loadComponent: () => import('./features/admin/reservations-management/reservations-management.component').then(m => m.ReservationsManagementComponent)
+      },
+      {
         path: 'avis',
         loadComponent: () => import('./features/admin/avis-moderation/avis-moderation.component').then(m => m.AvisModerationComponent)
       },
       {
         path: 'litiges',
         loadComponent: () => import('./features/admin/litiges-management/litiges-management.component').then(m => m.LitigesManagementComponent)
+      },
+      {
+        path: 'transactions',
+        loadComponent: () => import('./features/admin/transactions-management/transactions-management.component').then(m => m.TransactionsManagementComponent)
       }
     ]
   },

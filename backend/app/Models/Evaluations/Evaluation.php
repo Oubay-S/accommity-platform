@@ -2,6 +2,8 @@
 
 namespace App\Models\Evaluations;
 
+use App\Models\Annonces\Annonce;
+use App\Models\Reservations\Reservation;
 use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -25,10 +27,27 @@ class Evaluation extends Model
     protected $casts = [
         'note' => 'decimal:2',
         'est_signale' => 'boolean',
+        'date_creation' => 'datetime',
+        'date_modification' => 'datetime',
     ];
 
     public function auteur()
     {
         return $this->belongsTo(User::class, 'id_auteur');
+    }
+
+    public function cible()
+    {
+        return $this->belongsTo(User::class, 'id_cible');
+    }
+
+    public function annonce()
+    {
+        return $this->belongsTo(Annonce::class, 'id_annonce');
+    }
+
+    public function reservation()
+    {
+        return $this->belongsTo(Reservation::class, 'id_reservation');
     }
 }

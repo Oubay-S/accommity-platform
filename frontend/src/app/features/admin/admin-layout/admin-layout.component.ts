@@ -23,14 +23,21 @@ export class AdminLayoutComponent {
 
   readonly user = this.auth.currentUser;
   readonly section = signal('Tableau de bord');
+  readonly sidebarOpen = signal(true);
+
+  toggleSidebar(): void {
+    this.sidebarOpen.update((v) => !v);
+  }
 
   private readonly titles: Record<string, string> = {
     '/admin': 'Tableau de bord',
     '/admin/utilisateurs': 'Utilisateurs',
     '/admin/verifications': "Vérifications d'identité",
     '/admin/annonces': 'Annonces',
+    '/admin/reservations': 'Réservations',
     '/admin/avis': 'Avis signalés',
     '/admin/litiges': 'Litiges',
+    '/admin/transactions': 'Transactions',
   };
 
   constructor() {
