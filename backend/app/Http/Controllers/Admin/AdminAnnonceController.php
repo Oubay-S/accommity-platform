@@ -45,6 +45,7 @@ class AdminAnnonceController extends Controller
     {
         try {
             $annonce = $this->adminService->approuverAnnonce($id);
+
             return ApiResponse::success($annonce, 'Annonce approuvée et publiée avec succès.');
         } catch (\Exception $e) {
             return ApiResponse::error('Annonce introuvable ou erreur de validation.', 404);

@@ -6,15 +6,23 @@ use App\Models\Reservations\Reservation;
 use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property-read Reservation|null $reservation
+ * @property-read User|null $voyageur
+ * @property-read Paiement|null $paiement
+ */
 class Remboursement extends Model
 {
     use HasUuids;
 
     protected $table = 'remboursements';
+
     protected $primaryKey = 'id_remboursement';
 
     const CREATED_AT = 'date_remboursement';
+
     const UPDATED_AT = null;
 
     protected $fillable = [
@@ -28,17 +36,20 @@ class Remboursement extends Model
         'date_remboursement' => 'datetime',
     ];
 
-    public function reservation()
+    /** @return BelongsTo<Reservation, $this> */
+    public function reservation(): BelongsTo
     {
         return $this->belongsTo(Reservation::class, 'id_reservation');
     }
 
-    public function voyageur()
+    /** @return BelongsTo<User, $this> */
+    public function voyageur(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_voyageur');
     }
 
-    public function paiement()
+    /** @return BelongsTo<Paiement, $this> */
+    public function paiement(): BelongsTo
     {
         return $this->belongsTo(Paiement::class, 'id_paiement');
     }

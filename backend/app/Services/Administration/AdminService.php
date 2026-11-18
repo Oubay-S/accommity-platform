@@ -124,16 +124,16 @@ class AdminService
     {
         $query = User::with(['profil', 'verificationIdentite'])->latest('date_creation');
 
-        if (!empty($filters['recherche'])) {
-            $like = '%' . mb_strtolower(trim($filters['recherche'])) . '%';
+        if (! empty($filters['recherche'])) {
+            $like = '%'.mb_strtolower(trim($filters['recherche'])).'%';
             $query->where(function ($q) use ($like) {
                 $q->whereRaw('LOWER(nom) LIKE ?', [$like])
-                  ->orWhereRaw('LOWER(prenom) LIKE ?', [$like])
-                  ->orWhereRaw('LOWER(email) LIKE ?', [$like]);
+                    ->orWhereRaw('LOWER(prenom) LIKE ?', [$like])
+                    ->orWhereRaw('LOWER(email) LIKE ?', [$like]);
             });
         }
 
-        if (!empty($filters['role']) && $filters['role'] !== 'tous') {
+        if (! empty($filters['role']) && $filters['role'] !== 'tous') {
             if ($filters['role'] === 'hote') {
                 $query->where('est_hote', true)->whereDoesntHave('administrateur');
             } elseif ($filters['role'] === 'voyageur') {
@@ -142,9 +142,9 @@ class AdminService
                 $query->whereHas('administrateur');
             } elseif ($filters['role'] === 'en_attente') {
                 $query->where('est_hote', true)
-                      ->whereHas('verificationIdentite', function ($q) {
-                          $q->where('statut', VerificationIdentite::STATUT_EN_COURS);
-                      });
+                    ->whereHas('verificationIdentite', function ($q) {
+                        $q->where('statut', VerificationIdentite::STATUT_EN_COURS);
+                    });
             }
         }
 
@@ -179,7 +179,7 @@ class AdminService
         $user = User::findOrFail($userId);
 
         if ($currentUserId && $user->id_utilisateur === $currentUserId) {
-            throw new InvalidArgumentException("Vous ne pouvez pas supprimer votre propre compte administrateur.");
+            throw new InvalidArgumentException('Vous ne pouvez pas supprimer votre propre compte administrateur.');
         }
 
         $user->delete();
@@ -193,10 +193,10 @@ class AdminService
         $user = User::findOrFail($userId);
 
         if ($currentUserId && $user->id_utilisateur === $currentUserId) {
-            throw new InvalidArgumentException("Vous ne pouvez pas désactiver votre propre compte administrateur.");
+            throw new InvalidArgumentException('Vous ne pouvez pas désactiver votre propre compte administrateur.');
         }
 
-        $user->est_actif = !$user->est_actif;
+        $user->est_actif = ! $user->est_actif;
         $user->save();
 
         return $user;
@@ -214,21 +214,21 @@ class AdminService
             'politiqueAnnulation',
         ])->latest('date_creation');
 
-        if (!empty($filters['statut']) && $filters['statut'] !== 'tous') {
+        if (! empty($filters['statut']) && $filters['statut'] !== 'tous') {
             $query->where('statut', $filters['statut']);
         }
 
-        if (!empty($filters['recherche'])) {
-            $like = '%' . mb_strtolower(trim($filters['recherche'])) . '%';
+        if (! empty($filters['recherche'])) {
+            $like = '%'.mb_strtolower(trim($filters['recherche'])).'%';
             $query->where(function ($q) use ($like) {
                 $q->whereRaw('LOWER(titre) LIKE ?', [$like])
-                  ->orWhereHas('hote', function ($qhote) use ($like) {
-                      $qhote->whereRaw('LOWER(nom) LIKE ?', [$like])
+                    ->orWhereHas('hote', function ($qhote) use ($like) {
+                        $qhote->whereRaw('LOWER(nom) LIKE ?', [$like])
                             ->orWhereRaw('LOWER(prenom) LIKE ?', [$like]);
-                  })
-                  ->orWhereHas('categorie', function ($qcat) use ($like) {
-                      $qcat->whereRaw('LOWER(ville) LIKE ?', [$like]);
-                  });
+                    })
+                    ->orWhereHas('categorie', function ($qcat) use ($like) {
+                        $qcat->whereRaw('LOWER(ville) LIKE ?', [$like]);
+                    });
             });
         }
 
@@ -241,7 +241,7 @@ class AdminService
     public function approuverAnnonce(string $annonceId): Annonce
     {
         $annonce = Annonce::findOrFail($annonceId);
-        $annonce->statut = StatutAnnonce::PUBLIEE->value;
+        $annonce->statut = StatutAnnonce::PUBLIEE;
         $annonce->motif_moderation = null;
         $annonce->save();
 
@@ -262,8 +262,8 @@ class AdminService
     public function suspendreAnnonce(string $annonceId, string $motif, string $nouveauStatut = 'suspendue'): Annonce
     {
         $statutCible = $nouveauStatut === 'rejetee'
-            ? StatutAnnonce::REJETEE->value
-            : StatutAnnonce::SUSPENDUE->value;
+            ? StatutAnnonce::REJETEE
+            : StatutAnnonce::SUSPENDUE;
 
         $annonce = Annonce::findOrFail($annonceId);
         $annonce->statut = $statutCible;
@@ -273,7 +273,7 @@ class AdminService
         Notification::create([
             'id_utilisateur' => $annonce->id_hote,
             'titre' => 'Notification de modération de votre annonce',
-            'contenu' => "Votre annonce \"{$annonce->titre}\" a été mise à jour avec le statut \"{$statutCible}\". Motif : {$motif}",
+            'contenu' => "Votre annonce \"{$annonce->titre}\" a été mise à jour avec le statut \"{$statutCible->value}\". Motif : {$motif}",
             'type_alerte' => TypeNotification::SYSTEME->value,
             'est_lue' => false,
         ]);
@@ -290,16 +290,16 @@ class AdminService
             ->where('est_signale', true)
             ->latest('date_creation');
 
-        if (!empty($filters['recherche'])) {
-            $like = '%' . mb_strtolower(trim($filters['recherche'])) . '%';
+        if (! empty($filters['recherche'])) {
+            $like = '%'.mb_strtolower(trim($filters['recherche'])).'%';
             $query->where(function ($q) use ($like) {
                 $q->whereRaw('LOWER(commentaire) LIKE ?', [$like])
-                  ->orWhereRaw('LOWER(motif_signalement) LIKE ?', [$like])
-                  ->orWhereHas('auteur', function ($qa) use ($like) {
-                      $qa->whereRaw('LOWER(nom) LIKE ?', [$like])
-                         ->orWhereRaw('LOWER(prenom) LIKE ?', [$like])
-                         ->orWhereRaw('LOWER(email) LIKE ?', [$like]);
-                  });
+                    ->orWhereRaw('LOWER(motif_signalement) LIKE ?', [$like])
+                    ->orWhereHas('auteur', function ($qa) use ($like) {
+                        $qa->whereRaw('LOWER(nom) LIKE ?', [$like])
+                            ->orWhereRaw('LOWER(prenom) LIKE ?', [$like])
+                            ->orWhereRaw('LOWER(email) LIKE ?', [$like]);
+                    });
             });
         }
 
@@ -368,19 +368,19 @@ class AdminService
     {
         $query = Reservation::with(['annonce', 'voyageur.profil', 'hote.profil'])->latest('date_creation');
 
-        if (!empty($filters['statut']) && $filters['statut'] !== 'tous') {
+        if (! empty($filters['statut']) && $filters['statut'] !== 'tous') {
             $query->where('statut', $filters['statut']);
         }
 
-        if (!empty($filters['recherche'])) {
-            $like = '%' . mb_strtolower(trim($filters['recherche'])) . '%';
+        if (! empty($filters['recherche'])) {
+            $like = '%'.mb_strtolower(trim($filters['recherche'])).'%';
             $query->where(function ($q) use ($like) {
                 $q->whereHas('voyageur', function ($qv) use ($like) {
                     $qv->whereRaw('LOWER(nom) LIKE ?', [$like])
-                       ->orWhereRaw('LOWER(prenom) LIKE ?', [$like]);
+                        ->orWhereRaw('LOWER(prenom) LIKE ?', [$like]);
                 })->orWhereHas('hote', function ($qh) use ($like) {
                     $qh->whereRaw('LOWER(nom) LIKE ?', [$like])
-                       ->orWhereRaw('LOWER(prenom) LIKE ?', [$like]);
+                        ->orWhereRaw('LOWER(prenom) LIKE ?', [$like]);
                 })->orWhereHas('annonce', function ($qa) use ($like) {
                     $qa->whereRaw('LOWER(titre) LIKE ?', [$like]);
                 });
@@ -397,25 +397,28 @@ class AdminService
     {
         if ($type === 'versements') {
             $query = Versement::with(['reservation.annonce', 'hote'])->latest('date_liberation_prevue');
-            if (!empty($filters['statut']) && $filters['statut'] !== 'tous') {
+            if (! empty($filters['statut']) && $filters['statut'] !== 'tous') {
                 $query->where('statut', $filters['statut']);
             }
+
             return $query->paginate($perPage);
         }
 
         if ($type === 'remboursements') {
             $query = Remboursement::with(['reservation.annonce', 'voyageur'])->latest('date_remboursement');
-            if (!empty($filters['motif']) && $filters['motif'] !== 'tous') {
+            if (! empty($filters['motif']) && $filters['motif'] !== 'tous') {
                 $query->where('motif', $filters['motif']);
             }
+
             return $query->paginate($perPage);
         }
 
         // Par défaut : paiements reçus
         $query = Paiement::with(['reservation.annonce', 'voyageur'])->latest('date_transaction');
-        if (!empty($filters['statut']) && $filters['statut'] !== 'tous') {
+        if (! empty($filters['statut']) && $filters['statut'] !== 'tous') {
             $query->where('statut', $filters['statut']);
         }
+
         return $query->paginate($perPage);
     }
 }

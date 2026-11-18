@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
 use App\Services\Administration\AdminService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AdminDashboardController extends Controller
 {
@@ -18,6 +19,7 @@ class AdminDashboardController extends Controller
     public function stats(): JsonResponse
     {
         $stats = $this->adminService->getStatistiquesGlobales();
+
         return ApiResponse::success($stats, 'Statistiques administratives récupérées.');
     }
 
@@ -25,7 +27,7 @@ class AdminDashboardController extends Controller
      * GET /api/admin/reservations
      * Supervision de toutes les réservations de la plateforme.
      */
-    public function reservations(\Illuminate\Http\Request $request): JsonResponse
+    public function reservations(Request $request): JsonResponse
     {
         $filters = [
             'statut' => $request->query('statut', 'tous'),
@@ -49,7 +51,7 @@ class AdminDashboardController extends Controller
      * GET /api/admin/finances
      * Supervision des flux financiers (paiements, versements, remboursements).
      */
-    public function finances(\Illuminate\Http\Request $request): JsonResponse
+    public function finances(Request $request): JsonResponse
     {
         $type = $request->query('type', 'paiements');
         $filters = [

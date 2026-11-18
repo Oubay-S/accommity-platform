@@ -445,6 +445,66 @@ parameters:
 			path: app/Http/Resources/Utilisateurs/VerificationIdentiteResource.php
 
 		-
+			message: '#^Relation ''administrateur'' is not found in App\\Models\\Utilisateurs\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 5
+			path: app/Services/Administration/AdminService.php
+
+		-
+			message: '#^Relation ''annonce'' is not found in App\\Models\\Reservations\\Reservation model\.$#'
+			identifier: larastan.relationExistence
+			count: 5
+			path: app/Services/Administration/AdminService.php
+
+		-
+			message: '#^Relation ''hote'' is not found in App\\Models\\Reservations\\Reservation model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Services/Administration/AdminService.php
+
+		-
+			message: '#^Relation ''profil'' is not found in App\\Models\\Utilisateurs\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/Administration/AdminService.php
+
+		-
+			message: '#^Relation ''verificationIdentite'' is not found in App\\Models\\Utilisateurs\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Services/Administration/AdminService.php
+
+		-
+			message: '#^Relation ''voyageur'' is not found in App\\Models\\Reservations\\Reservation model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Services/Administration/AdminService.php
+
+		-
+			message: '#^Relation ''annonce'' is not found in App\\Models\\Reservations\\Reservation model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/Administration/LitigeService.php
+
+		-
+			message: '#^Relation ''hote'' is not found in App\\Models\\Reservations\\Reservation model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/Administration/LitigeService.php
+
+		-
+			message: '#^Relation ''profil'' is not found in App\\Models\\Utilisateurs\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/Administration/LitigeService.php
+
+		-
+			message: '#^Relation ''voyageur'' is not found in App\\Models\\Reservations\\Reservation model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/Administration/LitigeService.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_arrivee\.$#'
 			identifier: property.notFound
 			count: 1

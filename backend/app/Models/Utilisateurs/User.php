@@ -7,6 +7,7 @@ use App\Models\Notifications\Notification;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -44,13 +45,18 @@ class User extends Authenticatable
         ];
     }
 
-    public function profil()
+    /** @return HasOne<Profil, $this> */
+    public function profil(): HasOne
     {
         return $this->hasOne(Profil::class, 'id_utilisateur');
     }
 
-    /** Latest identity verification request (a host may resubmit after a rejection). */
-    public function verificationIdentite()
+    /**
+     * Latest identity verification request (a host may resubmit after a rejection).
+     *
+     * @return HasOne<VerificationIdentite, $this>
+     */
+    public function verificationIdentite(): HasOne
     {
         // Not latestOfMany(): it runs MAX() on the UUID primary key, which PostgreSQL doesn't support.
         return $this->hasOne(VerificationIdentite::class, 'id_utilisateur')->latest('date_soumission');
@@ -62,7 +68,8 @@ class User extends Authenticatable
         return $this->hasMany(VerificationIdentite::class, 'id_utilisateur');
     }
 
-    public function administrateur()
+    /** @return HasOne<Administrateur, $this> */
+    public function administrateur(): HasOne
     {
         return $this->hasOne(Administrateur::class, 'id_utilisateur');
     }

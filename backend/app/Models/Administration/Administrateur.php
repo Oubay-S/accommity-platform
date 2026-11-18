@@ -6,13 +6,19 @@ use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property-read User|null $utilisateur
+ */
 class Administrateur extends Model
 {
     use HasFactory, HasUuids;
 
     protected $table = 'administrateurs';
+
     protected $primaryKey = 'id_admin';
+
     public $timestamps = false;
 
     protected $fillable = ['id_utilisateur', 'derniere_connexion'];
@@ -24,7 +30,8 @@ class Administrateur extends Model
         ];
     }
 
-    public function utilisateur()
+    /** @return BelongsTo<User, $this> */
+    public function utilisateur(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_utilisateur');
     }

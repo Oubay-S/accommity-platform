@@ -6,13 +6,20 @@ use App\Models\Reservations\Reservation;
 use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property-read Reservation|null $reservation
+ * @property-read User|null $hote
+ */
 class Versement extends Model
 {
     use HasUuids;
 
     protected $table = 'versements';
+
     protected $primaryKey = 'id_versement';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -26,12 +33,14 @@ class Versement extends Model
         'date_liberation_prevue' => 'datetime',
     ];
 
-    public function reservation()
+    /** @return BelongsTo<Reservation, $this> */
+    public function reservation(): BelongsTo
     {
         return $this->belongsTo(Reservation::class, 'id_reservation');
     }
 
-    public function hote()
+    /** @return BelongsTo<User, $this> */
+    public function hote(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_hote');
     }

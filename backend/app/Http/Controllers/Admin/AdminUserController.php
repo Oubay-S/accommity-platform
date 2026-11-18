@@ -58,6 +58,7 @@ class AdminUserController extends Controller
 
         try {
             $user = $this->adminService->updateUser($id, $validated);
+
             return ApiResponse::success([
                 'user' => $user,
             ], 'Utilisateur mis à jour avec succès.');
@@ -70,6 +71,7 @@ class AdminUserController extends Controller
     {
         try {
             $this->adminService->deleteUser($id, $request->user()?->id_utilisateur);
+
             return ApiResponse::success(null, 'Utilisateur supprimé avec succès.');
         } catch (\InvalidArgumentException $e) {
             return ApiResponse::error($e->getMessage(), 422);

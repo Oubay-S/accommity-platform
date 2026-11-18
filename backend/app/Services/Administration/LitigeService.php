@@ -25,19 +25,19 @@ class LitigeService
             'admin.utilisateur',
         ])->latest('date_creation');
 
-        if (!empty($filters['statut']) && $filters['statut'] !== 'tous') {
+        if (! empty($filters['statut']) && $filters['statut'] !== 'tous') {
             $query->where('statut', $filters['statut']);
         }
 
-        if (!empty($filters['recherche'])) {
-            $like = '%' . mb_strtolower(trim($filters['recherche'])) . '%';
+        if (! empty($filters['recherche'])) {
+            $like = '%'.mb_strtolower(trim($filters['recherche'])).'%';
             $query->where(function ($q) use ($like) {
                 $q->whereRaw('LOWER(motif) LIKE ?', [$like])
-                  ->orWhereHas('declarant', function ($qdeclarant) use ($like) {
-                      $qdeclarant->whereRaw('LOWER(nom) LIKE ?', [$like])
-                                 ->orWhereRaw('LOWER(prenom) LIKE ?', [$like])
-                                 ->orWhereRaw('LOWER(email) LIKE ?', [$like]);
-                  });
+                    ->orWhereHas('declarant', function ($qdeclarant) use ($like) {
+                        $qdeclarant->whereRaw('LOWER(nom) LIKE ?', [$like])
+                            ->orWhereRaw('LOWER(prenom) LIKE ?', [$like])
+                            ->orWhereRaw('LOWER(email) LIKE ?', [$like]);
+                    });
             });
         }
 
@@ -73,7 +73,7 @@ class LitigeService
 
         // Notifier la seconde partie concernée (cible de l'évaluation ou autre acteur de la réservation)
         $secondePartieId = $litige->evaluation?->id_cible;
-        if (!$secondePartieId && $litige->reservation) {
+        if (! $secondePartieId && $litige->reservation) {
             $secondePartieId = $litige->reservation->id_voyageur === $litige->id_declarant
                 ? $litige->reservation->id_hote
                 : $litige->reservation->id_voyageur;

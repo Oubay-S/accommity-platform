@@ -43,6 +43,7 @@ class AdminAvisController extends Controller
     {
         try {
             $avis = $this->adminService->ignorerSignalementAvis($id);
+
             return ApiResponse::success($avis, 'Le signalement a été ignoré et l\'avis est maintenu en ligne.');
         } catch (\Exception $e) {
             return ApiResponse::error('Avis introuvable ou erreur de traitement.', 404);
@@ -57,6 +58,7 @@ class AdminAvisController extends Controller
     {
         try {
             $this->adminService->supprimerAvis($id);
+
             return ApiResponse::success(null, 'L\'avis signalé a été supprimé avec succès.');
         } catch (\Exception $e) {
             return ApiResponse::error('Avis introuvable ou erreur de suppression.', 404);
