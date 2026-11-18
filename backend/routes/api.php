@@ -33,6 +33,7 @@ Route::prefix('auth')->group(function () {
 // ── 2. Annonces Publiques & Recherche (RG10, RG11) ──
 Route::get('/annonces', [AnnonceController::class, 'index']);
 Route::get('/annonces/en-vedette', [AnnonceController::class, 'enVedette']);
+Route::get('/annonces/references', [AnnonceController::class, 'references']);
 Route::get('/annonces/{id}', [AnnonceController::class, 'show']);
 Route::get('/annonces/{id}/disponibilites', [CalendrierController::class, 'show']);
 Route::get('/annonces/{id}/avis', [EvaluationController::class, 'annonceAvis']);
@@ -82,8 +83,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role.hote')->prefix('hote')->group(function () {
         Route::get('/annonces', [AnnonceController::class, 'mesAnnonces']);
         Route::post('/annonces', [AnnonceController::class, 'store']);
+        Route::get('/annonces/{id}', [AnnonceController::class, 'showHote']);
         Route::put('/annonces/{id}', [AnnonceController::class, 'update']);
         Route::delete('/annonces/{id}', [AnnonceController::class, 'destroy']);
+        Route::post('/annonces/{id}/photos', [AnnonceController::class, 'ajouterPhotos']);
+        Route::delete('/annonces/{id}/photos', [AnnonceController::class, 'supprimerPhoto']);
+        Route::get('/annonces/{id}/calendrier', [CalendrierController::class, 'calendrierHote']);
         Route::post('/annonces/{id}/bloquer', [CalendrierController::class, 'bloquer']);
         Route::post('/annonces/{id}/debloquer', [CalendrierController::class, 'debloquer']);
 

@@ -112,6 +112,77 @@ class AnnonceRepository implements AnnonceRepositoryInterface
         )->find($id);
     }
 
+    public function mesAnnonces(string $hoteId, array $criteres, int $parPage): LengthAwarePaginator
+    {
+        $query = $this->avecNote(
+            Annonce::query()
+                ->where('id_hote', $hoteId)
+                ->with(['categorie', 'politiqueAnnulation'])
+        )->withCount([
+            'reservations as reservations_actives_count' => fn ($q) => $q->whereIn('statut', [
+                StatutReservation::CONFIRMEE->value,
+                StatutReservation::EN_COURS->value,
+            ]),
+        ]);
+
+        if (!empty($criteres['statut'])) {
+            $query->where('statut', $criteres['statut']);
+        }
+
+        if (!empty($criteres['recherche'])) {
+            $recherche = '%' . mb_strtolower(trim($criteres['recherche'])) . '%';
+            $query->where(function ($q) use ($recherche) {
+                $q->whereRaw('LOWER(titre) LIKE ?', [$recherche])
+                  ->orWhereRaw('LOWER(adresse) LIKE ?', [$recherche]);
+            });
+        }
+
+        return $query->orderByDesc('date_creation')->orderBy('id_annonce')->paginate($parPage);
+    }
+
+    public function findPourHote(string $id, string $hoteId): ?Annonce
+    {
+        return $this->avecNote(
+            Annonce::query()
+                ->where('id_hote', $hoteId)
+                ->with(['categorie', 'politiqueAnnulation'])
+        )->withCount([
+            'reservations as reservations_actives_count' => fn ($q) => $q->whereIn('statut', [
+                StatutReservation::CONFIRMEE->value,
+                StatutReservation::EN_COURS->value,
+            ]),
+        ])->find($id);
+    }
+
+    public function compterParStatut(string $hoteId): array
+    {
+        $compteurs = Annonce::query()
+            ->where('id_hote', $hoteId)
+            ->selectRaw('statut, COUNT(*) as total')
+            ->groupBy('statut')
+            ->pluck('total', 'statut')
+            ->toArray();
+
+        $resultat = ['total' => array_sum($compteurs)];
+
+        foreach (StatutAnnonce::cases() as $statut) {
+            $resultat[$statut->value] = (int) ($compteurs[$statut->value] ?? 0);
+        }
+
+        return $resultat;
+    }
+
+    public function aDesReservationsActives(string $id): bool
+    {
+        return Annonce::query()
+            ->whereKey($id)
+            ->whereHas('reservations', fn ($q) => $q->whereIn('statut', [
+                StatutReservation::CONFIRMEE->value,
+                StatutReservation::EN_COURS->value,
+            ]))
+            ->exists();
+    }
+
     /** [PORTED] partie lecture de calculerNoteGlobale() : moyenne des avis voyageurs. */
     private function avecNote(Builder $query): Builder
     {

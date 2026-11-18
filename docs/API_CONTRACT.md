@@ -154,7 +154,31 @@ Le document n'est **jamais** accessible publiquement (loi 09-08).
 
 Rappels planifiés : `php artisan reminders:send` (hôte 48 h, voyageur 24 h), idempotent.
 
-## 7. Angular
+## 7. Annonces hôte & calendrier (RG06, RG07, RG08, RG09)
+
+Routes protégées par `auth:sanctum` + `role.hote` (hôte vérifié RG03).
+
+| Méthode | Route | Description |
+| --- | --- | --- |
+| GET | `/api/annonces/references` | Référentiels publics : villes, politiques, types de logement |
+| GET | `/api/hote/annonces?statut=&recherche=&page=&per_page=` | Mes annonces + `statistiques` par statut |
+| GET | `/api/hote/annonces/{id}` | Détail d'une annonce même non publiée |
+| POST | `/api/hote/annonces` | Création `multipart/form-data` avec `photos[]` → `201` |
+| PUT | `/api/hote/annonces/{id}` | Mise à jour des champs (JSON, sans photos) |
+| DELETE | `/api/hote/annonces/{id}` | Suppression — `409` si réservations actives |
+| POST | `/api/hote/annonces/{id}/photos` | Ajout de photos `photos[]` (max 10 au total) |
+| DELETE | `/api/hote/annonces/{id}/photos?url=` | Suppression d'une photo |
+| GET | `/api/hote/annonces/{id}/calendrier?debut=&fin=` | Blocages manuels + nuits réservées |
+| POST | `/api/hote/annonces/{id}/bloquer` | `{ date_debut, date_fin }` inclusif |
+| POST | `/api/hote/annonces/{id}/debloquer` | `{ date_debut, date_fin }` inclusif |
+
+Codes d'erreur métier : `ANNONCE_INTROUVABLE` (404), `ACCES_REFUSE` (403),
+`ANNONCE_AYANT_RESERVATIONS` (409), `DATES_RESERVEES` (409), `VALIDATION_ECHOUEE` (422).
+
+Photos : stockées dans `storage/app/public/annonces/{id_annonce}/`, servies via
+`/storage/...` (nécessite `php artisan storage:link`), URLs absolues dans les réponses.
+
+## 8. Angular
 
 - `ApiService` déballe automatiquement `data` et normalise les erreurs en `ApiError` (`status`, `message`, `errors`, `errorCode`).
 - En développement, `/api` est proxifié vers Laravel (`frontend/proxy.conf.mjs`, cible surchargeable par `API_PROXY_TARGET`).

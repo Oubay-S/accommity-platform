@@ -4,6 +4,7 @@ return [
     'commission_rate' => 0.12, // Frais de service plateforme (12%)
     'delai_reponse_hote_heures' => 24, // RG15
     'delai_versement_hote_heures' => 24, // 24h après check-in
+    'types_logement' => ['appartement', 'maison', 'villa', 'riad', 'studio', 'chambre'],
     'politiques' => [
         'flexible' => [
             'delai_remb_total' => 24,
