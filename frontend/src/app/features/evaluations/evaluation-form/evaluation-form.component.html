@@ -1,3 +1,111 @@
-<div class="evaluation-form-page">
-  <h2>Evaluation Form</h2>
+<div class="container page">
+  <a routerLink="/profil/evaluations" class="back-link">
+    <span class="icon icon--sm">arrow_back</span> Mes évaluations
+  </a>
+
+  @if (loading()) {
+    <div class="card state-card">
+      <span class="spinner" aria-hidden="true"></span>
+      <p class="muted">Chargement du séjour…</p>
+    </div>
+  } @else if (loadError()) {
+    <div class="card state-card">
+      <span class="icon icon--lg" aria-hidden="true">error</span>
+      <h1>Évaluation indisponible</h1>
+      <p class="muted">{{ loadError() }}</p>
+      <a routerLink="/profil/evaluations" class="btn btn--dark">Retour à mes évaluations</a>
+    </div>
+  } @else if (reservation(); as sejour) {
+    <header class="page-head">
+      <span class="eyebrow">Avis post-séjour</span>
+      <h1>Partagez votre expérience</h1>
+      <p class="muted">
+        Votre avis aide la communauté et améliore la qualité des séjours.
+      </p>
+    </header>
+
+    <section class="card sejour-card">
+      <div>
+        <span class="muted small">Séjour</span>
+        <h2>{{ sejour.annonce?.titre || 'Séjour terminé' }}</h2>
+        <p class="muted small">
+          Du {{ sejour.date_arrivee }} au {{ sejour.date_depart }}
+          @if (sejour.cible) {
+            · avec {{ sejour.cible.prenom }} {{ sejour.cible.nom }}
+          }
+        </p>
+      </div>
+      <span class="badge">{{ sejour.role === 'voyageur' ? 'Voyageur' : 'Hôte' }}</span>
+    </section>
+
+    <form class="card evaluation-form" [formGroup]="form" (ngSubmit)="soumettre()">
+      <div class="field">
+        <span class="field__label">Note globale</span>
+        <app-star-rating-input
+          label="Note globale"
+          [value]="noteControl.value"
+          (valueChange)="setNote($event)"
+        />
+        @if (champInvalide('note')) {
+          <p class="field__error">Choisissez une note entre 1 et 5.</p>
+        }
+      </div>
+
+      @if (estVoyageur()) {
+        <fieldset class="criteres">
+          <legend>Notes détaillées</legend>
+          <div class="criteres__grid">
+            @for (critere of criteres; track critere.cle) {
+              <div class="critere">
+                <span class="field__label">{{ critere.libelle }}</span>
+                <app-star-rating-input
+                  [label]="critere.libelle"
+                  [value]="valeurCritere(critere.cle)"
+                  (valueChange)="setCritere(critere.cle, $event)"
+                />
+                @if (notesGroup.get(critere.cle)?.invalid && notesGroup.get(critere.cle)?.touched) {
+                  <p class="field__error">Note requise.</p>
+                }
+              </div>
+            }
+          </div>
+        </fieldset>
+      }
+
+      <div class="field">
+        <label class="field__label" for="commentaire">Votre commentaire</label>
+        <textarea
+          id="commentaire"
+          class="field__input"
+          rows="5"
+          formControlName="commentaire"
+          placeholder="Décrivez votre séjour, l’accueil, la propreté…"
+        ></textarea>
+        <div class="field__hint">
+          <span>{{ commentaireControl.value.length }} / 2000</span>
+          @if (champInvalide('commentaire')) {
+            <span class="field__error">Le commentaire doit contenir au moins 10 caractères.</span>
+          }
+        </div>
+      </div>
+
+      @if (serverError()) {
+        <div class="alert alert--danger">
+          <span class="icon icon--sm">error</span>
+          <span>{{ serverError() }}</span>
+        </div>
+      }
+
+      <div class="actions">
+        <a routerLink="/profil/evaluations" class="btn btn--ghost">Annuler</a>
+        <button type="submit" class="btn btn--dark" [disabled]="submitting()">
+          @if (submitting()) {
+            Publication…
+          } @else {
+            Publier mon avis
+          }
+        </button>
+      </div>
+    </form>
+  }
 </div>

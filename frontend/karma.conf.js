@@ -32,10 +32,10 @@ module.exports = function (config) {
       // Seuils plancher : empêchent toute régression, à relever progressivement.
       check: {
         global: {
-          statements: 18,
-          branches: 9,
-          functions: 8,
-          lines: 17
+          statements: 44,
+          branches: 25,
+          functions: 31,
+          lines: 44
         }
       }
     },

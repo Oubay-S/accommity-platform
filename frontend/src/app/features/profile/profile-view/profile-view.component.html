@@ -17,6 +17,9 @@
         <a routerLink="/profil/verification-identite" routerLinkActive="side-nav__item--active" class="side-nav__item">
           <span class="icon">verified_user</span> Vérification d'identité
         </a>
+        <a routerLink="/profil/evaluations" routerLinkActive="side-nav__item--active" class="side-nav__item">
+          <span class="icon">reviews</span> Mes évaluations
+        </a>
         <a routerLink="/notifications" routerLinkActive="side-nav__item--active" class="side-nav__item">
           <span class="icon">notifications</span> Notifications
         </a>
@@ -99,6 +102,8 @@
             {{ u.profil?.description || "Vous n'avez pas encore renseigné de biographie." }}
           </p>
         </section>
+
+        <app-evaluation-recues />
 
         <section class="card section">
           <div class="section__head">

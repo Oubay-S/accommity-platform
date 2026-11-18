@@ -1,0 +1,41 @@
+<section class="card section recues">
+  <div class="section__head recues__head">
+    <div>
+      <h3 class="section__title"><span class="icon">reviews</span> Avis reçus</h3>
+      <p class="section__desc">Ce que les autres disent de vos séjours.</p>
+    </div>
+    <a routerLink="/profil/evaluations" class="btn btn--ghost btn--sm">Tout voir</a>
+  </div>
+
+  @if (loading()) {
+    <p class="muted small">Chargement des avis…</p>
+  } @else if (erreur()) {
+    <p class="muted small">{{ erreur() }}</p>
+  } @else if (page(); as p) {
+    @if (p.statistiques.nb_avis > 0) {
+      <div class="recues__summary">
+        <strong>{{ p.statistiques.note_moyenne.toFixed(1) }}</strong>
+        <app-rating-stars [note]="p.statistiques.note_moyenne" taille="sm" />
+        <span class="muted small">{{ p.statistiques.nb_avis }} avis</span>
+      </div>
+    }
+
+    @if (p.items.length === 0) {
+      <p class="muted small">Vous n’avez pas encore reçu d’avis.</p>
+    } @else {
+      <ul class="recues__list">
+        @for (avis of p.items; track avis.id_evaluation) {
+          <li>
+            <div class="recues__line">
+              <strong>{{ avis.auteur?.prenom }} {{ avis.auteur?.nom }}</strong>
+              <app-rating-stars [note]="avis.note" taille="sm" />
+              <span class="muted small">{{ dateLisible(avis.date_creation) }}</span>
+            </div>
+            <p class="muted small recues__annonce">{{ avis.annonce?.titre }}</p>
+            <p class="recues__comment">{{ avis.commentaire }}</p>
+          </li>
+        }
+      </ul>
+    }
+  }
+</section>
