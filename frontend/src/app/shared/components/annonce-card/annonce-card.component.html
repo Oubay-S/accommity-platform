@@ -1,2 +1,57 @@
-<div class="annonce-card-container">
-</div>
+<a [routerLink]="['/annonces', annonce.id_annonce]" class="annonce-card">
+  <div class="annonce-card__media">
+    @if (annonce.photo_principale) {
+      <img
+        [src]="annonce.photo_principale"
+        [alt]="annonce.titre + ' à ' + locationLabel"
+        loading="lazy"
+        class="annonce-card__img"
+      />
+    } @else {
+      <div class="annonce-card__placeholder" aria-hidden="true">
+        <span class="icon">villa</span>
+      </div>
+    }
+
+    <span class="annonce-card__location">
+      <span class="icon icon--sm" aria-hidden="true">location_on</span>
+      {{ locationLabel }}
+    </span>
+
+    <button
+      type="button"
+      class="annonce-card__fav"
+      aria-label="Ajouter aux favoris"
+      (click)="onFavoriteClick($event)"
+    >
+      <span class="icon icon--sm" aria-hidden="true">favorite_border</span>
+    </button>
+  </div>
+
+  <div class="annonce-card__body">
+    <h3 class="annonce-card__title">{{ annonce.titre }}</h3>
+    <p class="annonce-card__spec tabular">
+      {{ typeLabel }} · {{ annonce.capacite }} voyageur{{ annonce.capacite > 1 ? 's' : '' }}
+    </p>
+
+    <div class="annonce-card__price-row">
+      <strong class="annonce-card__price tabular">{{ annonce.tarif_nuit | currencyMad }}</strong>
+      <span class="annonce-card__unit">/ nuit</span>
+    </div>
+
+    <div class="annonce-card__footer">
+      @if (annonce.nb_avis > 0) {
+        <div class="annonce-card__rating tabular">
+          <app-rating-stars [note]="annonce.note_moyenne" taille="sm" />
+          <strong>{{ annonce.note_moyenne.toFixed(1) }}</strong>
+          <span class="muted">({{ annonce.nb_avis }} avis)</span>
+        </div>
+      } @else {
+        <span class="annonce-card__new">
+          <span class="icon icon--sm" aria-hidden="true">auto_awesome</span>
+          Nouveau
+        </span>
+      }
+    </div>
+  </div>
+</a>

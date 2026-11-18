@@ -1,13 +1,30 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { AnnonceResume } from '../../models/annonce.model';
+import { CurrencyMadPipe } from '../../pipes/currency-mad.pipe';
+import { RatingStarsComponent } from '../rating-stars/rating-stars.component';
 
 @Component({
   selector: 'app-annonce-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [RouterLink, CurrencyMadPipe, RatingStarsComponent],
   templateUrl: './annonce-card.component.html',
-  styleUrl: './annonce-card.component.scss'
+  styleUrl: './annonce-card.component.scss',
 })
 export class AnnonceCardComponent {
-  // Squelette de composant partage
+  @Input({ required: true }) annonce!: AnnonceResume;
+
+  get typeLabel(): string {
+    const t = this.annonce.type_logement || 'Hébergement';
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }
+
+  get locationLabel(): string {
+    return this.annonce.ville || this.annonce.region || 'Maroc';
+  }
+
+  onFavoriteClick(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+  }
 }

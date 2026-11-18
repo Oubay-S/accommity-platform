@@ -1,3 +1,191 @@
-<div class="annonce-list-page">
-  <h2>Annonce List</h2>
+<div class="list-top">
+  <div class="container">
+    <app-search-bar [compact]="true" [initial]="criteres()" />
+  </div>
+</div>
+
+<div class="container list-layout">
+  <!-- Bouton Filtres mobile (< 1024px) -->
+  <div class="list-mobile-bar">
+    <button
+      type="button"
+      class="btn btn--ghost"
+      (click)="filtersOpen.set(true)"
+      aria-label="Ouvrir les filtres"
+    >
+      <span class="icon icon--sm" aria-hidden="true">tune</span>
+      Filtres
+    </button>
+  </div>
+
+  <!-- Backdrop drawer mobile -->
+  @if (filtersOpen()) {
+    <div class="filters-backdrop" (click)="filtersOpen.set(false)" aria-hidden="true"></div>
+  }
+
+  <!-- Sidebar filtres -->
+  <aside
+    class="filters-sidebar"
+    [class.is-open]="filtersOpen()"
+    aria-label="Filtres de recherche"
+  >
+    <div class="filters-sidebar__head">
+      <h2>Filtres</h2>
+      <div class="filters-sidebar__head-actions">
+        @if (hasActiveFilters) {
+          <button type="button" class="filters-clear" (click)="clearFilters()">
+            Effacer les filtres
+          </button>
+        }
+        <button
+          type="button"
+          class="filters-close"
+          aria-label="Fermer les filtres"
+          (click)="filtersOpen.set(false)"
+        >
+          <span class="icon icon--sm" aria-hidden="true">close</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h3>Budget par nuit (DH)</h3>
+      <div class="filter-price-row">
+        <div class="field">
+          <label for="f-prix-min">Min</label>
+          <input
+            id="f-prix-min"
+            type="number"
+            min="0"
+            placeholder="0"
+            [(ngModel)]="prixMin"
+            (change)="applySidebarNumbers()"
+            class="tabular"
+          />
+        </div>
+        <div class="field">
+          <label for="f-prix-max">Max</label>
+          <input
+            id="f-prix-max"
+            type="number"
+            min="0"
+            placeholder="5000"
+            [(ngModel)]="prixMax"
+            (change)="applySidebarNumbers()"
+            class="tabular"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h3>Type de logement</h3>
+      <div class="filter-chips">
+        @for (t of typesLogement; track t.value) {
+          <button
+            type="button"
+            class="chip filter-chip"
+            [class.is-selected]="criteres().type_logement === t.value"
+            (click)="toggleTypeLogement(t.value)"
+          >
+            {{ t.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h3>Voyageurs minimum</h3>
+      <div class="field">
+        <label for="f-voyageurs" class="sr-only">Nombre de voyageurs</label>
+        <input
+          id="f-voyageurs"
+          type="number"
+          min="1"
+          max="50"
+          placeholder="Ex : 2"
+          [(ngModel)]="voyageurs"
+          (change)="applySidebarNumbers()"
+          class="tabular"
+        />
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h3>Équipements</h3>
+      <div class="filter-checks">
+        @for (eq of equipementsOptions; track eq.value) {
+          <label class="filter-check">
+            <input
+              type="checkbox"
+              [checked]="hasEquipement(eq.value)"
+              (change)="toggleEquipement(eq.value)"
+            />
+            <span>{{ eq.label }}</span>
+          </label>
+        }
+      </div>
+    </div>
+
+    <div class="filters-sidebar__mobile-footer">
+      <button type="button" class="btn btn--dark" (click)="filtersOpen.set(false)">
+        Voir les résultats
+      </button>
+    </div>
+  </aside>
+
+  <!-- Résultats -->
+  <main class="results-main">
+    <div class="results-head">
+      <p class="results-count tabular">
+        <strong>{{ pagination().total }}</strong>
+        hébergement{{ pagination().total > 1 ? 's' : '' }}
+      </p>
+
+      <div class="results-sort">
+        <label for="sort-select" class="muted">Trier par</label>
+        <select id="sort-select" [(ngModel)]="tri" (change)="onTriChange()">
+          <option value="recent">Plus récents</option>
+          <option value="prix_asc">Prix croissant</option>
+          <option value="prix_desc">Prix décroissant</option>
+        </select>
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="results-error" role="alert">
+        <span class="icon icon--sm" aria-hidden="true">error_outline</span>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="results-grid" aria-busy="true" aria-label="Chargement des résultats">
+        @for (s of skeletons; track s) {
+          <div class="skeleton-card">
+            <div class="skeleton-card__img"></div>
+            <div class="skeleton-card__line skeleton-card__line--lg"></div>
+            <div class="skeleton-card__line skeleton-card__line--sm"></div>
+          </div>
+        }
+      </div>
+    } @else if (annonces().length === 0) {
+      <div class="empty-state">
+        <span class="icon" aria-hidden="true">search_off</span>
+        <h3>Aucun hébergement ne correspond à votre recherche</h3>
+        <p class="muted">Essayez d'élargir vos dates ou de modifier vos filtres.</p>
+        <button type="button" class="btn btn--dark" (click)="clearFilters()">
+          Effacer les filtres
+        </button>
+      </div>
+    } @else {
+      <div class="results-grid">
+        @for (annonce of annonces(); track annonce.id_annonce) {
+          <app-annonce-card [annonce]="annonce" />
+        }
+      </div>
+
+      <app-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)" />
+    }
+  </main>
 </div>

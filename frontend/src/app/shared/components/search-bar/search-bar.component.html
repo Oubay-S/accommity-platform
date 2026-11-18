@@ -1,2 +1,72 @@
-<div class="search-bar-container">
-</div>
+<form
+  class="search-capsule"
+  [class.search-capsule--compact]="compact"
+  (ngSubmit)="onSubmit()"
+  role="search"
+  aria-label="Rechercher un hébergement"
+>
+  <div class="search-capsule__cell">
+    <label for="sb-ville" class="search-capsule__label">Destination</label>
+    <input
+      id="sb-ville"
+      name="ville"
+      type="text"
+      [(ngModel)]="ville"
+      placeholder="Marrakech, Fès, Tanger…"
+      class="search-capsule__input"
+    />
+  </div>
+
+  <div class="search-capsule__divider" aria-hidden="true"></div>
+
+  <div class="search-capsule__cell">
+    <label for="sb-arrivee" class="search-capsule__label">Arrivée</label>
+    <input
+      id="sb-arrivee"
+      name="date_arrivee"
+      type="date"
+      [min]="today"
+      [(ngModel)]="date_arrivee"
+      class="search-capsule__input tabular"
+    />
+  </div>
+
+  <div class="search-capsule__divider" aria-hidden="true"></div>
+
+  <div class="search-capsule__cell">
+    <label for="sb-depart" class="search-capsule__label">Départ</label>
+    <input
+      id="sb-depart"
+      name="date_depart"
+      type="date"
+      [min]="date_arrivee || today"
+      [(ngModel)]="date_depart"
+      class="search-capsule__input tabular"
+    />
+  </div>
+
+  <div class="search-capsule__divider" aria-hidden="true"></div>
+
+  <div class="search-capsule__cell search-capsule__cell--guests">
+    <label for="sb-voyageurs" class="search-capsule__label">Voyageurs</label>
+    <input
+      id="sb-voyageurs"
+      name="voyageurs"
+      type="number"
+      min="1"
+      max="50"
+      [(ngModel)]="voyageurs"
+      placeholder="2"
+      class="search-capsule__input tabular"
+    />
+  </div>
+
+  <button type="submit" class="btn btn--primary search-capsule__submit">
+    <span class="icon icon--sm" aria-hidden="true">search</span>
+    Rechercher
+  </button>
+</form>
+
+@if (erreur()) {
+  <p class="search-capsule__error" role="alert">{{ erreur() }}</p>
+}

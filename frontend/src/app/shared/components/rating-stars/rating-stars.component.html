@@ -1,2 +1,18 @@
-<div class="rating-stars-container">
-</div>
+<span
+  class="rating-stars"
+  [class.rating-stars--sm]="taille === 'sm'"
+  [class.rating-stars--md]="taille === 'md'"
+  [class.rating-stars--lg]="taille === 'lg'"
+  [attr.aria-label]="ariaLabel"
+  role="img"
+>
+  @for (star of stars; track star) {
+    <span
+      class="icon rating-stars__star"
+      [class.rating-stars__star--filled]="star <= roundedNote"
+      aria-hidden="true"
+    >
+      star
+    </span>
+  }
+</span>
