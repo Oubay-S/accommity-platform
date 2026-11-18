@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Annonces;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RechercheAnnoncesRequest extends FormRequest
 {
@@ -32,7 +33,7 @@ class RechercheAnnoncesRequest extends FormRequest
             'date_arrivee' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:today', 'required_with:date_depart'],
             'date_depart' => ['nullable', 'date_format:Y-m-d', 'after:date_arrivee', 'required_with:date_arrivee'],
             'prix_min' => ['nullable', 'numeric', 'min:0'],
-            'prix_max' => ['nullable', 'numeric', 'min:0', 'gte:prix_min'],
+            'prix_max' => ['nullable', 'numeric', 'min:0', Rule::when($this->filled('prix_min'), 'gte:prix_min')],
             'equipements' => ['nullable', 'array'],
             'equipements.*' => ['string', 'max:50'],
             'tri' => ['nullable', 'in:recent,prix_asc,prix_desc'],

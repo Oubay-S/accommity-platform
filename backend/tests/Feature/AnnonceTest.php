@@ -120,6 +120,10 @@ class AnnonceTest extends TestCase
             ->assertOk()
             ->assertJsonCount(1, 'data.items')
             ->assertJsonPath('data.items.0.id_annonce', $cible->getKey());
+
+        $this->getJson('/api/annonces?prix_max=500')
+            ->assertOk()
+            ->assertJsonCount(1, 'data.items');
     }
 
     public function test_structure_pagination_et_plafond_per_page(): void
