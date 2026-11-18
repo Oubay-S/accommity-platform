@@ -3,17 +3,25 @@
 namespace App\Models\Paiements;
 
 use App\Models\Reservations\Reservation;
+use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property-read Reservation|null $reservation
+ * @property-read User|null $voyageur
+ */
 class Paiement extends Model
 {
     use HasUuids;
 
     protected $table = 'paiements';
+
     protected $primaryKey = 'id_paiement';
 
     const CREATED_AT = 'date_transaction';
+
     const UPDATED_AT = null;
 
     protected $fillable = [
@@ -22,10 +30,18 @@ class Paiement extends Model
 
     protected $casts = [
         'montant' => 'decimal:2',
+        'date_transaction' => 'datetime',
     ];
 
-    public function reservation()
+    /** @return BelongsTo<Reservation, $this> */
+    public function reservation(): BelongsTo
     {
         return $this->belongsTo(Reservation::class, 'id_reservation');
+    }
+
+    /** @return BelongsTo<User, $this> */
+    public function voyageur(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_voyageur');
     }
 }

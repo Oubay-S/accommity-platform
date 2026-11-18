@@ -1,3 +1,247 @@
-<div class="users-management-page">
-  <h2>Users Management</h2>
+<div class="admin-page">
+  <div class="admin-page__head">
+    <div>
+      <span class="eyebrow">Portail Admin</span>
+      <h1>Gestion des utilisateurs</h1>
+      <p class="muted" style="margin-top: 0.35rem">
+        Contrôle d'accès, édition des comptes, dossiers d'identité et modération des utilisateurs.
+      </p>
+    </div>
+  </div>
+
+  <!-- Barre d'outils & Filtres -->
+  <div class="admin-toolbar">
+    <div class="admin-tabs" style="margin-bottom: 0">
+      <button type="button" class="admin-tab" [class.admin-tab--active]="roleFilter() === 'tous'" (click)="setRoleFilter('tous')">
+        Tous les rôles
+      </button>
+      <button type="button" class="admin-tab" [class.admin-tab--active]="roleFilter() === 'hote'" (click)="setRoleFilter('hote')">
+        Hôtes
+      </button>
+      <button type="button" class="admin-tab" [class.admin-tab--active]="roleFilter() === 'voyageur'" (click)="setRoleFilter('voyageur')">
+        Voyageurs
+      </button>
+      <button type="button" class="admin-tab" [class.admin-tab--active]="roleFilter() === 'en_attente'" (click)="setRoleFilter('en_attente')">
+        Dossiers en attente
+      </button>
+      <button type="button" class="admin-tab" [class.admin-tab--active]="roleFilter() === 'admin'" (click)="setRoleFilter('admin')">
+        Admins
+      </button>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem; align-items: center">
+      <select class="field__input" style="width: auto; padding: 7px 12px; font-size: 13px" [ngModel]="statutFilter()" (ngModelChange)="setStatutFilter($event)">
+        <option value="tous">Tous statuts</option>
+        <option value="actif">Comptes Actifs</option>
+        <option value="inactif">Comptes Suspendus</option>
+      </select>
+
+      <div class="input-wrap admin-search" style="margin-bottom: 0">
+        <span class="icon icon--sm">search</span>
+        <input type="search" class="field__input" placeholder="Rechercher nom, email..." (input)="onSearch($any($event.target).value)" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau des utilisateurs -->
+  <div class="admin-card">
+    <div class="admin-table__head" style="grid-template-columns: 2fr 0.9fr 0.9fr 0.8fr 1.6fr">
+      <span>Utilisateur</span>
+      <span>Rôles</span>
+      <span>Vérif. Identité</span>
+      <span>Statut</span>
+      <span style="text-align: right">Actions</span>
+    </div>
+
+    @if (loading()) {
+      <div class="admin-loading">Chargement des utilisateurs...</div>
+    } @else if (users().length === 0) {
+      <div style="padding: 3rem; text-align: center; color: var(--muted)">
+        <span class="icon icon--lg" style="color: var(--muted-2); display: block; margin-bottom: 0.5rem">person_off</span>
+        Aucun utilisateur ne correspond aux critères sélectionnés.
+      </div>
+    } @else {
+      @for (u of users(); track u.id_utilisateur) {
+        <div class="admin-table__row" style="grid-template-columns: 2fr 0.9fr 0.9fr 0.8fr 1.6fr">
+          <div class="admin-user">
+            <span class="avatar" style="background: var(--surface-subdued); color: var(--ink); border: 1px solid var(--border)">
+              {{ u.prenom.charAt(0) }}{{ u.nom.charAt(0) }}
+            </span>
+            <div style="min-width: 0">
+              <strong>{{ u.prenom }} {{ u.nom }}</strong>
+              <span class="admin-user__meta">{{ u.email }} · Inscrit le {{ u.date_creation | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+
+          <div>
+            @if (u.est_hote) {
+              <span class="badge badge--success" style="font-size: 10px; margin-right: 4px">Hôte</span>
+            }
+            @if (u.est_voyageur) {
+              <span class="badge badge--neutral" style="font-size: 10px">Voyageur</span>
+            }
+          </div>
+
+          <div>
+            @if (u.verification_identite?.statut === 'validee') {
+              <span class="badge badge--success" style="font-size: 10px">
+                <span class="icon icon--sm" style="font-size: 11px">verified</span> Validé
+              </span>
+            } @else if (u.verification_identite?.statut === 'en_cours') {
+              <span class="badge badge--warning" style="font-size: 10px">En attente</span>
+            } @else if (u.verification_identite?.statut === 'rejetee') {
+              <span class="badge badge--error" style="font-size: 10px">Rejeté</span>
+            } @else {
+              <span style="font-size: 11.5px; color: var(--muted)">Non soumis</span>
+            }
+          </div>
+
+          <div>
+            @if (u.est_actif) {
+              <span class="badge badge--success" style="font-size: 10px">Actif</span>
+            } @else {
+              <span class="badge badge--error" style="font-size: 10px">Suspendu</span>
+            }
+          </div>
+
+          <div style="text-align: right; display: flex; gap: 0.35rem; justify-content: flex-end">
+            <button type="button" class="btn btn--outline btn--sm" style="padding: 4px 10px; font-size: 11.5px" (click)="openConsulter(u)">
+              Consulter
+            </button>
+            <button
+              type="button"
+              class="btn btn--sm"
+              [ngClass]="u.est_actif ? 'btn--ghost' : 'btn--outline'"
+              style="padding: 4px 10px; font-size: 11.5px"
+              (click)="toggleActif(u)">
+              <span class="icon icon--sm">{{ u.est_actif ? 'block' : 'check_circle' }}</span>
+              {{ u.est_actif ? 'Suspendre' : 'Réactiver' }}
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (lastPage() > 1) {
+    <div class="admin-pagination">
+      <span class="small muted">
+        Page {{ page() }} sur {{ lastPage() }} (Total : {{ total() }} utilisateurs)
+      </span>
+      <div style="display: flex; gap: 0.25rem">
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="page() <= 1" (click)="setPage(page() - 1)">Précédent</button>
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="page() >= lastPage()" (click)="setPage(page() + 1)">Suivant</button>
+      </div>
+    </div>
+  }
+
+  <!-- Modale / Tiroir "Consulter" -->
+  @if (selectedUser(); as sel) {
+    <div class="admin-drawer-backdrop" (click)="closeConsulter()"></div>
+    <div class="admin-drawer">
+      <div class="admin-drawer__head">
+        <div>
+          <span class="eyebrow">Fiche utilisateur</span>
+          <h2>{{ sel.prenom }} {{ sel.nom }}</h2>
+          <span class="muted" style="font-size: 12px">Inscrit le {{ sel.date_creation | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <button type="button" class="btn btn--icon btn--ghost" (click)="closeConsulter()" aria-label="Fermer">
+          <span class="icon icon--sm">close</span>
+        </button>
+      </div>
+
+      <div class="admin-drawer__body">
+        <!-- Rôles et statut -->
+        <div class="admin-facts">
+          <div>
+            <span>Rôles</span>
+            <strong>{{ sel.est_hote ? 'Compte Hôte' : '' }}{{ sel.est_hote && sel.est_voyageur ? ' & ' : '' }}{{ sel.est_voyageur ? 'Voyageur' : '' }}</strong>
+          </div>
+          <div>
+            <span>Statut du compte</span>
+            <strong>{{ sel.est_actif ? 'Actif' : 'Suspendu' }}</strong>
+          </div>
+        </div>
+
+        <!-- Formulaire d'édition des informations de contact -->
+        <div class="admin-card" style="padding: 1rem">
+          <h4 style="margin: 0 0 0.85rem; font-size: 13.5px; font-weight: 600">Informations de contact</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem">
+            <div class="field" style="margin-bottom: 0">
+              <label class="field__label">Prénom</label>
+              <input type="text" class="field__input" [ngModel]="editForm().prenom" (ngModelChange)="updateEditField('prenom', $event)" />
+            </div>
+            <div class="field" style="margin-bottom: 0">
+              <label class="field__label">Nom</label>
+              <input type="text" class="field__input" [ngModel]="editForm().nom" (ngModelChange)="updateEditField('nom', $event)" />
+            </div>
+          </div>
+          <div class="field" style="margin-bottom: 0.75rem">
+            <label class="field__label">Email</label>
+            <input type="email" class="field__input" [ngModel]="editForm().email" (ngModelChange)="updateEditField('email', $event)" />
+          </div>
+          <div class="field" style="margin-bottom: 1rem">
+            <label class="field__label">Téléphone</label>
+            <input type="text" class="field__input" [ngModel]="editForm().telephone" (ngModelChange)="updateEditField('telephone', $event)" />
+          </div>
+          <div style="display: flex; justify-content: flex-end">
+            <button type="button" class="btn btn--primary btn--sm" [disabled]="saving()" (click)="saveUser()">
+              {{ saving() ? 'Enregistrement...' : 'Sauvegarder' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Dossier d'identité hôte -->
+        @if (sel.est_hote) {
+          <div class="admin-card" style="padding: 1rem">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem">
+              <h4 style="margin: 0; font-size: 13.5px; font-weight: 600">Dossier d'identité Hôte</h4>
+              <a routerLink="/admin/verifications" (click)="closeConsulter()" class="muted" style="font-size: 11.5px; text-decoration: underline">
+                Ouvrir le lecteur complet
+              </a>
+            </div>
+
+            @if (sel.verification_identite; as verif) {
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: var(--surface-subdued); border-radius: var(--r-sm); margin-bottom: 0.75rem">
+                <span style="font-size: 12.5px">Pièce : <strong style="text-transform: uppercase">{{ verif.type_piece }}</strong></span>
+                <span class="badge" [ngClass]="verif.statut === 'validee' ? 'badge--success' : (verif.statut === 'en_cours' ? 'badge--warning' : 'badge--error')" style="font-size: 10.5px">
+                  {{ verif.statut }}
+                </span>
+              </div>
+
+              @if (verif.statut === 'rejetee' && verif.motif_rejet) {
+                <p style="font-size: 12px; color: var(--danger); margin-bottom: 0.5rem">
+                  <strong>Motif du rejet :</strong> {{ verif.motif_rejet }}
+                </p>
+              }
+
+              @if (verif.statut === 'en_cours' && verif.id_verification) {
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem">
+                  <button type="button" class="btn btn--primary btn--sm" (click)="validerIdentite(verif.id_verification)">
+                    Valider l'identité
+                  </button>
+                  <div style="display: flex; gap: 0.4rem">
+                    <input type="text" class="field__input" placeholder="Motif de rejet..." [ngModel]="rejectMotif()" (ngModelChange)="rejectMotif.set($event)" />
+                    <button type="button" class="btn btn--outline btn--sm" style="color: var(--danger); flex-shrink: 0" (click)="rejeterIdentite(verif.id_verification)">
+                      Rejeter
+                    </button>
+                  </div>
+                </div>
+              }
+            } @else {
+              <p class="muted" style="font-size: 12.5px">Cet hôte n'a pas encore soumis de pièce d'identité.</p>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="admin-drawer__foot">
+        <button type="button" class="btn btn--outline btn--sm" style="color: var(--danger); border-color: rgba(186,26,26,0.25); margin-right: auto" (click)="deleteUser(sel)">
+          <span class="icon icon--sm">delete</span> Supprimer le compte
+        </button>
+        <button type="button" class="btn btn--ghost btn--sm" (click)="closeConsulter()">Fermer</button>
+      </div>
+    </div>
+  }
 </div>

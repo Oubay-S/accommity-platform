@@ -2,7 +2,7 @@
   <app-header />
 }
 
-<main class="main-content">
+<main class="main-content" [class.main-content--bare]="!showChrome()">
   <router-outlet />
 </main>
 

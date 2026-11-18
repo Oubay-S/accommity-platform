@@ -10,6 +10,7 @@ use App\Services\Administration\AdminService;
 use App\Services\Utilisateurs\VerificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminUserController extends Controller
@@ -19,14 +20,80 @@ class AdminUserController extends Controller
         protected VerificationService $verificationService,
     ) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return response()->json(['users' => []]);
+        $filters = [
+            'recherche' => $request->query('recherche'),
+            'role' => $request->query('role', 'tous'),
+            'statut' => $request->query('statut', 'tous'),
+        ];
+        $perPage = (int) $request->query('par_page', 15);
+
+        $users = $this->adminService->getUsers($filters, $perPage);
+
+        return ApiResponse::success([
+            'items' => $users->items(),
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+            ],
+        ], 'Liste des utilisateurs récupérée.');
     }
 
-    public function toggleActif(string $id): JsonResponse
+    public function update(Request $request, string $id): JsonResponse
     {
-        return response()->json(['message' => 'Statut utilisateur modifié']);
+        $validated = $request->validate([
+            'nom' => ['required', 'string', 'max:100'],
+            'prenom' => ['required', 'string', 'max:100'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('utilisateurs', 'email')->ignore($id, 'id_utilisateur'),
+            ],
+            'telephone' => ['nullable', 'string', 'max:30'],
+        ]);
+
+        try {
+            $user = $this->adminService->updateUser($id, $validated);
+
+            return ApiResponse::success([
+                'user' => $user,
+            ], 'Utilisateur mis à jour avec succès.');
+        } catch (\Exception $e) {
+            return ApiResponse::error('Utilisateur introuvable ou erreur de mise à jour.', 404);
+        }
+    }
+
+    public function destroy(Request $request, string $id): JsonResponse
+    {
+        try {
+            $this->adminService->deleteUser($id, $request->user()?->id_utilisateur);
+
+            return ApiResponse::success(null, 'Utilisateur supprimé avec succès.');
+        } catch (\InvalidArgumentException $e) {
+            return ApiResponse::error($e->getMessage(), 422);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Utilisateur introuvable ou impossible de supprimer cet utilisateur.', 404);
+        }
+    }
+
+    public function toggleActif(Request $request, string $id): JsonResponse
+    {
+        try {
+            $user = $this->adminService->toggleUserActif($id, $request->user()?->id_utilisateur);
+            $action = $user->est_actif ? 'activé' : 'désactivé';
+
+            return ApiResponse::success([
+                'user' => $user,
+            ], "Compte utilisateur {$action} avec succès.");
+        } catch (\InvalidArgumentException $e) {
+            return ApiResponse::error($e->getMessage(), 422);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Utilisateur introuvable ou erreur de mise à jour.', 404);
+        }
     }
 
     /** GET /api/admin/verifications?statut=en_cours&recherche=amina */

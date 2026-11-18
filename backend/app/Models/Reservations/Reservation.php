@@ -9,15 +9,18 @@ use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Reservation extends Model
 {
     use HasFactory, HasUuids;
 
     protected $table = 'reservations';
+
     protected $primaryKey = 'id_reservation';
 
     const CREATED_AT = 'date_creation';
+
     const UPDATED_AT = 'date_modification';
 
     protected $fillable = [
@@ -39,17 +42,20 @@ class Reservation extends Model
         'date_annulation' => 'datetime',
     ];
 
-    public function voyageur()
+    /** @return BelongsTo<User, $this> */
+    public function voyageur(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_voyageur');
     }
 
-    public function hote()
+    /** @return BelongsTo<User, $this> */
+    public function hote(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_hote');
     }
 
-    public function annonce()
+    /** @return BelongsTo<Annonce, $this> */
+    public function annonce(): BelongsTo
     {
         return $this->belongsTo(Annonce::class, 'id_annonce');
     }

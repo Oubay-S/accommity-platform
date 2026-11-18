@@ -1,5 +1,5 @@
-<div class="admin-shell">
-  <aside class="admin-sidebar">
+<div class="admin-shell" [class.admin-shell--collapsed]="!sidebarOpen()">
+  <aside class="admin-sidebar" [class.admin-sidebar--closed]="!sidebarOpen()">
     <a routerLink="/" class="admin-brand">
       <span class="icon icon--lg">villa</span>
       <span>
@@ -23,11 +23,17 @@
       <a routerLink="/admin/annonces" routerLinkActive="admin-nav__item--active" class="admin-nav__item">
         <span class="icon">villa</span> Annonces
       </a>
+      <a routerLink="/admin/reservations" routerLinkActive="admin-nav__item--active" class="admin-nav__item">
+        <span class="icon">event</span> Réservations
+      </a>
       <a routerLink="/admin/avis" routerLinkActive="admin-nav__item--active" class="admin-nav__item">
         <span class="icon">flag</span> Avis signalés
       </a>
       <a routerLink="/admin/litiges" routerLinkActive="admin-nav__item--active" class="admin-nav__item">
         <span class="icon">gavel</span> Litiges
+      </a>
+      <a routerLink="/admin/transactions" routerLinkActive="admin-nav__item--active" class="admin-nav__item">
+        <span class="icon">payments</span> Transactions
       </a>
     </nav>
 
@@ -45,10 +51,16 @@
 
   <div class="admin-main">
     <header class="admin-topbar">
-      <div class="admin-topbar__crumb">
-        Portail Admin
-        <span class="icon icon--sm">chevron_right</span>
-        <strong>{{ section() }}</strong>
+      <div style="display: flex; align-items: center; gap: 0.75rem">
+        <button type="button" class="btn btn--ghost btn--icon" (click)="toggleSidebar()" [title]="sidebarOpen() ? 'Masquer le menu latéral' : 'Afficher le menu latéral'" style="color: var(--ink); width: 36px; height: 36px">
+          <span class="icon">{{ sidebarOpen() ? 'menu_open' : 'menu' }}</span>
+        </button>
+
+        <div class="admin-topbar__crumb">
+          Portail Admin
+          <span class="icon icon--sm">chevron_right</span>
+          <strong>{{ section() }}</strong>
+        </div>
       </div>
 
       <div style="display: flex; align-items: center; gap: 0.5rem">

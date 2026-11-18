@@ -65,18 +65,17 @@ class SchemaAlignmentTest extends TestCase
         }
     }
 
-    public function test_la_base_refuse_un_utilisateur_sans_role(): void
+    public function test_un_administrateur_peut_avoir_aucun_role_hote_ni_voyageur(): void
     {
-        if (DB::connection()->getDriverName() !== 'pgsql') {
-            $this->markTestSkipped('La contrainte CHECK n\'est créée que sur PostgreSQL.');
-        }
-
-        $this->expectException(QueryException::class);
-
-        User::factory()->create([
+        $user = User::factory()->create([
             'est_hote' => false,
             'est_voyageur' => false,
         ]);
+        Administrateur::factory()->create(['id_utilisateur' => $user->getKey()]);
+
+        $this->assertFalse($user->estHote());
+        $this->assertFalse($user->estVoyageur());
+        $this->assertTrue($user->estAdmin());
     }
 
     public function test_un_administrateur_est_deduit_de_la_table_administrateurs(): void

@@ -1,0 +1,229 @@
+<div class="admin-page">
+  <div class="admin-page__head">
+    <div>
+      <span class="eyebrow">Portail Admin</span>
+      <h1>Suivi des réservations</h1>
+      <p class="muted" style="margin-top: 0.35rem">
+        Supervision en lecture seule de l'ensemble des séjours, statuts et annulations sur la plateforme.
+      </p>
+    </div>
+  </div>
+
+  <!-- Barre d'outils & Filtres -->
+  <div class="admin-toolbar">
+    <div class="admin-tabs" style="margin-bottom: 0">
+      @for (tab of statusTabs; track tab.key) {
+        <button
+          type="button"
+          class="admin-tab"
+          [class.admin-tab--active]="statutFilter() === tab.key"
+          (click)="setStatutFilter(tab.key)">
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+
+    <div class="input-wrap admin-search" style="margin-bottom: 0">
+      <span class="icon icon--sm">search</span>
+      <input
+        type="search"
+        class="field__input"
+        placeholder="Voyageur, hôte, annonce..."
+        (input)="onSearch($any($event.target).value)" />
+    </div>
+  </div>
+
+  <!-- Tableau des réservations -->
+  <div class="admin-card">
+    <div class="admin-table__head" style="grid-template-columns: 2.2fr 1.5fr 1.2fr 1fr 0.8fr">
+      <span>Réservation & Logement</span>
+      <span>Voyageur / Hôte</span>
+      <span>Dates (Arr - Dép)</span>
+      <span>Statut</span>
+      <span style="text-align: right">Visualiser</span>
+    </div>
+
+    @if (loading()) {
+      <div class="admin-loading">Chargement des réservations...</div>
+    } @else if (reservations().length === 0) {
+      <div style="padding: 3rem; text-align: center; color: var(--muted)">
+        <span class="icon icon--lg" style="color: var(--muted-2); display: block; margin-bottom: 0.5rem">calendar_month</span>
+        Aucune réservation trouvée pour ces critères.
+      </div>
+    } @else {
+      @for (r of reservations(); track r.id_reservation) {
+        <div class="admin-table__row" style="grid-template-columns: 2.2fr 1.5fr 1.2fr 1fr 0.8fr">
+          <div style="display: flex; gap: 0.75rem; align-items: center; min-width: 0">
+            <div style="width: 40px; height: 40px; border-radius: var(--r-sm); background: rgba(194, 94, 48, 0.08); color: var(--clay); display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+              <span class="icon" style="font-size: 18px">event</span>
+            </div>
+            <div style="min-width: 0">
+              <strong style="display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+                {{ r.annonce?.titre || 'Annonce supprimée' }}
+              </strong>
+              <span class="muted" style="font-size: 11px; font-variant-numeric: tabular-nums">
+                {{ r.nb_voyageurs }} pers. · <strong>{{ r.montant_total | number:'1.0-0' }} DH</strong>
+              </span>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px">
+              <span style="width: 18px; height: 18px; border-radius: 50%; background: var(--surface-subdued); font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center">V</span>
+              <strong style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ r.voyageur?.prenom }} {{ r.voyageur?.nom }}</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted)">
+              <span style="width: 18px; height: 18px; border-radius: 50%; background: rgba(194, 94, 48, 0.12); color: var(--clay); font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center">H</span>
+              <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ r.hote?.prenom }} {{ r.hote?.nom }}</span>
+            </div>
+          </div>
+
+          <div style="font-variant-numeric: tabular-nums; font-size: 12px">
+            <div><strong>Arr :</strong> {{ r.date_arrivee | date:'dd/MM/yyyy' }}</div>
+            <div class="muted" style="font-size: 11px">Dép : {{ r.date_depart | date:'dd/MM/yyyy' }}</div>
+          </div>
+
+          <div>
+            @if (r.statut === 'confirmee' || r.statut === 'en_cours') {
+              <span class="badge badge--success" style="font-size: 10px">{{ statutLabel(r.statut) }}</span>
+            } @else if (r.statut === 'en_attente') {
+              <span class="badge badge--warning" style="font-size: 10px">{{ statutLabel(r.statut) }}</span>
+            } @else if (r.statut === 'annulee' || r.statut === 'refusee') {
+              <span class="badge badge--error" style="font-size: 10px">{{ statutLabel(r.statut) }}</span>
+            } @else {
+              <span class="badge badge--neutral" style="font-size: 10px">{{ statutLabel(r.statut) }}</span>
+            }
+          </div>
+
+          <div style="text-align: right">
+            <button type="button" class="btn btn--outline btn--sm" style="padding: 4px 10px; font-size: 11.5px" (click)="openDetails(r)">
+              Détails
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (lastPage() > 1) {
+    <div class="admin-pagination">
+      <span class="small muted">Page {{ page() }} sur {{ lastPage() }} (Total : {{ total() }} réservations)</span>
+      <div style="display: flex; gap: 0.25rem">
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="page() <= 1" (click)="setPage(page() - 1)">Précédent</button>
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="page() >= lastPage()" (click)="setPage(page() + 1)">Suivant</button>
+      </div>
+    </div>
+  }
+
+  <!-- Modale Détails Lecture Seule -->
+  @if (selectedReservation(); as sel) {
+    <div class="admin-drawer-backdrop" (click)="closeDetails()"></div>
+    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(740px, 95vw); max-height: 90vh; overflow-y: auto; background: var(--canvas); border-radius: var(--r-lg); box-shadow: var(--shadow-3); z-index: 100">
+      <div style="background: #fff; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10">
+        <div>
+          <span class="eyebrow" style="font-size: 10px">Lecture seule</span>
+          <strong style="display: block; font-size: 15px">Réservation #{{ sel.id_reservation | slice:0:8 }}</strong>
+        </div>
+        <button type="button" class="btn btn--icon btn--ghost" (click)="closeDetails()" aria-label="Fermer">
+          <span class="icon icon--sm">close</span>
+        </button>
+      </div>
+
+      <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem">
+        <!-- Résumé Statut -->
+        <div class="admin-card" style="padding: 1.25rem; text-align: center">
+          <span style="display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.5rem">
+            Statut de la réservation
+          </span>
+          <span class="badge" [ngClass]="sel.statut === 'confirmee' || sel.statut === 'en_cours' ? 'badge--success' : (sel.statut === 'en_attente' ? 'badge--warning' : (sel.statut === 'annulee' || sel.statut === 'refusee' ? 'badge--error' : 'badge--neutral'))" style="font-size: 13px; padding: 6px 16px">
+            {{ statutLabel(sel.statut) | uppercase }}
+          </span>
+
+          @if (sel.statut === 'annulee') {
+            <p class="muted" style="font-size: 12.5px; margin-top: 0.75rem">
+              Annulée par : <strong>{{ sel.acteur_annulation || 'Inconnu' }}</strong>
+              @if (sel.motif_annulation) {
+                — {{ sel.motif_annulation }}
+              }
+            </p>
+          }
+
+          @if (sel.statut === 'refusee' && sel.motif_refus) {
+            <div style="margin-top: 0.75rem; background: var(--surface-subdued); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 0.75rem; font-size: 12.5px; text-align: left">
+              <strong style="display: block; margin-bottom: 2px">Motif du refus de l'hôte :</strong>
+              {{ sel.motif_refus }}
+            </div>
+          }
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem">
+          <!-- Détails du séjour -->
+          <div class="admin-card" style="padding: 1.25rem">
+            <h4 style="margin: 0 0 0.85rem; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted)">Détails du séjour</h4>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 13px">
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.45rem">
+                <span class="muted">Logement</span>
+                <strong style="text-align: right">{{ sel.annonce?.titre || 'N/A' }}</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.45rem">
+                <span class="muted">Mode</span>
+                <span>{{ modeLabel(sel.mode_reservation) }}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.45rem">
+                <span class="muted">Arrivée</span>
+                <strong style="font-variant-numeric: tabular-nums">{{ sel.date_arrivee | date:'dd/MM/yyyy' }}</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.45rem">
+                <span class="muted">Départ</span>
+                <strong style="font-variant-numeric: tabular-nums">{{ sel.date_depart | date:'dd/MM/yyyy' }}</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.45rem">
+                <span class="muted">Voyageurs</span>
+                <span>{{ sel.nb_voyageurs }} personne(s)</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-top: 0.25rem">
+                <strong>Total</strong>
+                <strong style="font-size: 16px; color: var(--clay); font-variant-numeric: tabular-nums">{{ sel.montant_total | number:'1.2-2' }} DH</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Acteurs -->
+          <div style="display: flex; flex-direction: column; gap: 1rem">
+            <div class="admin-card" style="padding: 1rem; display: flex; align-items: center; gap: 0.85rem">
+              <span class="avatar" style="background: var(--surface-subdued); color: var(--ink); border: 1px solid var(--border)">
+                {{ sel.voyageur?.prenom?.charAt(0) || 'V' }}{{ sel.voyageur?.nom?.charAt(0) || '' }}
+              </span>
+              <div style="min-width: 0">
+                <span style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted)">Voyageur locataire</span>
+                <strong style="display: block; font-size: 13.5px">{{ sel.voyageur?.prenom }} {{ sel.voyageur?.nom }}</strong>
+                <span class="muted" style="font-size: 12px">{{ sel.voyageur?.email }}</span>
+              </div>
+            </div>
+
+            <div class="admin-card" style="padding: 1rem; display: flex; align-items: center; gap: 0.85rem; border-left: 3px solid var(--clay)">
+              <span class="avatar" style="background: rgba(194, 94, 48, 0.12); color: var(--clay)">
+                {{ sel.hote?.prenom?.charAt(0) || 'H' }}{{ sel.hote?.nom?.charAt(0) || '' }}
+              </span>
+              <div style="min-width: 0">
+                <span style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--clay)">Hôte propriétaire</span>
+                <strong style="display: block; font-size: 13.5px">{{ sel.hote?.prenom }} {{ sel.hote?.nom }}</strong>
+                <span class="muted" style="font-size: 12px">{{ sel.hote?.email }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        @if (sel.message_optionnel) {
+          <div class="admin-card" style="padding: 1rem 1.25rem">
+            <span style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem">
+              Message d'accompagnement du voyageur
+            </span>
+            <p style="font-style: italic; font-size: 13px; color: var(--ink)">"{{ sel.message_optionnel }}"</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

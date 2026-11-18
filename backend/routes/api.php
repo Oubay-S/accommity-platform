@@ -102,9 +102,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // ── 5. Espace Administration & Modération ──
     Route::middleware('role.admin')->prefix('admin')->group(function () {
         Route::get('/stats', [AdminDashboardController::class, 'stats']);
+        Route::get('/reservations', [AdminDashboardController::class, 'reservations']);
+        Route::get('/finances', [AdminDashboardController::class, 'finances']);
 
         // Gestion utilisateurs & identités
         Route::get('/users', [AdminUserController::class, 'index']);
+        Route::put('/users/{id}', [AdminUserController::class, 'update']);
+        Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
         Route::put('/users/{id}/toggle-actif', [AdminUserController::class, 'toggleActif']);
         Route::get('/verifications', [AdminUserController::class, 'verifications']);
         Route::get('/verifications/{id}/document', [AdminUserController::class, 'document']);
@@ -118,6 +122,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Modération avis
         Route::get('/avis/signales', [AdminAvisController::class, 'signales']);
+        Route::put('/avis/{id}/ignorer', [AdminAvisController::class, 'ignorer']);
         Route::delete('/avis/{id}', [AdminAvisController::class, 'supprimer']);
 
         // Gestion des litiges

@@ -5,7 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      * Crée l'ensemble des 20 tables métier d'Accommity (PostgreSQL / Laravel).
@@ -64,20 +65,7 @@ return new class extends Migration {
             $table->foreign('id_admin_traitant')->references('id_admin')->on('administrateurs')->nullOnDelete();
         });
 
-        // 5. JETON_ACCES (remplace sessions pour l'architecture API Token / Angular)
-        Schema::create('jeton_acces', function (Blueprint $table) {
-            $table->uuid('id_jeton')->primary();
-            $table->uuid('id_utilisateur');
-            $table->string('token');
-            $table->string('nom_appareil')->nullable();
-            $table->timestamp('date_creation');
-            $table->timestamp('date_expiration')->nullable();
-
-            $table->index('id_utilisateur');
-            $table->foreign('id_utilisateur')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
-        });
-
-        // 6. CATEGORIE_GEOGRAPHIQUES
+        // 5. CATEGORIE_GEOGRAPHIQUES
         Schema::create('categorie_geographiques', function (Blueprint $table) {
             $table->uuid('id_categorie')->primary();
             $table->string('ville');
@@ -85,7 +73,7 @@ return new class extends Migration {
             $table->string('pays');
         });
 
-        // 7. POLITIQUE_ANNULATIONS
+        // 6. POLITIQUE_ANNULATIONS
         Schema::create('politique_annulations', function (Blueprint $table) {
             $table->uuid('id_politique')->primary();
             $table->enum('type_politique', ['flexible', 'moderee', 'stricte']);
@@ -95,7 +83,7 @@ return new class extends Migration {
             $table->text('description');
         });
 
-        // 8. ANNONCES
+        // 7. ANNONCES
         Schema::create('annonces', function (Blueprint $table) {
             $table->uuid('id_annonce')->primary();
             $table->uuid('id_hote');
@@ -123,7 +111,7 @@ return new class extends Migration {
             $table->foreign('id_politique')->references('id_politique')->on('politique_annulations')->restrictOnDelete();
         });
 
-        // 9. CALENDRIERS
+        // 8. CALENDRIERS
         Schema::create('calendriers', function (Blueprint $table) {
             $table->uuid('id_calendrier')->primary();
             $table->uuid('id_annonce');
@@ -136,7 +124,7 @@ return new class extends Migration {
             $table->foreign('id_annonce')->references('id_annonce')->on('annonces')->onDelete('cascade');
         });
 
-        // 10. RESERVATIONS
+        // 9. RESERVATIONS
         Schema::create('reservations', function (Blueprint $table) {
             $table->uuid('id_reservation')->primary();
             $table->uuid('id_annonce');
@@ -169,7 +157,7 @@ return new class extends Migration {
             $table->foreign('id_politique')->references('id_politique')->on('politique_annulations')->onDelete('set null');
         });
 
-        // 11. MINUTERIES
+        // 10. MINUTERIES
         Schema::create('minuteries', function (Blueprint $table) {
             $table->uuid('id_minuterie')->primary();
             $table->uuid('id_reservation')->nullable();
@@ -181,7 +169,7 @@ return new class extends Migration {
             $table->foreign('id_reservation')->references('id_reservation')->on('reservations')->onDelete('cascade');
         });
 
-        // 12. RECAPITULATIF_RESERVATIONS
+        // 11. RECAPITULATIF_RESERVATIONS
         Schema::create('recapitulatif_reservations', function (Blueprint $table) {
             $table->uuid('id_recapitulatif')->primary();
             $table->uuid('id_reservation')->unique();
@@ -196,7 +184,7 @@ return new class extends Migration {
             $table->foreign('id_reservation')->references('id_reservation')->on('reservations')->onDelete('cascade');
         });
 
-        // 13. PAIEMENTS
+        // 12. PAIEMENTS
         Schema::create('paiements', function (Blueprint $table) {
             $table->uuid('id_paiement')->primary();
             $table->uuid('id_reservation')->unique();
@@ -211,7 +199,7 @@ return new class extends Migration {
             $table->foreign('id_voyageur')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
         });
 
-        // 14. VERSEMENTS
+        // 13. VERSEMENTS
         Schema::create('versements', function (Blueprint $table) {
             $table->uuid('id_versement')->primary();
             $table->uuid('id_reservation');
@@ -228,7 +216,7 @@ return new class extends Migration {
             $table->foreign('id_hote')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
         });
 
-        // 15. REMBOURSEMENTS
+        // 14. REMBOURSEMENTS
         Schema::create('remboursements', function (Blueprint $table) {
             $table->uuid('id_remboursement')->primary();
             $table->uuid('id_reservation');
@@ -247,7 +235,7 @@ return new class extends Migration {
             $table->foreign('id_paiement')->references('id_paiement')->on('paiements')->onDelete('cascade');
         });
 
-        // 16. RECUS
+        // 15. RECUS
         Schema::create('recus', function (Blueprint $table) {
             $table->uuid('id_recu')->primary();
             $table->uuid('id_paiement');
@@ -259,7 +247,7 @@ return new class extends Migration {
             $table->foreign('id_paiement')->references('id_paiement')->on('paiements')->onDelete('cascade');
         });
 
-        // 17. EVALUATIONS
+        // 16. EVALUATIONS
         Schema::create('evaluations', function (Blueprint $table) {
             $table->uuid('id_evaluation')->primary();
             $table->uuid('id_reservation');
@@ -284,7 +272,7 @@ return new class extends Migration {
             $table->foreign('id_annonce')->references('id_annonce')->on('annonces')->onDelete('set null');
         });
 
-        // 18. NOTE_DETAILLEES
+        // 17. NOTE_DETAILLEES
         Schema::create('note_detaillees', function (Blueprint $table) {
             $table->uuid('id_note')->primary();
             $table->uuid('id_evaluation');
@@ -298,7 +286,7 @@ return new class extends Migration {
             $table->foreign('id_evaluation')->references('id_evaluation')->on('evaluations')->onDelete('cascade');
         });
 
-        // 19. TICKET_LITIGES
+        // 18. TICKET_LITIGES
         Schema::create('ticket_litiges', function (Blueprint $table) {
             $table->uuid('id_ticket')->primary();
             $table->uuid('id_evaluation')->nullable();
@@ -320,7 +308,7 @@ return new class extends Migration {
             $table->foreign('id_reservation')->references('id_reservation')->on('reservations')->nullOnDelete();
         });
 
-        // 20. NOTIFICATIONS
+        // 19. NOTIFICATIONS
         Schema::create('notifications', function (Blueprint $table) {
             $table->uuid('id_notification')->primary();
             $table->uuid('id_utilisateur');
@@ -335,7 +323,6 @@ return new class extends Migration {
         });
 
         if (DB::getDriverName() === 'pgsql') {
-            DB::statement('ALTER TABLE utilisateurs ADD CONSTRAINT utilisateurs_role_check CHECK (est_hote OR est_voyageur)');
             DB::statement('ALTER TABLE evaluations ADD CONSTRAINT evaluations_note_check CHECK (note BETWEEN 1 AND 5)');
             DB::statement('ALTER TABLE ticket_litiges ADD CONSTRAINT ticket_litiges_cible_check CHECK (id_evaluation IS NOT NULL OR id_reservation IS NOT NULL)');
         }
@@ -361,7 +348,6 @@ return new class extends Migration {
         Schema::dropIfExists('annonces');
         Schema::dropIfExists('politique_annulations');
         Schema::dropIfExists('categorie_geographiques');
-        Schema::dropIfExists('jeton_acces');
         Schema::dropIfExists('verification_identites');
         Schema::dropIfExists('administrateurs');
         Schema::dropIfExists('profils');

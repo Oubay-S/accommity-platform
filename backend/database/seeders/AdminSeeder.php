@@ -20,7 +20,7 @@ class AdminSeeder extends Seeder
                 'prenom' => 'Accommity',
                 'mot_de_passe' => $motDePasse,
                 'est_hote' => false,
-                'est_voyageur' => true,
+                'est_voyageur' => false,
                 'est_actif' => true,
             ]
         );
