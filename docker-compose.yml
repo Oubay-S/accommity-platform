@@ -30,9 +30,14 @@ services:
     restart: unless-stopped
     ports:
       - "4200:4200"
+    environment:
+      # Le proxy /api du dev-server vise nginx (127.0.0.1 = ce conteneur)
+      API_PROXY_TARGET: http://nginx
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    depends_on:
+      - nginx
     networks:
       - accommity-network
 

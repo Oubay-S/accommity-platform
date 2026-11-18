@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AdminService } from '../services/admin.service';
@@ -9,6 +9,7 @@ import { AdminDashboardStats } from '../models/admin-dashboard.model';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {

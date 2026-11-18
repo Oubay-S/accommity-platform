@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -11,6 +11,7 @@ import { VerificationService } from '../services/verification.service';
   standalone: true,
   imports: [RouterLink],
   templateUrl: './verification-identite.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './verification-identite.component.scss'
 })
 export class VerificationIdentiteComponent {

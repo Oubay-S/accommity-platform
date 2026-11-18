@@ -27,7 +27,7 @@
           <div class="photo-upload">
             <span class="avatar avatar--lg">
               @if (u.profil?.photo_url) {
-                <img [src]="u.profil?.photo_url" [alt]="u.prenom" />
+                <img [src]="$safeNavigationMigration(u.profil?.photo_url)" [alt]="u.prenom" />
               } @else {
                 {{ initials() }}
               }

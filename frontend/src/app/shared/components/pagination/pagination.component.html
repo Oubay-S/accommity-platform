@@ -1,2 +1,40 @@
-<div class="pagination-container">
-</div>
+@if (pagination && pagination.last_page > 1) {
+  <nav class="pagination" aria-label="Pagination des résultats">
+    <button
+      type="button"
+      class="pagination__btn"
+      [disabled]="pagination.current_page <= 1"
+      (click)="goTo(pagination.current_page - 1)"
+      aria-label="Page précédente"
+    >
+      <span class="icon icon--sm" aria-hidden="true">chevron_left</span>
+    </button>
+
+    @for (item of pages; track $index) {
+      @if (item === '...') {
+        <span class="pagination__ellipsis" aria-hidden="true">…</span>
+      } @else {
+        <button
+          type="button"
+          class="pagination__page tabular"
+          [class.is-active]="item === pagination.current_page"
+          [attr.aria-current]="item === pagination.current_page ? 'page' : null"
+          [attr.aria-label]="'Page ' + item"
+          (click)="goTo(item)"
+        >
+          {{ item }}
+        </button>
+      }
+    }
+
+    <button
+      type="button"
+      class="pagination__btn"
+      [disabled]="pagination.current_page >= pagination.last_page"
+      (click)="goTo(pagination.current_page + 1)"
+      aria-label="Page suivante"
+    >
+      <span class="icon icon--sm" aria-hidden="true">chevron_right</span>
+    </button>
+  </nav>
+}

@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+
 
 @Component({
   selector: 'app-reservations-hote',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './reservations-hote.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './reservations-hote.component.scss'
 })
 export class ReservationsHoteComponent {

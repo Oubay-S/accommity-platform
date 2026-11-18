@@ -1,0 +1,535 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservations\\Reservation\:\:\$hote\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendReminders.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservations\\Reservation\:\:\$voyageur\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendReminders.php
+
+		-
+			message: '#^Relation ''hote'' is not found in App\\Models\\Reservations\\Reservation model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Console/Commands/SendReminders.php
+
+		-
+			message: '#^Relation ''voyageur'' is not found in App\\Models\\Reservations\\Reservation model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Console/Commands/SendReminders.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Utilisateurs\\User\:\:\$administrateur\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Auth/AuthController.php
+
+		-
+			message: '#^Instanceof between Laravel\\Sanctum\\PersonalAccessToken and Laravel\\Sanctum\\PersonalAccessToken will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: app/Http/Controllers/Auth/AuthController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:marquerCommeLue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Notifications/NotificationController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:nonLues\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: app/Http/Controllers/Notifications/NotificationController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Utilisateurs\\User\:\:\$profil\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Utilisateurs/ProfilController.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceDetailResource\:\:\$adresse\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceDetailResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceDetailResource\:\:\$date_creation\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceDetailResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceDetailResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceDetailResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceDetailResource\:\:\$hote\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceDetailResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceDetailResource\:\:\$photo_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceDetailResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceDetailResource\:\:\$politiqueAnnulation\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceDetailResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceDetailResource\:\:\$reglement_interieur\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceDetailResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$delai_remb_partiel\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceHoteResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$delai_remb_total\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceHoteResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceHoteResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pays\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceHoteResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$region\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceHoteResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$taux_remb_partiel\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceHoteResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$type_politique\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceHoteResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$ville\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceHoteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceResource\:\:\$statut\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceResource\:\:\$tarif_nuit\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceResource\:\:\$titre\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Annonces\\AnnonceResource\:\:getKey\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceResumeResource\:\:\$capacite\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResumeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceResumeResource\:\:\$categorie\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/Annonces/AnnonceResumeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceResumeResource\:\:\$mode_reservation\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResumeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceResumeResource\:\:\$photo_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResumeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceResumeResource\:\:\$tarif_nuit\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResumeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceResumeResource\:\:\$titre\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResumeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Annonces\\AnnonceResumeResource\:\:\$type_logement\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResumeResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Annonces\\AnnonceResumeResource\:\:getKey\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResumeResource.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>value" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Resources/Annonces/AnnonceResumeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Notifications\\NotificationResource\:\:\$contenu\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Notifications/NotificationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Notifications\\NotificationResource\:\:\$data\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Notifications/NotificationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Notifications\\NotificationResource\:\:\$date_creation\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Notifications/NotificationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Notifications\\NotificationResource\:\:\$est_lue\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Notifications/NotificationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Notifications\\NotificationResource\:\:\$id_notification\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Notifications/NotificationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Notifications\\NotificationResource\:\:\$id_reservation\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Notifications/NotificationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Notifications\\NotificationResource\:\:\$titre\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Notifications/NotificationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Notifications\\NotificationResource\:\:\$type_alerte\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Notifications/NotificationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Reservations\\ReservationResource\:\:\$montant_total\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Reservations/ReservationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Reservations\\ReservationResource\:\:\$statut\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Reservations/ReservationResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Reservations\\ReservationResource\:\:getKey\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Reservations/ReservationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\ProfilResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/ProfilResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\ProfilResource\:\:\$id_profil\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/ProfilResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\ProfilResource\:\:\$note_moyenne\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/ProfilResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\ProfilResource\:\:\$photo_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/ProfilResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\UserResource\:\:\$date_creation\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\UserResource\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\UserResource\:\:\$est_actif\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\UserResource\:\:\$est_hote\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\UserResource\:\:\$est_voyageur\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\UserResource\:\:\$nom\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\UserResource\:\:\$prenom\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\UserResource\:\:\$profil\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\UserResource\:\:\$telephone\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\UserResource\:\:\$verificationIdentite\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Utilisateurs\\UserResource\:\:estAdmin\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Utilisateurs\\UserResource\:\:estHoteVerifie\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Utilisateurs\\UserResource\:\:getKey\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\VerificationIdentiteResource\:\:\$chemin_document\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/VerificationIdentiteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\VerificationIdentiteResource\:\:\$date_soumission\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/VerificationIdentiteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\VerificationIdentiteResource\:\:\$date_traitement\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/VerificationIdentiteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\VerificationIdentiteResource\:\:\$id_verification\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/VerificationIdentiteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\VerificationIdentiteResource\:\:\$motif_rejet\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/VerificationIdentiteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\VerificationIdentiteResource\:\:\$statut\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/VerificationIdentiteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\VerificationIdentiteResource\:\:\$type_piece\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/VerificationIdentiteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Utilisateurs\\VerificationIdentiteResource\:\:\$utilisateur\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Utilisateurs/VerificationIdentiteResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_arrivee\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Annonces/AnnonceService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_debut\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Annonces/AnnonceService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_depart\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Annonces/AnnonceService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_fin\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Annonces/AnnonceService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_arrivee\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Annonces/CalendrierService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_debut\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Annonces/CalendrierService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_depart\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Annonces/CalendrierService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_fin\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Annonces/CalendrierService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$statut\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Annonces/CalendrierService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) expects callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: array\{id_calendrier\: mixed, date_debut\: non\-falsy\-string, date_fin\: non\-falsy\-string\}, Closure\(App\\Models\\Annonces\\Calendrier\)\: array\{id_calendrier\: mixed, date_debut\: non\-falsy\-string, date_fin\: non\-falsy\-string\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/Annonces/CalendrierService.php
+
+		-
+			message: '#^Parameter \#1 \$destinataire of method App\\Services\\Notifications\\NotificationService\:\:notifier\(\) expects App\\Models\\Utilisateurs\\User, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/Notifications/NotificationService.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between string and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Services/Notifications/NotificationService.php
+
+		-
+			message: '#^Instanceof between Laravel\\Sanctum\\PersonalAccessToken and Laravel\\Sanctum\\PersonalAccessToken will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: app/Services/Utilisateurs/UserService.php
+
+		-
+			message: '#^Relation ''profil'' is not found in App\\Models\\Utilisateurs\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Services/Utilisateurs/UserService.php
+
+		-
+			message: '#^Relation ''verificationIdentite'' is not found in App\\Models\\Utilisateurs\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Services/Utilisateurs/UserService.php

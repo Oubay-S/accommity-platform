@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -13,6 +13,7 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './users-management.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './users-management.component.scss'
 })
 export class UsersManagementComponent implements OnInit {

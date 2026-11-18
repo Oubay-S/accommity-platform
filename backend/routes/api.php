@@ -1,22 +1,21 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Utilisateurs\UserController;
-use App\Http\Controllers\Utilisateurs\ProfilController;
-use App\Http\Controllers\Utilisateurs\VerificationIdentiteController;
-use App\Http\Controllers\Annonces\AnnonceController;
-use App\Http\Controllers\Annonces\CalendrierController;
-use App\Http\Controllers\Reservations\ReservationController;
-use App\Http\Controllers\Paiements\PaiementController;
-use App\Http\Controllers\Paiements\RemboursementController;
-use App\Http\Controllers\Evaluations\EvaluationController;
-use App\Http\Controllers\Notifications\NotificationController;
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminAnnonceController;
 use App\Http\Controllers\Admin\AdminAvisController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminLitigeController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Annonces\AnnonceController;
+use App\Http\Controllers\Annonces\CalendrierController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Evaluations\EvaluationController;
+use App\Http\Controllers\Notifications\NotificationController;
+use App\Http\Controllers\Paiements\PaiementController;
+use App\Http\Controllers\Paiements\RemboursementController;
+use App\Http\Controllers\Reservations\ReservationController;
+use App\Http\Controllers\Utilisateurs\ProfilController;
+use App\Http\Controllers\Utilisateurs\VerificationIdentiteController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +31,8 @@ Route::prefix('auth')->group(function () {
 
 // ── 2. Annonces Publiques & Recherche (RG10, RG11) ──
 Route::get('/annonces', [AnnonceController::class, 'index']);
+Route::get('/annonces/en-vedette', [AnnonceController::class, 'enVedette']);
+Route::get('/annonces/references', [AnnonceController::class, 'references']);
 Route::get('/annonces/{id}', [AnnonceController::class, 'show']);
 Route::get('/annonces/{id}/disponibilites', [CalendrierController::class, 'show']);
 Route::get('/annonces/{id}/avis', [EvaluationController::class, 'annonceAvis']);
@@ -81,8 +82,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role.hote')->prefix('hote')->group(function () {
         Route::get('/annonces', [AnnonceController::class, 'mesAnnonces']);
         Route::post('/annonces', [AnnonceController::class, 'store']);
+        Route::get('/annonces/{id}', [AnnonceController::class, 'showHote']);
         Route::put('/annonces/{id}', [AnnonceController::class, 'update']);
         Route::delete('/annonces/{id}', [AnnonceController::class, 'destroy']);
+        Route::post('/annonces/{id}/photos', [AnnonceController::class, 'ajouterPhotos']);
+        Route::delete('/annonces/{id}/photos', [AnnonceController::class, 'supprimerPhoto']);
+        Route::get('/annonces/{id}/calendrier', [CalendrierController::class, 'calendrierHote']);
         Route::post('/annonces/{id}/bloquer', [CalendrierController::class, 'bloquer']);
         Route::post('/annonces/{id}/debloquer', [CalendrierController::class, 'debloquer']);
 

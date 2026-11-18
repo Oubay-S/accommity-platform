@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
@@ -12,6 +12,7 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './annonces-moderation.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './annonces-moderation.component.scss'
 })
 export class AnnoncesModerationComponent implements OnInit {

@@ -7,10 +7,14 @@
       l'Atlas et appartements en front de mer.
     </p>
 
+    <div class="home-hero__search">
+      <app-search-bar />
+    </div>
+
     <div class="home-hero__actions">
-      <a routerLink="/annonces" class="btn btn--primary">
+      <a routerLink="/annonces" class="btn btn--dark">
         Explorer les hébergements
-        <span class="icon icon--sm">arrow_forward</span>
+        <span class="icon icon--sm" aria-hidden="true">arrow_forward</span>
       </a>
       @if (!isAuthenticated() || !isHote()) {
         <a routerLink="/auth/register" class="btn btn--ghost">Devenir hôte</a>
@@ -21,24 +25,17 @@
 
     <div class="home-proof">
       <div class="home-proof__item">
-        <span class="icon">verified_user</span>
+        <span class="icon" aria-hidden="true">verified_user</span>
         <div>
           <strong>Paiement 100 % sécurisé</strong>
           <span>En Dirham Marocain (MAD)</span>
         </div>
       </div>
       <div class="home-proof__item">
-        <span class="icon">villa</span>
+        <span class="icon" aria-hidden="true">villa</span>
         <div>
           <strong>Riads &amp; villas vérifiés</strong>
-          <span>Audits et photos conformes</span>
-        </div>
-      </div>
-      <div class="home-proof__item">
-        <span class="icon">support_agent</span>
-        <div>
-          <strong>Assistance locale 24/7</strong>
-          <span>Équipe bilingue FR &amp; Darija</span>
+          <span>Identité des hôtes contrôlée</span>
         </div>
       </div>
     </div>
@@ -48,35 +45,74 @@
 <section class="container home-section">
   <div class="page-head">
     <span class="eyebrow">Sélection</span>
-    <h2>Explorez par style d'hébergement</h2>
+    <h2>Types de logement</h2>
     <p class="muted">Choisissez le cadre architectural parfait pour votre prochain séjour.</p>
   </div>
 
-  <div class="home-styles">
-    <a routerLink="/annonces" class="home-style">
-      <span class="icon">mosque</span>
-      <strong>Riads traditionnels</strong>
-      <span>Marrakech &amp; Fès</span>
+  <div class="home-chips">
+    @for (t of typesLogement; track t.value) {
+      <a [routerLink]="['/annonces']" [queryParams]="{ type_logement: t.value }" class="chip home-chip">
+        <span class="icon icon--sm" aria-hidden="true">{{ t.icon }}</span>
+        <span>{{ t.label }}</span>
+      </a>
+    }
+  </div>
+</section>
+
+<section class="container home-section home-section--featured">
+  <div class="home-section__head">
+    <div>
+      <span class="eyebrow">À la une</span>
+      <h2>Hébergements à la une</h2>
+    </div>
+    <a routerLink="/annonces" class="btn btn--ghost">
+      Voir tout
+      <span class="icon icon--sm" aria-hidden="true">arrow_forward</span>
     </a>
-    <a routerLink="/annonces" class="home-style">
-      <span class="icon">pool</span>
-      <strong>Villas avec piscine</strong>
-      <span>Palmeraie &amp; Essaouira</span>
-    </a>
-    <a routerLink="/annonces" class="home-style">
-      <span class="icon">water</span>
-      <strong>Apparts vue océan</strong>
-      <span>Taghazout &amp; Tanger</span>
-    </a>
-    <a routerLink="/annonces" class="home-style">
-      <span class="icon">landscape</span>
-      <strong>Kasbahs de l'Atlas</strong>
-      <span>Atlas &amp; Dadès</span>
-    </a>
-    <a routerLink="/annonces" class="home-style">
-      <span class="icon">apartment</span>
-      <strong>Studios citadins</strong>
-      <span>Casablanca &amp; Rabat</span>
-    </a>
+  </div>
+
+  @if (loading()) {
+    <div class="home-grid" aria-busy="true" aria-label="Chargement des hébergements">
+      @for (s of skeletons; track s) {
+        <div class="skeleton-card">
+          <div class="skeleton-card__img"></div>
+          <div class="skeleton-card__line skeleton-card__line--lg"></div>
+          <div class="skeleton-card__line skeleton-card__line--sm"></div>
+        </div>
+      }
+    </div>
+  } @else if (enVedette().length === 0) {
+    <div class="empty-state">
+      <span class="icon" aria-hidden="true">villa</span>
+      <h3>Aucun hébergement publié pour le moment</h3>
+      <p class="muted">Revenez bientôt ou explorez l'ensemble du catalogue disponible.</p>
+      <a routerLink="/annonces" class="btn btn--dark">Explorer le catalogue</a>
+    </div>
+  } @else {
+    <div class="home-grid">
+      @for (annonce of enVedette(); track annonce.id_annonce) {
+        <app-annonce-card [annonce]="annonce" />
+      }
+    </div>
+  }
+</section>
+
+<section class="container home-section">
+  <div class="home-host-cta">
+    <div>
+      <span class="eyebrow">Devenir hôte</span>
+      <h2>Partagez votre riad ou villa avec nos voyageurs</h2>
+      <p class="muted">
+        Publiez votre hébergement en quelques minutes et bénéficiez d'une commission
+        transparente de 12 % seulement sur les réservations confirmées.
+      </p>
+    </div>
+    <div class="home-host-cta__actions">
+      @if (!isAuthenticated() || !isHote()) {
+        <a routerLink="/auth/register" class="btn btn--dark">Devenir hôte</a>
+      } @else {
+        <a routerLink="/annonces/creer" class="btn btn--dark">Publier une annonce</a>
+      }
+    </div>
   </div>
 </section>

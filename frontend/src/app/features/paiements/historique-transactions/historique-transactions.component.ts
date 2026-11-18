@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+
 
 @Component({
   selector: 'app-historique-transactions',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './historique-transactions.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './historique-transactions.component.scss'
 })
 export class HistoriqueTransactionsComponent {

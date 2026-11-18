@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -11,6 +11,7 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './avis-moderation.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './avis-moderation.component.scss'
 })
 export class AvisModerationComponent implements OnInit {

@@ -1,3 +1,329 @@
-<div class="annonce-detail-page">
-  <h2>Annonce Detail</h2>
-</div>
+@if (loading()) {
+  <div class="container detail-page" aria-busy="true" aria-label="Chargement de l'annonce">
+    <div class="detail-skeleton-title"></div>
+    <div class="detail-skeleton-gallery"></div>
+  </div>
+} @else if (loadError()) {
+  <div class="container detail-page">
+    <div class="empty-state" role="alert">
+      <span class="icon" aria-hidden="true">cloud_off</span>
+      <h2>Impossible de charger l'annonce</h2>
+      <p class="muted">Vérifiez votre connexion puis réessayez.</p>
+      <button type="button" class="btn btn--dark" (click)="recharger()">Réessayer</button>
+    </div>
+  </div>
+} @else if (notFound() || !annonce()) {
+  <div class="container detail-page">
+    <div class="empty-state">
+      <span class="icon" aria-hidden="true">home_work</span>
+      <h2>Cette annonce n'est plus disponible</h2>
+      <p class="muted">L'hébergement recherché est introuvable ou n'est plus publié.</p>
+      <a routerLink="/annonces" class="btn btn--dark">Retour au catalogue</a>
+    </div>
+  </div>
+} @else {
+  @let item = annonce()!;
+
+  <div class="container detail-page">
+    <!-- En-tête -->
+    <header class="detail-head">
+      <h1 class="detail-title">{{ item.titre }}</h1>
+      <div class="detail-meta tabular">
+        @if (item.nb_avis > 0) {
+          <span class="detail-meta__rating">
+            <app-rating-stars [note]="item.note_moyenne" taille="sm" />
+            <strong>{{ item.note_moyenne.toFixed(1) }}</strong>
+            <a href="#avis" class="muted">({{ item.nb_avis }} avis)</a>
+          </span>
+          <span aria-hidden="true">·</span>
+        }
+        <span class="detail-meta__loc">
+          <span class="icon icon--sm" aria-hidden="true">location_on</span>
+          {{ item.ville || 'Maroc' }}@if (item.region) {, {{ item.region }}}
+        </span>
+      </div>
+    </header>
+
+    <!-- Galerie -->
+    @if (item.photos.length > 0) {
+      <section class="detail-gallery" aria-label="Galerie photos">
+        @if (item.photos.length >= 3) {
+          <div class="gallery-grid">
+            <button
+              type="button"
+              class="gallery-grid__main"
+              (click)="openLightbox(0)"
+              aria-label="Agrandir la photo principale"
+            >
+              <img [src]="item.photos[0]" [alt]="item.titre" />
+            </button>
+            <div class="gallery-grid__side" [attr.data-thumbs]="item.photos.slice(1, 5).length">
+              @for (photo of item.photos.slice(1, 5); track $index) {
+                <button
+                  type="button"
+                  class="gallery-grid__thumb"
+                  (click)="openLightbox($index + 1)"
+                  [attr.aria-label]="'Agrandir la photo ' + ($index + 2)"
+                >
+                  <img [src]="photo" [alt]="item.titre + ' - photo ' + ($index + 2)" loading="lazy" />
+                </button>
+              }
+            </div>
+          </div>
+        } @else {
+          <button
+            type="button"
+            class="gallery-single"
+            (click)="openLightbox(0)"
+            aria-label="Agrandir la photo"
+          >
+            <img [src]="item.photos[0]" [alt]="item.titre" />
+          </button>
+        }
+
+        <!-- Carrousel mobile -->
+        <div class="gallery-mobile">
+          @for (photo of item.photos; track $index) {
+            <button
+              type="button"
+              class="gallery-mobile__slide"
+              (click)="openLightbox($index)"
+              [attr.aria-label]="'Voir la photo ' + ($index + 1)"
+            >
+              <img [src]="photo" [alt]="item.titre + ' - photo ' + ($index + 1)" />
+            </button>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="btn btn--ghost gallery-all-btn"
+          (click)="openLightbox(0)"
+        >
+          <span class="icon icon--sm" aria-hidden="true">photo_library</span>
+          Voir toutes les photos ({{ item.photos.length }})
+        </button>
+      </section>
+    }
+
+    <!-- Contenu principal + colonne réservation -->
+    <div class="detail-body">
+      <div class="detail-main">
+        <!-- Hôte & capacité -->
+        <section class="detail-host">
+          <div>
+            <h2>{{ getTypeLabel(item.type_logement) }} proposé par {{ item.hote?.prenom || 'Hôte' }}</h2>
+            <p class="muted tabular">
+              Jusqu'à {{ item.capacite }} voyageur{{ item.capacite > 1 ? 's' : '' }}
+              @if (item.hote?.date_creation) {
+                · Hôte depuis {{ getHoteYear($safeNavigationMigration(item.hote?.date_creation)) }}
+              }
+            </p>
+          </div>
+          <div class="detail-host__avatar" aria-hidden="true">
+            @if (item.hote?.photo_url) {
+              <img [src]="item.hote!.photo_url!" [alt]="item.hote!.prenom" />
+            } @else {
+              <span>{{ getHoteInitial($safeNavigationMigration(item.hote?.prenom)) }}</span>
+            }
+          </div>
+        </section>
+
+        <!-- Description -->
+        <section class="detail-section">
+          <h3>À propos de ce logement</h3>
+          <p class="detail-description">{{ item.description }}</p>
+        </section>
+
+        <!-- Équipements -->
+        @if (item.equipements.length > 0) {
+          <section class="detail-section">
+            <h3>Équipements</h3>
+            <div class="equipements-grid">
+              @for (eq of item.equipements; track eq) {
+                <div class="equipement-item">
+                  <span class="icon icon--sm" aria-hidden="true">{{ getEquipementIcon(eq) }}</span>
+                  <span>{{ eq }}</span>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Règlement intérieur -->
+        @if (item.reglement_interieur) {
+          <section class="detail-section">
+            <h3>Règlement intérieur</h3>
+            <p class="detail-description">{{ item.reglement_interieur }}</p>
+          </section>
+        }
+
+        <!-- Politique d'annulation -->
+        @if (item.politique_annulation) {
+          <section class="detail-section">
+            <h3>Politique d'annulation</h3>
+            <div class="policy-card">
+              <span
+                class="policy-badge"
+                [class.policy-badge--flexible]="item.politique_annulation.type_politique === 'flexible'"
+                [class.policy-badge--moderee]="item.politique_annulation.type_politique === 'moderee'"
+                [class.policy-badge--stricte]="item.politique_annulation.type_politique === 'stricte'"
+              >
+                {{ getPolitiqueLabel(item.politique_annulation.type_politique) }}
+              </span>
+              <p>{{ item.politique_annulation.description }}</p>
+            </div>
+          </section>
+        }
+
+        <!-- Disponibilités (calendrier lecture seule 2 mois / 1 sur mobile) -->
+        <section class="detail-section">
+          <div class="calendar-head">
+            <h3>Disponibilités</h3>
+            <div class="calendar-nav">
+              <button
+                type="button"
+                class="calendar-nav__btn"
+                [disabled]="!canGoPrevMonth()"
+                (click)="prevMonth()"
+                aria-label="Mois précédent"
+              >
+                <span class="icon icon--sm" aria-hidden="true">chevron_left</span>
+              </button>
+              <button
+                type="button"
+                class="calendar-nav__btn"
+                (click)="nextMonth()"
+                aria-label="Mois suivant"
+              >
+                <span class="icon icon--sm" aria-hidden="true">chevron_right</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="calendar-months">
+            @for (month of calendarMonths(); track month.label; let idx = $index) {
+              <div class="calendar-month" [class.calendar-month--second]="idx === 1">
+                <h4 class="calendar-month__title">{{ month.label }}</h4>
+                <div class="calendar-weekdays">
+                  @for (w of weekdayLabels; track w) {
+                    <span>{{ w }}</span>
+                  }
+                </div>
+                <div class="calendar-days tabular">
+                  @for (d of month.days; track d.iso) {
+                    @if (d.day === null) {
+                      <span class="calendar-day calendar-day--empty"></span>
+                    } @else {
+                      <span
+                        class="calendar-day"
+                        [class.calendar-day--disabled]="d.disabled"
+                        [class.calendar-day--unavailable]="d.unavailable"
+                      >
+                        {{ d.day }}
+                      </span>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="calendar-legend">
+            <span><i class="legend-sample" aria-hidden="true">12</i> Disponible</span>
+            <span><i class="legend-sample legend-sample--unavailable" aria-hidden="true">12</i> Indisponible</span>
+          </div>
+        </section>
+
+        <!-- Avis : PK_Evaluations (Oubay) -->
+        <section id="avis" class="detail-section">
+          <h3>Avis des voyageurs</h3>
+          <p class="muted">Les avis détaillés apparaîtront ici.</p>
+        </section>
+      </div>
+
+      <!-- Colonne réservation (sticky desktop / barre fixe mobile) -->
+      <aside class="detail-booking" aria-label="Réservation">
+        <!-- Widget de réservation : PK_Reservations (Taha) -->
+        <div class="booking-card">
+          <div class="booking-card__price">
+            <strong class="tabular">{{ item.tarif_nuit | currencyMad }}</strong>
+            <span class="muted">/ nuit</span>
+          </div>
+
+          <div class="booking-card__mode">
+            <span class="icon icon--sm" aria-hidden="true">
+              {{ item.mode_reservation === 'instantanee' ? 'bolt' : 'schedule' }}
+            </span>
+            <span>
+              {{ item.mode_reservation === 'instantanee' ? 'Réservation instantanée' : 'Sur demande' }}
+            </span>
+          </div>
+
+          <a
+            [routerLink]="['/reservations/creer', item.id_annonce]"
+            [queryParams]="forwardQueryParams()"
+            class="btn btn--primary booking-card__cta"
+          >
+            {{ item.mode_reservation === 'instantanee' ? 'Réserver' : 'Demander une réservation' }}
+          </a>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  @if (lightboxOpen()) {
+    <div
+      class="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Visionneuse de photos"
+      (click)="closeLightbox()"
+    >
+      <div #lightboxPanel class="lightbox__panel" (click)="$event.stopPropagation()">
+        <button
+          #lightboxCloseBtn
+          type="button"
+          class="lightbox__close"
+          aria-label="Fermer la galerie"
+          (click)="closeLightbox()"
+        >
+          <span class="icon" aria-hidden="true">close</span>
+        </button>
+
+        @if (item.photos.length > 1) {
+          <button
+            type="button"
+            class="lightbox__nav lightbox__nav--prev"
+            aria-label="Photo précédente"
+            (click)="prevPhoto()"
+          >
+            <span class="icon" aria-hidden="true">chevron_left</span>
+          </button>
+        }
+
+        <img
+          [src]="item.photos[lightboxIndex()]"
+          [alt]="item.titre + ' - photo ' + (lightboxIndex() + 1)"
+          class="lightbox__img"
+        />
+
+        @if (item.photos.length > 1) {
+          <button
+            type="button"
+            class="lightbox__nav lightbox__nav--next"
+            aria-label="Photo suivante"
+            (click)="nextPhoto()"
+          >
+            <span class="icon" aria-hidden="true">chevron_right</span>
+          </button>
+        }
+
+        <div class="lightbox__counter tabular">
+          {{ lightboxIndex() + 1 }} / {{ item.photos.length }}
+        </div>
+      </div>
+    </div>
+  }
+}

@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+
 
 @Component({
   selector: 'app-mes-voyages',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './mes-voyages.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './mes-voyages.component.scss'
 })
 export class MesVoyagesComponent {

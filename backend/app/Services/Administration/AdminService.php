@@ -26,8 +26,8 @@ class AdminService
     public function getStatistiquesGlobales(): array
     {
         $totalUsers = User::count();
-        $totalHotes = User::where('est_hote', true)->count();
-        $totalVoyageurs = User::where('est_voyageur', true)->count();
+        $totalHotes = User::where('est_hote', true)->whereDoesntHave('administrateur')->count();
+        $totalVoyageurs = User::where('est_voyageur', true)->whereDoesntHave('administrateur')->count();
         $totalActifs = User::where('est_actif', true)->count();
         $totalInactifs = User::where('est_actif', false)->count();
         $verificationsEnCours = VerificationIdentite::where('statut', VerificationIdentite::STATUT_EN_COURS)->count();
@@ -135,9 +135,9 @@ class AdminService
 
         if (!empty($filters['role']) && $filters['role'] !== 'tous') {
             if ($filters['role'] === 'hote') {
-                $query->where('est_hote', true);
+                $query->where('est_hote', true)->whereDoesntHave('administrateur');
             } elseif ($filters['role'] === 'voyageur') {
-                $query->where('est_voyageur', true);
+                $query->where('est_voyageur', true)->whereDoesntHave('administrateur');
             } elseif ($filters['role'] === 'admin') {
                 $query->whereHas('administrateur');
             } elseif ($filters['role'] === 'en_attente') {

@@ -5,14 +5,25 @@ on:
     branches: [ main, develop ]
     paths:
       - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
   pull_request:
     branches: [ main, develop ]
     paths:
       - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
-  laravel-tests:
+  backend-qa:
+    name: Backend QA & Automated Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     services:
       postgres:
@@ -29,39 +40,111 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    steps:
-      - uses: actions/checkout@v4
+    env:
+      APP_ENV: testing
+      APP_KEY: 'base64:tQjF90z1f7uG9kS6mG+P3L9Y8Z1X4C7V0B2N5M8Q1W4='
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: accommity_test
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
 
-      - name: Setup PHP
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP & Extensions
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql, pgsql, bcmath
-          coverage: none
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql, pgsql, bcmath, pcov
+          coverage: pcov
+          tools: composer:v2
 
-      - name: Validate composer.json
+      - name: Validate composer.json & composer.lock
         run: cd backend && composer validate --strict
 
-      - name: Cache Composer dependencies
+      - name: Security Vulnerability Audit
+        run: cd backend && composer audit --locked --abandoned=report
+
+      - name: Cache Composer Dependencies
         uses: actions/cache@v4
         with:
-          path: /tmp/composer-cache
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          path: |
+            ~/.cache/composer
+            ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
-      - name: Install Dependencies
+      - name: Install Composer Dependencies
         run: cd backend && composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Run Syntax & Linter Check
+      # On ne vérifie que les fichiers PHP modifiés par la PR / le push.
+      # Cela évite de bloquer l'équipe sur du style préexistant hors périmètre.
+      - name: Code Style Check (changed files / Laravel Pint)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch --no-tags origin "${{ github.base_ref }}"
+            BASE="origin/${{ github.base_ref }}"
+          else
+            BASE="${{ github.event.before }}"
+            if [ -z "$BASE" ] || [[ "$BASE" =~ ^0+$ ]]; then
+              BASE="HEAD^"
+            fi
+          fi
+
+          mapfile -t FILES < <(
+            git diff --name-only --diff-filter=ACMR "$BASE" HEAD -- 'backend/*.php' \
+              | sed 's|^backend/||'
+          )
+
+          if [ ${#FILES[@]} -eq 0 ]; then
+            echo "Aucun fichier PHP backend modifié : rien à formater."
+            exit 0
+          fi
+
+          printf 'Fichiers vérifiés :\n%s\n' "${FILES[@]}"
+          cd backend
+          ./vendor/bin/pint --test "${FILES[@]}"
+
+      - name: Static Analysis (Larastan / PHPStan)
+        run: cd backend && ./vendor/bin/phpstan analyse --no-progress --error-format=github
+
+      - name: Database Migrations & Seeds Integrity Test
+        run: cd backend && php artisan migrate:fresh --seed --force
+
+      - name: Run PHPUnit Test Suite with Coverage
         run: |
           cd backend
-          find app -name "*.php" -exec php -l {} \;
+          php artisan optimize:clear
+          ./vendor/bin/phpunit \
+            --coverage-clover build/coverage/clover.xml \
+            --coverage-text \
+            --log-junit build/junit.xml
 
-      - name: Run PHPUnit Tests
-        env:
-          DB_CONNECTION: pgsql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 5432
-          DB_DATABASE: accommity_test
-          DB_USERNAME: postgres
-          DB_PASSWORD: password
-        run: cd backend && ./vendor/bin/phpunit
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-reports
+          path: |
+            backend/build/junit.xml
+            backend/build/coverage
+          if-no-files-found: ignore
+          retention-days: 7
+
+      # Après les tests, pour ne pas laisser une config en cache qui fausserait
+      # la connexion à la base lors des étapes suivantes.
+      - name: Production Cache & Optimization Verification
+        run: |
+          cd backend
+          php artisan config:cache
+          php artisan route:cache
+          php artisan optimize:clear

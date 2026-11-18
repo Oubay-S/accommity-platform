@@ -1,1 +1,27 @@
-.rating-stars-container { display: block; }
+.rating-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.rating-stars__star {
+  color: var(--border-strong);
+  font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+  user-select: none;
+}
+
+.rating-stars__star--filled {
+  color: var(--clay);
+}
+
+.rating-stars--sm .rating-stars__star {
+  font-size: 16px;
+}
+
+.rating-stars--md .rating-stars__star {
+  font-size: 20px;
+}
+
+.rating-stars--lg .rating-stars__star {
+  font-size: 28px;
+}
