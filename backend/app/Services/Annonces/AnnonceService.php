@@ -106,7 +106,7 @@ class AnnonceService
         $paginator = $this->annonceRepository->mesAnnonces($hoteId, $criteres, $parPage);
 
         return [
-            'items' => $paginator->getCollection(),
+            'items' => $paginator->items(),
             'pagination' => [
                 'total' => $paginator->total(),
                 'per_page' => $paginator->perPage(),
@@ -176,7 +176,7 @@ class AnnonceService
      */
     public function ajouterPhotos(Annonce $annonce, array $photos): Annonce
     {
-        $existantes = is_array($annonce->photo_url) ? $annonce->photo_url : [];
+        $existantes = $annonce->photo_url ?? [];
 
         if (count($existantes) + count($photos) > 10) {
             throw new ApiException(
@@ -198,7 +198,7 @@ class AnnonceService
 
     public function supprimerPhoto(Annonce $annonce, string $url): Annonce
     {
-        $existantes = is_array($annonce->photo_url) ? $annonce->photo_url : [];
+        $existantes = $annonce->photo_url ?? [];
 
         if (! in_array($url, $existantes, true)) {
             throw new ApiException('Photo introuvable sur cette annonce.', 404, 'PHOTO_INTROUVABLE');
@@ -345,10 +345,6 @@ class AnnonceService
     private function supprimerFichiers(array $urls): void
     {
         foreach ($urls as $url) {
-            if (! is_string($url)) {
-                continue;
-            }
-
             if (preg_match('#/storage/(.+)$#', $url, $matches)) {
                 Storage::disk('public')->delete($matches[1]);
             }

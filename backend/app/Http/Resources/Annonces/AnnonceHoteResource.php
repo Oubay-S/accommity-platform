@@ -2,17 +2,20 @@
 
 namespace App\Http\Resources\Annonces;
 
+use App\Models\Annonces\Annonce;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Représentation complète d'une annonce pour son hôte (édition, liste).
+ *
+ * @mixin Annonce
  */
 class AnnonceHoteResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $photos = is_array($this->photo_url) ? $this->photo_url : [];
+        $photos = $this->photo_url ?? [];
 
         return [
             'id_annonce' => $this->getKey(),
@@ -23,8 +26,8 @@ class AnnonceHoteResource extends JsonResource
             'adresse' => $this->adresse,
             'capacite' => (int) $this->capacite,
             'tarif_nuit' => number_format((float) $this->tarif_nuit, 2, '.', ''),
-            'mode_reservation' => $this->mode_reservation?->value ?? $this->mode_reservation,
-            'statut' => $this->statut?->value ?? $this->statut,
+            'mode_reservation' => $this->mode_reservation->value,
+            'statut' => $this->statut->value,
             'motif_moderation' => $this->motif_moderation,
             'equipements' => $this->equipementsEnTableau(),
             'reglement_interieur' => $this->reglement_interieur,
@@ -47,7 +50,7 @@ class AnnonceHoteResource extends JsonResource
             'note_moyenne' => round((float) ($this->note_moyenne ?? 0), 1),
             'nb_avis' => (int) ($this->nb_avis ?? 0),
             'a_des_reservations_actives' => (int) ($this->reservations_actives_count ?? 0) > 0,
-            'date_creation' => $this->date_creation?->toIso8601String(),
+            'date_creation' => $this->date_creation->toIso8601String(),
         ];
     }
 
@@ -56,10 +59,6 @@ class AnnonceHoteResource extends JsonResource
      */
     private function equipementsEnTableau(): array
     {
-        if (is_array($this->equipements)) {
-            return array_values($this->equipements);
-        }
-
         return array_values(array_filter(
             array_map('trim', explode(',', (string) ($this->equipements ?? ''))),
             fn (string $valeur) => $valeur !== '',

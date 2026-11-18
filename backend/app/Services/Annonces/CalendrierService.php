@@ -80,7 +80,7 @@ class CalendrierService
                 'id_reservation' => $reservation->getKey(),
                 'date_arrivee' => Carbon::parse($reservation->date_arrivee)->format('Y-m-d'),
                 'date_depart' => Carbon::parse($reservation->date_depart)->format('Y-m-d'),
-                'statut' => $reservation->statut?->value ?? $reservation->statut,
+                'statut' => $reservation->statut->value,
             ])->values()->all(),
         ];
     }

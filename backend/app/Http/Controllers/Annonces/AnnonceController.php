@@ -30,7 +30,7 @@ class AnnonceController extends Controller
         $paginator = $this->annonceService->rechercherAnnoncesPubliees($request->validated(), $parPage);
 
         return ApiResponse::success([
-            'items' => AnnonceResumeResource::collection($paginator->getCollection())->resolve(),
+            'items' => AnnonceResumeResource::collection($paginator->items())->resolve(),
             'pagination' => [
                 'total' => $paginator->total(),
                 'per_page' => $paginator->perPage(),

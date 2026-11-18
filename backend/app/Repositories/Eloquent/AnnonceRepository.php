@@ -203,6 +203,10 @@ class AnnonceRepository implements AnnonceRepositoryInterface
     }
 
     /** [PORTED] partie lecture de calculerNoteGlobale() : moyenne des avis voyageurs. */
+    /**
+     * @param  Builder<Annonce>  $query
+     * @return Builder<Annonce>
+     */
     private function avecNote(Builder $query): Builder
     {
         $avisVoyageurs = fn ($q) => $q->where('type_auteur', 'voyageur');
