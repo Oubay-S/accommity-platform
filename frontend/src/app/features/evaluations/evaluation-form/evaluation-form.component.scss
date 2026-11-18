@@ -1,1 +1,104 @@
-.evaluation-form-page { padding: 16px; }
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--ink);
+  }
+}
+
+.state-card,
+.sejour-card {
+  margin-bottom: 1rem;
+}
+
+.state-card {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.sejour-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+
+  h2 {
+    margin: 0.15rem 0;
+    font-size: 1.15rem;
+  }
+}
+
+.evaluation-form {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.criteres {
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+  }
+}
+
+.criteres__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem;
+}
+
+.critere {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.field__hint {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.field__error {
+  margin: 0.25rem 0 0;
+  color: var(--danger);
+  font-size: 0.8rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--border);
+  border-top-color: var(--clay);
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

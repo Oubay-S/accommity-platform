@@ -178,7 +178,111 @@ Codes d'erreur métier : `ANNONCE_INTROUVABLE` (404), `ACCES_REFUSE` (403),
 Photos : stockées dans `storage/app/public/annonces/{id_annonce}/`, servies via
 `/storage/...` (nécessite `php artisan storage:link`), URLs absolues dans les réponses.
 
-## 8. Angular
+## 8. Évaluations & avis (RG27, RG28)
+
+Un avis est **bilatéral** : le voyageur évalue l'hôte et l'annonce, l'hôte évalue le voyageur.
+Un seul avis par réservation et par auteur.
+
+| Méthode | Route | Auth | Description |
+| --- | --- | --- | --- |
+| GET | `/api/annonces/{id}/avis?note=&page=&par_page=` | — | Avis publics d'une annonce (voyageurs uniquement) + statistiques |
+| GET | `/api/evaluations/a-evaluer` | Bearer | Séjours terminés sans avis déposé par l'utilisateur |
+| GET | `/api/evaluations/recues?page=&par_page=` | Bearer | Avis reçus par l'utilisateur |
+| GET | `/api/evaluations/donnees?page=&par_page=` | Bearer | Avis rédigés par l'utilisateur |
+| POST | `/api/evaluations` | Bearer | Dépose un avis → `201` |
+| POST | `/api/evaluations/{id}/signaler` | Bearer | Signale un avis et ouvre un ticket de litige → `201` |
+
+### Déposer un avis
+
+```json
+{
+  "id_reservation": "uuid",
+  "note": 5,
+  "commentaire": "Un séjour excellent, je recommande vivement.",
+  "notes_detaillees": {
+    "proprete": 5,
+    "communication": 5,
+    "emplacement": 4,
+    "rapport_qualite_prix": 5,
+    "exactitude": 5
+  }
+}
+```
+
+- `notes_detaillees` est **obligatoire pour un avis voyageur** ; il est ignoré pour un avis hôte.
+- `id_auteur`, `id_cible`, `id_annonce` et `type_auteur` sont dérivés côté serveur.
+- La réservation doit appartenir à l'utilisateur et être au statut `terminee`.
+
+### Ressource `Evaluation`
+
+```json
+{
+  "id_evaluation": "uuid",
+  "note": 4.5,
+  "commentaire": "…",
+  "date_creation": "2026-11-14T15:44:55+00:00",
+  "auteur": {
+    "id_utilisateur": "uuid",
+    "prenom": "Sara",
+    "nom": "M.",
+    "photo_url": "url | null"
+  },
+  "notes_detaillees": {
+    "proprete": 5,
+    "communication": 5,
+    "emplacement": 4,
+    "rapport_qualite_prix": 5,
+    "exactitude": 5
+  }
+}
+```
+
+`notes_detaillees` vaut `null` pour un avis hôte.
+
+### Liste publique
+
+```json
+{
+  "items": ["…Evaluation"],
+  "pagination": { "total": 12, "per_page": 10, "current_page": 1, "last_page": 2 },
+  "statistiques": {
+    "note_moyenne": 4.6,
+    "nb_avis": 12,
+    "repartition": { "1": 0, "2": 1, "3": 1, "4": 4, "5": 6 }
+  }
+}
+```
+
+Seuls les avis `type_auteur = voyageur` sont exposés publiquement. Aucune donnée privée
+(`est_signale`, `motif_signalement`, email) n'est renvoyée.
+
+### Signalement
+
+```json
+{ "motif": "Ce commentaire contient des propos inappropriés." }
+```
+
+Création d'un ticket `ticket_litiges` (`statut = en_cours`), passage de l'avis à
+`est_signale = true`. L'avis reste visible jusqu'à la décision de l'administration.
+
+### Erreurs métier
+
+| HTTP | `error_code` | Cas |
+| --- | --- | --- |
+| 404 | `RESERVATION_INTROUVABLE` | Réservation inconnue |
+| 403 | `NON_PARTICIPANT` | Utilisateur étranger à la réservation |
+| 422 | `RESERVATION_NON_TERMINEE` | Séjour non terminé |
+| 409 | `AVIS_DEJA_DEPOSE` | Avis déjà déposé par cet auteur |
+| 422 | `NOTES_DETAILLEES_REQUISES` | Avis voyageur sans notes détaillées |
+| 404 | `ANNONCE_INTROUVABLE` | Annonce inconnue |
+| 404 | `AVIS_INTROUVABLE` | Avis inconnu |
+| 403 | `AUTO_SIGNALEMENT` | Signalement de son propre avis |
+| 409 | `AVIS_DEJA_SIGNE` | Avis déjà signalé par cet utilisateur |
+
+La moyenne du destinataire est recalculée après chaque dépôt. La note d'une annonce
+est calculée dynamiquement à partir des avis voyageurs.
+
+## 9. Angular
 
 - `ApiService` déballe automatiquement `data` et normalise les erreurs en `ApiError` (`status`, `message`, `errors`, `errorCode`).
 - En développement, `/api` est proxifié vers Laravel (`frontend/proxy.conf.mjs`, cible surchargeable par `API_PROXY_TARGET`).

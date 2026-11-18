@@ -1,0 +1,35 @@
+.star-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.star-input__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--border-strong);
+  cursor: pointer;
+  transition: color 120ms ease, transform 120ms ease;
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    color: var(--cedar);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+}
+
+.star-input__button--active {
+  color: var(--cedar);
+}

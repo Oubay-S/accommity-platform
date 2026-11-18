@@ -69,6 +69,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Avis & Évaluations (RG26, RG27)
+    Route::get('/evaluations/a-evaluer', [EvaluationController::class, 'aEvaluer']);
+    Route::get('/evaluations/recues', [EvaluationController::class, 'recues']);
+    Route::get('/evaluations/donnees', [EvaluationController::class, 'donnees']);
     Route::post('/evaluations', [EvaluationController::class, 'store']);
     Route::post('/evaluations/{id}/signaler', [EvaluationController::class, 'signaler']);
 

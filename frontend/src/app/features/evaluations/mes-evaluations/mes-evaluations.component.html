@@ -1,0 +1,95 @@
+<div class="container page">
+  <header class="page-head">
+    <span class="eyebrow">Confiance & réputation</span>
+    <h1>Mes évaluations</h1>
+    <p class="muted">Laissez un avis après vos séjours et consultez ceux que vous avez publiés.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Évaluations">
+    <button
+      type="button"
+      role="tab"
+      class="tabs__item"
+      [class.tabs__item--active]="onglet() === 'a-evaluer'"
+      [attr.aria-selected]="onglet() === 'a-evaluer'"
+      (click)="changerOnglet('a-evaluer')"
+    >
+      À évaluer
+      @if (aEvaluer().length > 0) {
+        <span class="badge badge--clay">{{ aEvaluer().length }}</span>
+      }
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="tabs__item"
+      [class.tabs__item--active]="onglet() === 'donnees'"
+      [attr.aria-selected]="onglet() === 'donnees'"
+      (click)="changerOnglet('donnees')"
+    >
+      Mes avis publiés
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="card state-card">
+      <span class="spinner" aria-hidden="true"></span>
+      <p class="muted">Chargement…</p>
+    </div>
+  } @else if (erreur()) {
+    <div class="card state-card">
+      <p class="muted">{{ erreur() }}</p>
+    </div>
+  } @else if (onglet() === 'a-evaluer') {
+    @if (aEvaluer().length === 0) {
+      <div class="card state-card">
+        <span class="icon icon--lg" aria-hidden="true">task_alt</span>
+        <p class="muted">Tous vos séjours terminés ont déjà été évalués.</p>
+      </div>
+    } @else {
+      <ul class="sejours">
+        @for (sejour of aEvaluer(); track sejour.id_reservation) {
+          <li class="card sejour">
+            <div class="sejour__main">
+              <span class="badge">{{ sejour.role === 'voyageur' ? 'Voyageur' : 'Hôte' }}</span>
+              <h2>{{ sejour.annonce?.titre || 'Séjour terminé' }}</h2>
+              <p class="muted small">
+                Du {{ dateLisible(sejour.date_arrivee) }} au {{ dateLisible(sejour.date_depart) }}
+                @if (sejour.cible) {
+                  · avec {{ sejour.cible.prenom }} {{ sejour.cible.nom }}
+                }
+              </p>
+            </div>
+            <a
+              class="btn btn--dark"
+              [routerLink]="['/evaluations/nouvelle', sejour.id_reservation]"
+            >
+              Laisser un avis
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  } @else {
+    @if (!donnees() || donnees()!.items.length === 0) {
+      <div class="card state-card">
+        <span class="icon icon--lg" aria-hidden="true">reviews</span>
+        <p class="muted">Vous n’avez pas encore publié d’avis.</p>
+      </div>
+    } @else {
+      <ul class="avis-publies">
+        @for (avis of donnees()!.items; track avis.id_evaluation) {
+          <li class="card avis-publie">
+            <div class="avis-publie__head">
+              <strong>{{ avis.annonce?.titre || 'Séjour' }}</strong>
+              <app-rating-stars [note]="avis.note" taille="sm" />
+              <span class="muted small">{{ dateLisible(avis.date_creation) }}</span>
+            </div>
+            <p>{{ avis.commentaire }}</p>
+            <p class="muted small">À propos de {{ avis.cible?.prenom }} {{ avis.cible?.nom }}</p>
+          </li>
+        }
+      </ul>
+    }
+  }
+</div>

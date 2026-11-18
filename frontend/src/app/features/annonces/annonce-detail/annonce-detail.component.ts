@@ -17,6 +17,7 @@ import { RatingStarsComponent } from '../../../shared/components/rating-stars/ra
 import { AnnonceDetail } from '../../../shared/models/annonce.model';
 import { ApiError } from '../../../shared/models/api-response.model';
 import { CurrencyMadPipe } from '../../../shared/pipes/currency-mad.pipe';
+import { EvaluationListComponent } from '../../evaluations/evaluation-list/evaluation-list.component';
 import { AnnonceService } from '../services/annonce.service';
 
 interface CalendarDay {
@@ -34,7 +35,7 @@ interface CalendarMonth {
 @Component({
   selector: 'app-annonce-detail',
   standalone: true,
-  imports: [RouterLink, CurrencyMadPipe, RatingStarsComponent],
+  imports: [RouterLink, CurrencyMadPipe, RatingStarsComponent, EvaluationListComponent],
   templateUrl: './annonce-detail.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './annonce-detail.component.scss',
