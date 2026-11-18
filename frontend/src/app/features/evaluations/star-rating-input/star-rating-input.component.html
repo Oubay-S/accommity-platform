@@ -1,0 +1,15 @@
+<div class="star-input" role="group" [attr.aria-label]="label">
+  @for (etoile of etoiles; track etoile) {
+    <button
+      type="button"
+      class="star-input__button"
+      [class.star-input__button--active]="etoile <= value"
+      [disabled]="disabled"
+      [attr.aria-label]="ariaLabel(etoile)"
+      [attr.aria-pressed]="etoile === value"
+      (click)="selectionner(etoile)"
+    >
+      <span class="icon icon--filled" aria-hidden="true">star</span>
+    </button>
+  }
+</div>

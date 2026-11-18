@@ -37,8 +37,19 @@ export const routes: Routes = [
       {
         path: 'verification-identite',
         loadComponent: () => import('./features/profile/verification-identite/verification-identite.component').then(m => m.VerificationIdentiteComponent)
+      },
+      {
+        path: 'evaluations',
+        loadComponent: () => import('./features/evaluations/mes-evaluations/mes-evaluations.component').then(m => m.MesEvaluationsComponent)
       }
     ]
+  },
+
+  // Avis post-séjour
+  {
+    path: 'evaluations/nouvelle/:reservationId',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/evaluations/evaluation-form/evaluation-form.component').then(m => m.EvaluationFormComponent)
   },
 
   // ── Espace hôte : mes annonces ──

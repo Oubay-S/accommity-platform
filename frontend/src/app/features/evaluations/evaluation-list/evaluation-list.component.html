@@ -1,3 +1,163 @@
-<div class="evaluation-list-page">
-  <h2>Evaluation List</h2>
-</div>
+<section class="avis" aria-labelledby="avis-title">
+  <div class="avis__head">
+    <div>
+      <span class="eyebrow">Avis vérifiés</span>
+      <h2 id="avis-title">Avis des voyageurs</h2>
+    </div>
+
+    @if (page(); as p) {
+      @if (p.statistiques.nb_avis > 0) {
+        <div class="avis__summary">
+          <strong class="avis__average">{{ p.statistiques.note_moyenne.toFixed(1) }}</strong>
+          <div>
+            <app-rating-stars [note]="p.statistiques.note_moyenne" taille="md" />
+            <span class="muted small">{{ p.statistiques.nb_avis }} avis</span>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  @if (page(); as p) {
+    @if (p.statistiques.nb_avis > 0) {
+      <div class="repartition" aria-label="Répartition des notes">
+        @for (ligne of repartition(); track ligne.etoile) {
+          <div class="repartition__ligne">
+            <span class="repartition__etoile">{{ ligne.etoile }} <span class="icon icon--sm icon--filled" aria-hidden="true">star</span></span>
+            <span class="repartition__bar" aria-hidden="true">
+              <span class="repartition__fill" [style.width.%]="ligne.pourcentage"></span>
+            </span>
+            <span class="repartition__nombre">{{ ligne.nombre }}</span>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  @if (loading()) {
+    <div class="avis__state">
+      <span class="spinner" aria-hidden="true"></span>
+      <p class="muted">Chargement des avis…</p>
+    </div>
+  } @else if (erreur()) {
+    <div class="avis__state">
+      <p class="muted">{{ erreur() }}</p>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="charger(1)">Réessayer</button>
+    </div>
+  } @else if (page(); as p) {
+    @if (p.items.length === 0) {
+      <div class="avis__state">
+        <span class="icon icon--lg" aria-hidden="true">reviews</span>
+        <p class="muted">Aucun avis pour le moment. Soyez le premier à partager votre expérience.</p>
+      </div>
+    } @else {
+      <ul class="avis__list">
+        @for (avis of p.items; track avis.id_evaluation) {
+          <li class="avis-card">
+            <div class="avis-card__head">
+              <span class="avatar avatar--sm">
+                @if (avis.auteur?.photo_url) {
+                  <img [src]="avis.auteur?.photo_url" [alt]="avis.auteur?.prenom || 'Auteur'" />
+                } @else {
+                  {{ initiale(avis) }}
+                }
+              </span>
+              <div class="avis-card__meta">
+                <strong>{{ avis.auteur?.prenom }} {{ avis.auteur?.nom }}</strong>
+                <span class="muted small">{{ dateLisible(avis.date_creation) }}</span>
+              </div>
+              <app-rating-stars [note]="avis.note" taille="sm" />
+            </div>
+
+            <p class="avis-card__comment">{{ avis.commentaire }}</p>
+
+            @if (notesDetaillees(avis).length > 0) {
+              <div class="avis-card__criteres">
+                @for (critere of notesDetaillees(avis); track critere) {
+                  <span class="chip">{{ critere }}</span>
+                }
+              </div>
+            }
+
+            @if (peutSignaler(avis)) {
+              <button type="button" class="avis-card__signaler" (click)="ouvrirSignalement(avis)">
+                <span class="icon icon--sm" aria-hidden="true">flag</span> Signaler cet avis
+              </button>
+            }
+          </li>
+        }
+      </ul>
+
+      @if (p.pagination.last_page > 1) {
+        <nav class="avis__pagination" aria-label="Pagination des avis">
+          <button
+            type="button"
+            class="btn btn--ghost btn--sm"
+            [disabled]="p.pagination.current_page <= 1"
+            (click)="charger(p.pagination.current_page - 1)"
+          >
+            Précédent
+          </button>
+          <span class="muted small">Page {{ p.pagination.current_page }} / {{ p.pagination.last_page }}</span>
+          <button
+            type="button"
+            class="btn btn--ghost btn--sm"
+            [disabled]="p.pagination.current_page >= p.pagination.last_page"
+            (click)="charger(p.pagination.current_page + 1)"
+          >
+            Suivant
+          </button>
+        </nav>
+      }
+    }
+  }
+
+  @if (!connecte()) {
+    <p class="muted small avis__login">
+      <a routerLink="/auth/login">Connectez-vous</a> pour signaler un avis inapproprié.
+    </p>
+  }
+</section>
+
+@if (signalerCible(); as avis) {
+  <div class="modal-backdrop" role="presentation" (click)="fermerSignalement()">
+    <div
+      class="modal card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="signalement-title"
+      (click)="$event.stopPropagation()"
+    >
+      <h3 id="signalement-title">Signaler cet avis</h3>
+      <p class="muted small">
+        Expliquez pourquoi cet avis pose problème. Notre équipe examinera le signalement.
+      </p>
+
+      <label class="field__label" for="motif-signalement">Motif</label>
+      <textarea
+        id="motif-signalement"
+        class="field__input"
+        rows="4"
+        [ngModel]="motif()"
+        (ngModelChange)="motif.set($event)"
+        placeholder="Contenu injurieux, informations fausses, spam…"
+      ></textarea>
+
+      @if (signalementErreur()) {
+        <p class="field__error">{{ signalementErreur() }}</p>
+      }
+
+      <div class="modal__actions">
+        <button type="button" class="btn btn--ghost" (click)="fermerSignalement()">Annuler</button>
+        <button
+          type="button"
+          class="btn btn--dark"
+          [disabled]="signalementEnCours()"
+          (click)="confirmerSignalement()"
+        >
+          {{ signalementEnCours() ? 'Envoi…' : 'Signaler' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

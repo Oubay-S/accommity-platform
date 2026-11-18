@@ -1,11 +1,12 @@
 import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { EvaluationRecuesComponent } from '../../evaluations/evaluation-recues/evaluation-recues.component';
 
 @Component({
   selector: 'app-profile-view',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, EvaluationRecuesComponent],
   templateUrl: './profile-view.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './profile-view.component.scss'
