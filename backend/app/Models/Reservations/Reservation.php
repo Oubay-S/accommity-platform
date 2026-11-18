@@ -16,9 +16,11 @@ class Reservation extends Model
     use HasFactory, HasUuids;
 
     protected $table = 'reservations';
+
     protected $primaryKey = 'id_reservation';
 
     const CREATED_AT = 'date_creation';
+
     const UPDATED_AT = 'date_modification';
 
     protected $fillable = [

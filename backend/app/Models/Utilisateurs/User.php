@@ -16,9 +16,11 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, HasUuids;
 
     protected $table = 'utilisateurs';
+
     protected $primaryKey = 'id_utilisateur';
 
     const CREATED_AT = 'date_creation';
+
     const UPDATED_AT = null;
 
     /** The password column is "mot_de_passe" (Laravel 11+ feature). */
