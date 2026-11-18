@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CriteresRecherche } from '../../models/annonce.model';
@@ -8,6 +8,7 @@ import { CriteresRecherche } from '../../models/annonce.model';
   standalone: true,
   imports: [FormsModule],
   templateUrl: './search-bar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './search-bar.component.scss',
 })
 export class SearchBarComponent implements OnChanges {

@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ToastService } from '../../../core/services/toast.service';
@@ -10,8 +10,9 @@ import { AnnonceService } from '../services/annonce.service';
 @Component({
   selector: 'app-mes-annonces',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink],
   templateUrl: './mes-annonces.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './mes-annonces.component.scss',
 })
 export class MesAnnoncesComponent implements OnInit {

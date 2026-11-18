@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -27,6 +27,7 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink, RouterLinkActive],
   templateUrl: './profile-edit.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './profile-edit.component.scss'
 })
 export class ProfileEditComponent {

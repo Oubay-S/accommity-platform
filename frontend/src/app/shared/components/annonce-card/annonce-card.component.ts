@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AnnonceResume } from '../../models/annonce.model';
 import { CurrencyMadPipe } from '../../pipes/currency-mad.pipe';
@@ -9,6 +9,7 @@ import { RatingStarsComponent } from '../rating-stars/rating-stars.component';
   standalone: true,
   imports: [RouterLink, CurrencyMadPipe, RatingStarsComponent],
   templateUrl: './annonce-card.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './annonce-card.component.scss',
 })
 export class AnnonceCardComponent {

@@ -7,8 +7,9 @@ import {
   Output,
   SimpleChanges,
   inject,
+  ChangeDetectionStrategy
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AnnonceHote, AnnonceHotePayload, AnnonceReferences } from '../../../shared/models/annonce.model';
@@ -37,8 +38,9 @@ const EQUIPEMENTS_SUGGESTIONS = [
 @Component({
   selector: 'app-annonce-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './annonce-form.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './annonce-form.component.scss',
 })
 export class AnnonceFormComponent implements OnChanges, OnDestroy {

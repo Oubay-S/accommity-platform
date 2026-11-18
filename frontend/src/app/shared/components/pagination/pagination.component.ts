@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { Pagination } from '../../models/api-response.model';
 
 @Component({
@@ -6,6 +6,7 @@ import { Pagination } from '../../models/api-response.model';
   standalone: true,
   imports: [],
   templateUrl: './pagination.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './pagination.component.scss',
 })
 export class PaginationComponent {

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -10,6 +10,7 @@ import { NotificationService } from '../services/notification.service';
   selector: 'app-notification-list',
   standalone: true,
   templateUrl: './notification-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './notification-list.component.scss'
 })
 export class NotificationListComponent {

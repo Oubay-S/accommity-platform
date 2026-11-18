@@ -1,5 +1,5 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { ToastService } from '../../../core/services/toast.service';
@@ -18,8 +18,9 @@ interface MoisAffiche {
 @Component({
   selector: 'app-calendrier-hote',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   templateUrl: './calendrier-hote.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './calendrier-hote.component.scss',
 })
 export class CalendrierHoteComponent implements OnInit {

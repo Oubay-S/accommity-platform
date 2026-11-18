@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, viewChild } from '@angular/core';
+import { Component, OnInit, inject, signal, viewChild, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastService } from '../../../core/services/toast.service';
 import { ApiError } from '../../../shared/models/api-response.model';
@@ -11,6 +11,7 @@ import { AnnonceFormComponent, AnnonceFormSubmit } from '../annonce-form/annonce
   standalone: true,
   imports: [AnnonceFormComponent],
   templateUrl: './annonce-edit.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './annonce-edit.component.scss',
 })
 export class AnnonceEditComponent implements OnInit {

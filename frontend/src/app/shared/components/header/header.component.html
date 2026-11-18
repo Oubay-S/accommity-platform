@@ -70,7 +70,7 @@
         <a routerLink="/profil" class="user-chip" title="Mon profil">
           <span class="avatar">
             @if (user()?.profil?.photo_url) {
-              <img [src]="user()?.profil?.photo_url" [alt]="fullName()" />
+              <img [src]="$safeNavigationMigration(user()?.profil?.photo_url)" [alt]="fullName()" />
             } @else {
               {{ initials() }}
             }

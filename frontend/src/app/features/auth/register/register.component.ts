@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -44,6 +44,7 @@ function passwordScore(value: string): number {
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './register.component.scss'
 })
 export class RegisterComponent {

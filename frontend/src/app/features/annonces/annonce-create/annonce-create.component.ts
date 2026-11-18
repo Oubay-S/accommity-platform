@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastService } from '../../../core/services/toast.service';
 import { ApiError } from '../../../shared/models/api-response.model';
@@ -11,6 +11,7 @@ import { AnnonceFormComponent, AnnonceFormSubmit } from '../annonce-form/annonce
   standalone: true,
   imports: [AnnonceFormComponent],
   templateUrl: './annonce-create.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './annonce-create.component.scss',
 })
 export class AnnonceCreateComponent {

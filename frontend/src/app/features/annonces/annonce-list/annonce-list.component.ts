@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -15,6 +15,7 @@ import { AnnonceService } from '../services/annonce.service';
   standalone: true,
   imports: [FormsModule, SearchBarComponent, AnnonceCardComponent, PaginationComponent],
   templateUrl: './annonce-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './annonce-list.component.scss',
 })
 export class AnnonceListComponent implements OnInit {

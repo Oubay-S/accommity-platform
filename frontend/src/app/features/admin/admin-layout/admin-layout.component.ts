@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   NavigationEnd,
   Router,
@@ -15,6 +15,7 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './admin-layout.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './admin-layout.component.scss'
 })
 export class AdminLayoutComponent {
