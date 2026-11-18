@@ -50,3 +50,6 @@ yarn-error.log*
 #reda gitignore
 conception/
 /backend/.phpunit.result.cache
+
+# Playwright MCP (captures et snapshots locaux)
+.playwright-mcp/
