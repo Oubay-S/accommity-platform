@@ -1,1 +1,50 @@
-.annonce-edit-page { padding: 16px; }
+.loading-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--muted);
+}
+
+.statut-banner {
+  max-width: 1440px;
+  margin: var(--space-lg) auto 0;
+  margin-inline: max(var(--margin), calc((100vw - 1440px) / 2 + var(--margin)));
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--r-md);
+  background: var(--warning-bg);
+  color: var(--warning);
+  border: 1px solid #f0d9ae;
+}
+
+.statut-banner strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.statut-banner p {
+  font-size: 13px;
+  color: var(--warning);
+}
+
+.statut-banner[data-statut='rejetee'],
+.statut-banner[data-statut='suspendue'] {
+  background: var(--danger-bg);
+  border-color: #f5b8b2;
+  color: var(--danger);
+}
+
+.statut-banner[data-statut='rejetee'] p,
+.statut-banner[data-statut='suspendue'] p {
+  color: var(--danger);
+}
+
+@media (max-width: 640px) {
+  .statut-banner {
+    margin-inline: var(--margin-mobile);
+  }
+}

@@ -1,3 +1,40 @@
-<div class="annonce-edit-page">
-  <h2>Annonce Edit</h2>
-</div>
+@if (loading()) {
+  <div class="container page">
+    <div class="loading-card" aria-live="polite">Chargement de l’annonce…</div>
+  </div>
+} @else {
+  @if (annonce(); as annonce) {
+    @if (annonce.statut !== 'publiee') {
+      <div class="statut-banner" [attr.data-statut]="annonce.statut">
+        <span class="icon icon--sm" aria-hidden="true">info</span>
+        <div>
+          <strong>
+            @switch (annonce.statut) {
+              @case ('en_attente') { Annonce en attente de validation }
+              @case ('suspendue') { Annonce suspendue }
+              @case ('rejetee') { Annonce rejetée }
+              @case ('desactivee') { Annonce désactivée }
+            }
+          </strong>
+          @if (annonce.motif_moderation) {
+            <p>{{ annonce.motif_moderation }}</p>
+          }
+        </div>
+      </div>
+    }
+
+    <app-annonce-form
+      mode="edit"
+      [references]="references()"
+      [initial]="annonce"
+      [submitting]="submitting()"
+      [serverErrors]="errors()"
+      (save)="enregistrer($event)"
+      (removePhoto)="supprimerPhoto($event)"
+    />
+  } @else {
+    <div class="container page">
+      <div class="loading-card">Annonce introuvable.</div>
+    </div>
+  }
+}

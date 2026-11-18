@@ -12,6 +12,7 @@
         <a routerLink="/reservations/mes-voyages" routerLinkActive="nav__link--active" class="nav__link">Mes voyages</a>
       }
       @if (isHote()) {
+        <a routerLink="/hote/annonces" routerLinkActive="nav__link--active" class="nav__link">Mes annonces</a>
         <a routerLink="/profil/verification-identite" routerLinkActive="nav__link--active" class="nav__link">Espace hôte</a>
       }
       @if (isAdmin()) {

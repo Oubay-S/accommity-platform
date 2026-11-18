@@ -41,6 +41,23 @@ export const routes: Routes = [
     ]
   },
 
+  // ── Espace hôte : mes annonces ──
+  {
+    path: 'hote',
+    canActivate: [authGuard, hoteGuard],
+    children: [
+      {
+        path: 'annonces',
+        loadComponent: () => import('./features/annonces/mes-annonces/mes-annonces.component').then(m => m.MesAnnoncesComponent)
+      },
+      {
+        path: '',
+        redirectTo: 'annonces',
+        pathMatch: 'full'
+      }
+    ]
+  },
+
   // ── 4.4, 4.5 & 4.6 Annonces & Recherche ──
   {
     path: 'annonces',

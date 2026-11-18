@@ -1,0 +1,265 @@
+.form-page {
+  padding-bottom: 5rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: var(--space-sm);
+}
+
+.back-link:hover {
+  color: var(--ink);
+}
+
+.page-sub {
+  max-width: 60ch;
+  color: var(--muted);
+}
+
+.form-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.form-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  box-shadow: var(--shadow-1);
+}
+
+.form-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border);
+}
+
+.form-card__head h2 {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.form-card__head p {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.step-chip {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-full);
+  background: var(--ink);
+  color: var(--surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.photo-tile {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--surface-subdued);
+  border: 1px solid var(--border);
+}
+
+.photo-tile--new {
+  outline: 2px dashed var(--clay);
+  outline-offset: -2px;
+}
+
+.photo-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-tile__badge {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  background: rgba(18, 19, 22, 0.82);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.photo-tile__remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-full);
+  border: 0;
+  background: rgba(18, 19, 22, 0.72);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-tile__remove:hover {
+  background: var(--danger);
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: var(--space-lg);
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-subdued);
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.dropzone:hover {
+  border-color: var(--clay);
+  background: #fdf6f1;
+}
+
+.dropzone strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.dropzone span {
+  font-size: 12px;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.form-side {
+  position: sticky;
+  top: 96px;
+}
+
+.summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  box-shadow: var(--shadow-2);
+}
+
+.summary-card h3 {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.summary-card dl {
+  margin: 0 0 var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-card dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  font-size: 13px;
+}
+
+.summary-card dt {
+  color: var(--muted);
+}
+
+.summary-card dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+.summary-note {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  padding-top: var(--space-xs);
+}
+
+@media (max-width: 1024px) {
+  .form-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-side {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-card {
+    padding: var(--space-md);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropzone {
+    transition: none;
+  }
+}

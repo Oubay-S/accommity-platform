@@ -1,3 +1,7 @@
-<div class="annonce-create-page">
-  <h2>Annonce Create</h2>
-</div>
+<app-annonce-form
+  mode="create"
+  [references]="references()"
+  [submitting]="submitting()"
+  [serverErrors]="errors()"
+  (save)="enregistrer($event)"
+/>
