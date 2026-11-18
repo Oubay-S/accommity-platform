@@ -8,6 +8,7 @@ import {
   computed,
   inject,
   signal,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -35,6 +36,7 @@ interface CalendarMonth {
   standalone: true,
   imports: [RouterLink, CurrencyMadPipe, RatingStarsComponent],
   templateUrl: './annonce-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './annonce-detail.component.scss',
 })
 export class AnnonceDetailComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
@@ -11,6 +11,7 @@ import { Notification, TypeAlerte } from '../../../shared/models/notification.mo
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './header.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {

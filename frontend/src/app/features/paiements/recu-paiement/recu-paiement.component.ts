@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+
 
 @Component({
   selector: 'app-recu-paiement',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './recu-paiement.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './recu-paiement.component.scss'
 })
 export class RecuPaiementComponent {

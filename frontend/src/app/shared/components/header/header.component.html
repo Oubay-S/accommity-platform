@@ -12,6 +12,7 @@
         <a routerLink="/reservations/mes-voyages" routerLinkActive="nav__link--active" class="nav__link">Mes voyages</a>
       }
       @if (isHote()) {
+        <a routerLink="/hote/annonces" routerLinkActive="nav__link--active" class="nav__link">Mes annonces</a>
         <a routerLink="/profil/verification-identite" routerLinkActive="nav__link--active" class="nav__link">Espace hôte</a>
       }
       @if (isAdmin()) {
@@ -69,7 +70,7 @@
         <a routerLink="/profil" class="user-chip" title="Mon profil">
           <span class="avatar">
             @if (user()?.profil?.photo_url) {
-              <img [src]="user()?.profil?.photo_url" [alt]="fullName()" />
+              <img [src]="$safeNavigationMigration(user()?.profil?.photo_url)" [alt]="fullName()" />
             } @else {
               {{ initials() }}
             }

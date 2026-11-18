@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { AnnonceCardComponent } from '../../shared/components/annonce-card/annonce-card.component';
@@ -17,6 +17,7 @@ interface TypeLogementItem {
   standalone: true,
   imports: [RouterLink, SearchBarComponent, AnnonceCardComponent],
   templateUrl: './home.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './home.component.scss',
 })
 export class HomeComponent implements OnInit {

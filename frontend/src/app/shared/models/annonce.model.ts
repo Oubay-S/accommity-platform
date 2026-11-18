@@ -1,3 +1,5 @@
+export type StatutAnnonce = 'en_attente' | 'publiee' | 'suspendue' | 'desactivee' | 'rejetee';
+
 export interface Annonce {
   id_annonce: string;
   id_hote: string;
@@ -9,7 +11,7 @@ export interface Annonce {
   tarif_nuit: number | string;
   capacite: number;
   mode_reservation: 'instantanee' | 'sur_demande';
-  statut: 'en_attente' | 'publiee' | 'suspendue' | 'desactivee' | 'rejetee';
+  statut: StatutAnnonce;
   photo_url?: string[];
   note_moyenne?: number;
   nb_avis?: number;
@@ -75,4 +77,102 @@ export interface DisponibiliteCalendrier {
   date: string;
   est_disponible: boolean;
   prix_specifique?: number;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Espace hôte                                                               */
+/* ------------------------------------------------------------------------- */
+
+export interface CategorieGeo {
+  id_categorie: string;
+  ville: string;
+  region: string;
+  pays: string;
+}
+
+export interface PolitiqueHote extends PolitiqueAnnulationResume {
+  id_politique: string;
+}
+
+export interface AnnonceReferences {
+  categories: CategorieGeo[];
+  politiques: PolitiqueHote[];
+  types_logement: string[];
+}
+
+export interface AnnonceHote {
+  id_annonce: string;
+  id_hote: string;
+  titre: string;
+  description: string;
+  type_logement: string;
+  adresse: string;
+  capacite: number;
+  tarif_nuit: string;
+  mode_reservation: 'instantanee' | 'sur_demande';
+  statut: StatutAnnonce;
+  motif_moderation: string | null;
+  equipements: string[];
+  reglement_interieur: string | null;
+  photos: string[];
+  photo_principale: string | null;
+  categorie: CategorieGeo | null;
+  politique_annulation: PolitiqueHote | null;
+  note_moyenne: number;
+  nb_avis: number;
+  a_des_reservations_actives: boolean;
+  date_creation: string | null;
+}
+
+export interface StatistiquesAnnonces {
+  total: number;
+  en_attente: number;
+  publiee: number;
+  suspendue: number;
+  desactivee: number;
+  rejetee: number;
+}
+
+export interface MesAnnoncesResultat {
+  items: AnnonceHote[];
+  pagination: {
+    total: number;
+    per_page: number;
+    current_page: number;
+    last_page: number;
+  };
+  statistiques: StatistiquesAnnonces;
+}
+
+export interface AnnonceHotePayload {
+  titre: string;
+  description: string;
+  type_logement: string;
+  adresse: string;
+  id_categorie: string;
+  id_politique: string;
+  capacite: number;
+  tarif_nuit: number;
+  mode_reservation: 'instantanee' | 'sur_demande';
+  equipements: string[];
+  reglement_interieur: string | null;
+}
+
+export interface BlocageCalendrier {
+  id_calendrier: string;
+  date_debut: string;
+  date_fin: string;
+}
+
+export interface ReservationCalendrier {
+  id_reservation: string;
+  date_arrivee: string;
+  date_depart: string;
+  statut: string;
+}
+
+export interface CalendrierHote {
+  blocages: BlocageCalendrier[];
+  dates_reservees: string[];
+  reservations: ReservationCalendrier[];
 }

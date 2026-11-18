@@ -16,10 +16,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   frontend-qa:
     name: Frontend QA & Automated Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout Code
@@ -28,24 +32,35 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
-          cache-dependency-path: frontend/package.json
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install NPM Dependencies
-        run: cd frontend && npm ci --legacy-peer-deps || npm install
+        run: cd frontend && npm ci
 
-      - name: Security Vulnerability Audit
-        run: cd frontend && npm audit --audit-level=high || echo "Security audit completed with warnings"
+      - name: Security Vulnerability Audit (production dependencies)
+        run: cd frontend && npm audit --omit=dev --audit-level=high
 
       - name: TypeScript Strict Type Check & Lint
         run: cd frontend && npm run lint
 
       - name: Headless Unit & Component Tests (Karma / Jasmine)
-        run: cd frontend && npm run test:ci || echo "Headless tests executed"
+        env:
+          CI: 'true'
+        run: cd frontend && npm run test:ci
 
       - name: Production Build & Bundle Budget Gate
         run: cd frontend && npm run build:prod
+
+      - name: Upload Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Upload Production Build Artifact
         uses: actions/upload-artifact@v4

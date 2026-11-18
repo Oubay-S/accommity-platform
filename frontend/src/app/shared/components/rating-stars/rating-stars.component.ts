@@ -1,10 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-rating-stars',
   standalone: true,
   imports: [],
   templateUrl: './rating-stars.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './rating-stars.component.scss',
 })
 export class RatingStarsComponent {

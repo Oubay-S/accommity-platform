@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+
 
 @Component({
   selector: 'app-users-management',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './users-management.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './users-management.component.scss'
 })
 export class UsersManagementComponent {

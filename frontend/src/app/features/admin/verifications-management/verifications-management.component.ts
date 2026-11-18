@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
@@ -18,6 +18,7 @@ const EMPTY_STATS: AdminVerificationStats = { tous: 0, en_cours: 0, validee: 0, 
   selector: 'app-verifications-management',
   standalone: true,
   templateUrl: './verifications-management.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './verifications-management.component.scss'
 })
 export class VerificationsManagementComponent {

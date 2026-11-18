@@ -1,0 +1,273 @@
+<div class="container page form-page">
+  <header class="page-head">
+    <a routerLink="/hote/annonces" class="back-link">
+      <span class="icon icon--sm" aria-hidden="true">arrow_back</span>
+      Mes annonces
+    </a>
+    <h1>{{ mode === 'create' ? 'Créer une annonce' : 'Modifier l’annonce' }}</h1>
+    <p class="page-sub">
+      Renseignez les informations de votre logement. Toute annonce est vérifiée par notre équipe
+      avant publication.
+    </p>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form-shell">
+    <div class="form-main">
+      <!-- 1. Le logement -->
+      <section class="form-card">
+        <div class="form-card__head">
+          <span class="step-chip">1</span>
+          <div>
+            <h2>Le logement</h2>
+            <p>Présentez votre bien aux voyageurs.</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="titre">Titre de l’annonce</label>
+          <input id="titre" class="field__input" type="text" formControlName="titre" placeholder="Riad de charme au cœur de la médina" />
+          @if (errorFor('titre'); as message) {
+            <p class="field__error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="type_logement">Type de logement</label>
+            <select id="type_logement" formControlName="type_logement">
+              <option value="" disabled>Choisir…</option>
+              @for (type of references?.types_logement ?? []; track type) {
+                <option [value]="type">{{ libelleType(type) }}</option>
+              }
+            </select>
+            @if (errorFor('type_logement'); as message) {
+              <p class="field__error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="field">
+            <label for="capacite">Capacité (voyageurs)</label>
+            <input id="capacite" class="field__input tabular" type="number" min="1" max="50" formControlName="capacite" />
+            @if (errorFor('capacite'); as message) {
+              <p class="field__error">{{ message }}</p>
+            }
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="id_categorie">Ville</label>
+          <select id="id_categorie" formControlName="id_categorie">
+            <option value="" disabled>Choisir une ville…</option>
+            @for (categorie of references?.categories ?? []; track categorie.id_categorie) {
+              <option [value]="categorie.id_categorie">
+                {{ categorie.ville }} — {{ categorie.region }}
+              </option>
+            }
+          </select>
+          @if (errorFor('id_categorie'); as message) {
+            <p class="field__error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="adresse">Adresse exacte</label>
+          <input id="adresse" class="field__input" type="text" formControlName="adresse" placeholder="12 rue des épices, Médina" />
+          @if (errorFor('adresse'); as message) {
+            <p class="field__error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            rows="6"
+            formControlName="description"
+            placeholder="Décrivez l’ambiance, les espaces, ce qui rend votre logement unique…"
+          ></textarea>
+          @if (errorFor('description'); as message) {
+            <p class="field__error">{{ message }}</p>
+          }
+        </div>
+      </section>
+
+      <!-- 2. Équipements & règles -->
+      <section class="form-card">
+        <div class="form-card__head">
+          <span class="step-chip">2</span>
+          <div>
+            <h2>Équipements & règles</h2>
+            <p>Ce que les voyageurs trouveront sur place.</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="field__label">Équipements</span>
+          <div class="chips">
+            @for (equipement of suggestions; track equipement) {
+              <button
+                type="button"
+                class="chip"
+                [class.chip--active]="hasEquipement(equipement)"
+                (click)="toggleEquipement(equipement)"
+                [attr.aria-pressed]="hasEquipement(equipement)"
+              >
+                {{ equipement }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="reglement_interieur">Règlement intérieur (optionnel)</label>
+          <textarea
+            id="reglement_interieur"
+            rows="4"
+            formControlName="reglement_interieur"
+            placeholder="Non fumeur, pas d’animaux, calme après 22 h…"
+          ></textarea>
+          @if (errorFor('reglement_interieur'); as message) {
+            <p class="field__error">{{ message }}</p>
+          }
+        </div>
+      </section>
+
+      <!-- 3. Tarifs & réservation -->
+      <section class="form-card">
+        <div class="form-card__head">
+          <span class="step-chip">3</span>
+          <div>
+            <h2>Tarifs & réservation</h2>
+            <p>Définissez votre prix et vos conditions.</p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="tarif_nuit">Tarif par nuit (DH)</label>
+            <input id="tarif_nuit" class="field__input tabular" type="number" min="50" step="10" formControlName="tarif_nuit" />
+            @if (errorFor('tarif_nuit'); as message) {
+              <p class="field__error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="field">
+            <label for="mode_reservation">Mode de réservation</label>
+            <select id="mode_reservation" formControlName="mode_reservation">
+              <option value="instantanee">Réservation instantanée</option>
+              <option value="sur_demande">Sur demande</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="id_politique">Politique d’annulation</label>
+          <select id="id_politique" formControlName="id_politique">
+            <option value="" disabled>Choisir une politique…</option>
+            @for (politique of references?.politiques ?? []; track politique.id_politique) {
+              <option [value]="politique.id_politique">
+                {{ libelleType(politique.type_politique) }} — {{ politique.description }}
+              </option>
+            }
+          </select>
+          @if (errorFor('id_politique'); as message) {
+            <p class="field__error">{{ message }}</p>
+          }
+        </div>
+      </section>
+
+      <!-- 4. Photos -->
+      <section class="form-card">
+        <div class="form-card__head">
+          <span class="step-chip">4</span>
+          <div>
+            <h2>Photos</h2>
+            <p>{{ totalPhotos }}/10 photos — la première sera la photo de couverture.</p>
+          </div>
+        </div>
+
+        @if (existingPhotos.length) {
+          <div class="photo-grid">
+            @for (photo of existingPhotos; track photo; let index = $index) {
+              <figure class="photo-tile">
+                <img [src]="photo" [alt]="'Photo ' + (index + 1)" />
+                @if (index === 0) {
+                  <span class="photo-tile__badge">Couverture</span>
+                }
+                <button type="button" class="photo-tile__remove" (click)="removeExistingPhoto(photo)" aria-label="Supprimer la photo">
+                  <span class="icon icon--sm" aria-hidden="true">close</span>
+                </button>
+              </figure>
+            }
+          </div>
+        }
+
+        @if (photoPreviews.length) {
+          <div class="photo-grid">
+            @for (url of photoPreviews; track url; let index = $index) {
+              <figure class="photo-tile photo-tile--new">
+                <img [src]="url" [alt]="'Nouvelle photo ' + (index + 1)" />
+                <button type="button" class="photo-tile__remove" (click)="removeSelectedPhoto(index)" aria-label="Retirer la photo">
+                  <span class="icon icon--sm" aria-hidden="true">close</span>
+                </button>
+              </figure>
+            }
+          </div>
+        }
+
+        @if (totalPhotos < maxPhotos) {
+          <label class="dropzone" for="photos">
+            <span class="icon icon--lg" aria-hidden="true">add_photo_alternate</span>
+            <strong>Ajouter des photos</strong>
+            <span>JPG, PNG ou WEBP — 5 Mo max par photo</span>
+            <input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple (change)="onPhotosSelected($event)" hidden />
+          </label>
+        }
+
+        @if (photoError) {
+          <p class="field__error">{{ photoError }}</p>
+        }
+
+        @if (mode === 'create' && totalPhotos === 0) {
+          <p class="hint">Au moins une photo est obligatoire pour créer l’annonce.</p>
+        }
+      </section>
+    </div>
+
+    <aside class="form-side">
+      <div class="summary-card">
+        <h3>Récapitulatif</h3>
+        <dl>
+          <div>
+            <dt>Type</dt>
+            <dd>{{ form.controls.type_logement.value ? libelleType(form.controls.type_logement.value) : '—' }}</dd>
+          </div>
+          <div>
+            <dt>Capacité</dt>
+            <dd>{{ form.controls.capacite.value }} voyageur(s)</dd>
+          </div>
+          <div>
+            <dt>Tarif</dt>
+            <dd>{{ form.controls.tarif_nuit.value }} DH / nuit</dd>
+          </div>
+          <div>
+            <dt>Photos</dt>
+            <dd>{{ totalPhotos }} / 10</dd>
+          </div>
+        </dl>
+
+        <button type="submit" class="btn btn--primary btn--block" [disabled]="submitting">
+          {{ submitting ? 'Enregistrement…' : (mode === 'create' ? 'Créer l’annonce' : 'Enregistrer les modifications') }}
+        </button>
+
+        <a routerLink="/hote/annonces" class="btn btn--ghost btn--block">Annuler</a>
+
+        @if (mode === 'create') {
+          <p class="summary-note">
+            Votre annonce sera en attente de validation par notre équipe avant d’être visible.
+          </p>
+        }
+      </div>
+    </aside>
+  </form>
+</div>

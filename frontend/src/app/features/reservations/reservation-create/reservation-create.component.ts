@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+
 
 @Component({
   selector: 'app-reservation-create',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './reservation-create.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './reservation-create.component.scss'
 })
 export class ReservationCreateComponent {

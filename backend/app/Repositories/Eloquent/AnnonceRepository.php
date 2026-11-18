@@ -12,11 +12,30 @@ use Illuminate\Database\Eloquent\Collection;
 
 class AnnonceRepository implements AnnonceRepositoryInterface
 {
-    public function findById(string $id) { return Annonce::find($id); }
-    public function search(array $criteres) { return Annonce::query()->paginate(15); }
-    public function create(array $data) { return Annonce::create($data); }
-    public function update(string $id, array $data) { return tap(Annonce::findOrFail($id))->update($data); }
-    public function delete(string $id) { return Annonce::destroy($id); }
+    public function findById(string $id)
+    {
+        return Annonce::find($id);
+    }
+
+    public function search(array $criteres)
+    {
+        return Annonce::query()->paginate(15);
+    }
+
+    public function create(array $data)
+    {
+        return Annonce::create($data);
+    }
+
+    public function update(string $id, array $data)
+    {
+        return tap(Annonce::findOrFail($id))->update($data);
+    }
+
+    public function delete(string $id)
+    {
+        return Annonce::destroy($id);
+    }
 
     public function rechercherAnnoncesDisponibles(array $criteres, int $parPage): LengthAwarePaginator
     {
@@ -24,49 +43,49 @@ class AnnonceRepository implements AnnonceRepositoryInterface
         $query = Annonce::query()->where('statut', StatutAnnonce::PUBLIEE->value);
 
         // [PORTED] catégorie exacte
-        if (!empty($criteres['id_categorie'])) {
+        if (! empty($criteres['id_categorie'])) {
             $query->where('id_categorie', $criteres['id_categorie']);
         }
 
         // [PORTED] type de logement (insensible à la casse : la colonne est un texte libre)
-        if (!empty($criteres['type_logement'])) {
+        if (! empty($criteres['type_logement'])) {
             $query->whereRaw('LOWER(type_logement) = ?', [mb_strtolower($criteres['type_logement'])]);
         }
 
         // [PORTED] localisation : ville, région ou pays (ancien `location`).
         // L'ancien LIKE était insensible à la casse sous MySQL ; LOWER() garde ce
         // comportement sous PostgreSQL et SQLite (tests).
-        if (!empty($criteres['ville'])) {
-            $loc = '%' . mb_strtolower($criteres['ville']) . '%';
+        if (! empty($criteres['ville'])) {
+            $loc = '%'.mb_strtolower($criteres['ville']).'%';
             $query->whereHas('categorie', function ($q) use ($loc) {
                 $q->whereRaw('LOWER(ville) LIKE ?', [$loc])
-                  ->orWhereRaw('LOWER(region) LIKE ?', [$loc])
-                  ->orWhereRaw('LOWER(pays) LIKE ?', [$loc]);
+                    ->orWhereRaw('LOWER(region) LIKE ?', [$loc])
+                    ->orWhereRaw('LOWER(pays) LIKE ?', [$loc]);
             });
         }
 
         // [PORTED] capacité
-        if (!empty($criteres['voyageurs'])) {
+        if (! empty($criteres['voyageurs'])) {
             $query->where('capacite', '>=', (int) $criteres['voyageurs']);
         }
 
         // [PORTED] dates : exclut les annonces ayant une réservation confirmée ou en
         // cours qui chevauche l'intervalle (3 cas, recopiés de l'ancien code).
-        if (!empty($criteres['date_arrivee']) && !empty($criteres['date_depart'])) {
+        if (! empty($criteres['date_arrivee']) && ! empty($criteres['date_depart'])) {
             $checkin = $criteres['date_arrivee'];
             $checkout = $criteres['date_depart'];
 
             $query->whereDoesntHave('reservations', function ($q) use ($checkin, $checkout) {
                 $q->whereIn('statut', [StatutReservation::CONFIRMEE->value, StatutReservation::EN_COURS->value])
-                  ->where(function ($sub) use ($checkin, $checkout) {
-                      $sub->where(function ($sq) use ($checkin, $checkout) {
-                          $sq->whereDate('date_arrivee', '>=', $checkin)->whereDate('date_arrivee', '<', $checkout);
-                      })->orWhere(function ($sq) use ($checkin, $checkout) {
-                          $sq->whereDate('date_depart', '>', $checkin)->whereDate('date_depart', '<=', $checkout);
-                      })->orWhere(function ($sq) use ($checkin, $checkout) {
-                          $sq->whereDate('date_arrivee', '<=', $checkin)->whereDate('date_depart', '>=', $checkout);
-                      });
-                  });
+                    ->where(function ($sub) use ($checkin, $checkout) {
+                        $sub->where(function ($sq) use ($checkin, $checkout) {
+                            $sq->whereDate('date_arrivee', '>=', $checkin)->whereDate('date_arrivee', '<', $checkout);
+                        })->orWhere(function ($sq) use ($checkin, $checkout) {
+                            $sq->whereDate('date_depart', '>', $checkin)->whereDate('date_depart', '<=', $checkout);
+                        })->orWhere(function ($sq) use ($checkin, $checkout) {
+                            $sq->whereDate('date_arrivee', '<=', $checkin)->whereDate('date_depart', '>=', $checkout);
+                        });
+                    });
             });
         }
 
@@ -80,7 +99,7 @@ class AnnonceRepository implements AnnonceRepositoryInterface
 
         // [ADDED] équipements : chaque équipement demandé doit figurer dans la colonne texte
         foreach ($criteres['equipements'] ?? [] as $equipement) {
-            $query->whereRaw('LOWER(equipements) LIKE ?', ['%' . mb_strtolower(trim($equipement)) . '%']);
+            $query->whereRaw('LOWER(equipements) LIKE ?', ['%'.mb_strtolower(trim($equipement)).'%']);
         }
 
         // [ADDED] tri + ordre stable pour la pagination
@@ -112,7 +131,82 @@ class AnnonceRepository implements AnnonceRepositoryInterface
         )->find($id);
     }
 
+    public function mesAnnonces(string $hoteId, array $criteres, int $parPage): LengthAwarePaginator
+    {
+        $query = $this->avecNote(
+            Annonce::query()
+                ->where('id_hote', $hoteId)
+                ->with(['categorie', 'politiqueAnnulation'])
+        )->withCount([
+            'reservations as reservations_actives_count' => fn ($q) => $q->whereIn('statut', [
+                StatutReservation::CONFIRMEE->value,
+                StatutReservation::EN_COURS->value,
+            ]),
+        ]);
+
+        if (! empty($criteres['statut'])) {
+            $query->where('statut', $criteres['statut']);
+        }
+
+        if (! empty($criteres['recherche'])) {
+            $recherche = '%'.mb_strtolower(trim($criteres['recherche'])).'%';
+            $query->where(function ($q) use ($recherche) {
+                $q->whereRaw('LOWER(titre) LIKE ?', [$recherche])
+                    ->orWhereRaw('LOWER(adresse) LIKE ?', [$recherche]);
+            });
+        }
+
+        return $query->orderByDesc('date_creation')->orderBy('id_annonce')->paginate($parPage);
+    }
+
+    public function findPourHote(string $id, string $hoteId): ?Annonce
+    {
+        return $this->avecNote(
+            Annonce::query()
+                ->where('id_hote', $hoteId)
+                ->with(['categorie', 'politiqueAnnulation'])
+        )->withCount([
+            'reservations as reservations_actives_count' => fn ($q) => $q->whereIn('statut', [
+                StatutReservation::CONFIRMEE->value,
+                StatutReservation::EN_COURS->value,
+            ]),
+        ])->find($id);
+    }
+
+    public function compterParStatut(string $hoteId): array
+    {
+        $compteurs = Annonce::query()
+            ->where('id_hote', $hoteId)
+            ->selectRaw('statut, COUNT(*) as total')
+            ->groupBy('statut')
+            ->pluck('total', 'statut')
+            ->toArray();
+
+        $resultat = ['total' => array_sum($compteurs)];
+
+        foreach (StatutAnnonce::cases() as $statut) {
+            $resultat[$statut->value] = (int) ($compteurs[$statut->value] ?? 0);
+        }
+
+        return $resultat;
+    }
+
+    public function aDesReservationsActives(string $id): bool
+    {
+        return Annonce::query()
+            ->whereKey($id)
+            ->whereHas('reservations', fn ($q) => $q->whereIn('statut', [
+                StatutReservation::CONFIRMEE->value,
+                StatutReservation::EN_COURS->value,
+            ]))
+            ->exists();
+    }
+
     /** [PORTED] partie lecture de calculerNoteGlobale() : moyenne des avis voyageurs. */
+    /**
+     * @param  Builder<Annonce>  $query
+     * @return Builder<Annonce>
+     */
     private function avecNote(Builder $query): Builder
     {
         $avisVoyageurs = fn ($q) => $q->where('type_auteur', 'voyageur');

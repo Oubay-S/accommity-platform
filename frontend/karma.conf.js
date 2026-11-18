@@ -28,7 +28,16 @@ module.exports = function (config) {
         { type: 'html' },
         { type: 'text-summary' },
         { type: 'lcovonly' }
-      ]
+      ],
+      // Seuils plancher : empêchent toute régression, à relever progressivement.
+      check: {
+        global: {
+          statements: 18,
+          branches: 9,
+          functions: 8,
+          lines: 17
+        }
+      }
     },
     reporters: ['progress', 'kjhtml'],
     browsers: ['Chrome'],

@@ -1,3 +1,132 @@
-<div class="calendrier-hote-page">
-  <h2>Calendrier Hote</h2>
+<div class="container page calendrier-page">
+  <header class="page-head">
+    <a routerLink="/hote/annonces" class="back-link">
+      <span class="icon icon--sm" aria-hidden="true">arrow_back</span>
+      Mes annonces
+    </a>
+    <h1>Calendrier des disponibilités</h1>
+    <p class="page-sub">
+      @if (annonce(); as annonce) {
+        {{ annonce.titre }} — bloquez les dates où votre logement n’est pas disponible.
+      } @else {
+        Sélectionnez les dates à bloquer ou à débloquer.
+      }
+    </p>
+  </header>
+
+  <div class="calendar-toolbar">
+    <div class="segmented" role="tablist" aria-label="Mode du calendrier">
+      <button
+        type="button"
+        role="tab"
+        class="segmented__btn"
+        [class.segmented__btn--active]="mode() === 'bloquer'"
+        [attr.aria-selected]="mode() === 'bloquer'"
+        (click)="changerMode('bloquer')"
+      >
+        <span class="icon icon--sm" aria-hidden="true">block</span>
+        Bloquer
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="segmented__btn"
+        [class.segmented__btn--active]="mode() === 'debloquer'"
+        [attr.aria-selected]="mode() === 'debloquer'"
+        (click)="changerMode('debloquer')"
+      >
+        <span class="icon icon--sm" aria-hidden="true">lock_open</span>
+        Débloquer
+      </button>
+    </div>
+
+    <div class="month-nav">
+      <button type="button" class="month-nav__btn" (click)="moisPrecedent()" aria-label="Mois précédent">
+        <span class="icon icon--sm" aria-hidden="true">chevron_left</span>
+      </button>
+      <button type="button" class="month-nav__btn" (click)="moisSuivant()" aria-label="Mois suivant">
+        <span class="icon icon--sm" aria-hidden="true">chevron_right</span>
+      </button>
+    </div>
+  </div>
+
+  <ul class="legend" aria-label="Légende">
+    <li><span class="dot dot--disponible"></span> Disponible</li>
+    <li><span class="dot dot--reserve"></span> Réservé</li>
+    <li><span class="dot dot--bloque"></span> Bloqué</li>
+    <li><span class="dot dot--selection"></span> Sélection</li>
+    <li><span class="dot dot--passe"></span> Passé</li>
+  </ul>
+
+  @if (loading()) {
+    <div class="calendar-loading" aria-live="polite">Chargement du calendrier…</div>
+  } @else {
+    <div class="months">
+      @for (mois of mois(); track mois.label) {
+        <section class="month" [attr.aria-label]="mois.label">
+          <h2>{{ mois.label }}</h2>
+          <div class="month__grid month__grid--head" aria-hidden="true">
+            @for (jour of ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']; track jour) {
+              <span>{{ jour }}</span>
+            }
+          </div>
+          <div class="month__grid">
+            @for (cellule of mois.cellules; track $index) {
+              @if (cellule) {
+                <button
+                  type="button"
+                  class="day"
+                  [attr.data-etat]="etatJour(cellule)"
+                  [disabled]="etatJour(cellule) === 'passe' || etatJour(cellule) === 'reserve'"
+                  [attr.aria-label]="jourLisible(cellule) + ' — ' + etatJour(cellule)"
+                  [attr.aria-pressed]="etatJour(cellule) === 'selection'"
+                  (click)="selectionnerJour(cellule)"
+                >
+                  {{ numeroJour(cellule) }}
+                </button>
+              } @else {
+                <span class="day day--empty"></span>
+              }
+            }
+          </div>
+        </section>
+      }
+    </div>
+  }
+
+  <div class="action-bar">
+    <div class="action-bar__info">
+      @if (debut() && fin()) {
+        <strong>{{ nombreJours() }} jour{{ nombreJours() > 1 ? 's' : '' }}</strong>
+        <span>du {{ formatCourt(debut() || '') }} au {{ formatCourt(fin() || '') }}</span>
+      } @else if (debut()) {
+        <strong>1 jour</strong>
+        <span>{{ formatCourt(debut() || '') }} — choisissez la fin</span>
+      } @else {
+        <span>
+          @if (mode() === 'bloquer') {
+            Sélectionnez la première date à bloquer.
+          } @else {
+            Sélectionnez un jour bloqué à libérer.
+          }
+        </span>
+      }
+    </div>
+
+    <div class="action-bar__buttons">
+      @if (debut() || fin()) {
+        <button type="button" class="btn btn--ghost" (click)="reinitialiserSelection()">Effacer</button>
+      }
+      <button
+        type="button"
+        class="btn"
+        [class.btn--primary]="mode() === 'bloquer'"
+        [class.btn--dark]="mode() === 'debloquer'"
+        [disabled]="!peutValider()"
+        (click)="appliquer()"
+      >
+        {{ saving() ? 'Traitement…' : (mode() === 'bloquer' ? 'Bloquer ces dates' : 'Débloquer ces dates') }}
+      </button>
+    </div>
+  </div>
 </div>

@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -7,6 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './profile-view.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './profile-view.component.scss'
 })
 export class ProfileViewComponent {

@@ -1,0 +1,156 @@
+<div class="container page mes-annonces">
+  <header class="page-head mes-head">
+    <div>
+      <h1>Mes annonces</h1>
+      <p class="page-sub">Gérez vos logements, leurs disponibilités et leur statut de publication.</p>
+    </div>
+    <a routerLink="/annonces/creer" class="btn btn--primary">
+      <span class="icon icon--sm" aria-hidden="true">add</span>
+      Créer une annonce
+    </a>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Filtrer par statut">
+    @for (onglet of onglets; track onglet.valeur) {
+      <button
+        type="button"
+        role="tab"
+        class="tab"
+        [class.tab--active]="statut() === onglet.valeur"
+        [attr.aria-selected]="statut() === onglet.valeur"
+        (click)="changerStatut(onglet.valeur)"
+      >
+        {{ onglet.libelle }}
+        <span class="tab__count">{{ compteur(onglet.cle) }}</span>
+      </button>
+    }
+  </div>
+
+  <div class="toolbar">
+    <div class="search">
+      <span class="icon icon--sm" aria-hidden="true">search</span>
+      <input
+        class="field__input"
+        type="search"
+        placeholder="Rechercher par titre ou adresse…"
+        [ngModel]="recherche()"
+        (ngModelChange)="recherche.set($event)"
+        (keyup.enter)="rechercher()"
+        aria-label="Rechercher dans mes annonces"
+      />
+    </div>
+    <button type="button" class="btn btn--ghost btn--sm" (click)="rechercher()">Rechercher</button>
+  </div>
+
+  @if (loading()) {
+    <div class="empty-card" aria-live="polite">Chargement de vos annonces…</div>
+  } @else if (!resultat()?.items?.length) {
+    <div class="empty-card">
+      <span class="icon icon--lg" aria-hidden="true">holiday_village</span>
+      <h2>Aucune annonce pour le moment</h2>
+      <p>Publiez votre premier logement et commencez à accueillir des voyageurs.</p>
+      <a routerLink="/annonces/creer" class="btn btn--primary">Créer une annonce</a>
+    </div>
+  } @else {
+    <div class="cards">
+      @for (annonce of resultat()!.items; track annonce.id_annonce) {
+        <article class="annonce-card">
+          <div class="annonce-card__media">
+            @if (annonce.photo_principale) {
+              <img [src]="annonce.photo_principale" [alt]="annonce.titre" loading="lazy" />
+            } @else {
+              <div class="annonce-card__placeholder">
+                <span class="icon icon--lg" aria-hidden="true">image</span>
+              </div>
+            }
+            <span class="statut" [attr.data-statut]="annonce.statut">
+              {{ libelleStatut(annonce.statut) }}
+            </span>
+          </div>
+
+          <div class="annonce-card__body">
+            <div class="annonce-card__title">
+              <h2>{{ annonce.titre }}</h2>
+              @if (annonce.note_moyenne > 0) {
+                <span class="rating">
+                  <span class="icon icon--sm" aria-hidden="true">star</span>
+                  {{ annonce.note_moyenne }} ({{ annonce.nb_avis }})
+                </span>
+              }
+            </div>
+
+            <p class="annonce-card__loc">
+              <span class="icon icon--sm" aria-hidden="true">location_on</span>
+              {{ annonce.categorie?.ville }} — {{ annonce.categorie?.region }}
+            </p>
+
+            <div class="annonce-card__meta">
+              <span>{{ annonce.type_logement }}</span>
+              <span>{{ annonce.capacite }} voyageur(s)</span>
+              <strong>{{ annonce.tarif_nuit }} DH / nuit</strong>
+            </div>
+
+            @if (annonce.motif_moderation && annonce.statut !== 'publiee') {
+              <p class="annonce-card__motif">{{ annonce.motif_moderation }}</p>
+            }
+
+            <div class="annonce-card__actions">
+              @if (annonce.statut === 'publiee') {
+                <a [routerLink]="['/annonces', annonce.id_annonce]" class="btn btn--ghost btn--sm">Voir</a>
+              }
+              <a [routerLink]="['/annonces', annonce.id_annonce, 'modifier']" class="btn btn--ghost btn--sm">Modifier</a>
+              <a [routerLink]="['/annonces', annonce.id_annonce, 'calendrier']" class="btn btn--ghost btn--sm">Calendrier</a>
+              <button
+                type="button"
+                class="btn btn--danger btn--sm"
+                (click)="demanderSuppression(annonce)"
+                [disabled]="annonce.a_des_reservations_actives"
+                [title]="annonce.a_des_reservations_actives ? 'Des réservations actives empêchent la suppression' : 'Supprimer l’annonce'"
+              >
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+
+    @if (resultat()!.pagination.last_page > 1) {
+      <nav class="pagination" aria-label="Pagination des annonces">
+        <button
+          type="button"
+          class="btn btn--ghost btn--sm"
+          [disabled]="resultat()!.pagination.current_page <= 1"
+          (click)="changerPage(resultat()!.pagination.current_page - 1)"
+        >
+          Précédent
+        </button>
+        <span>Page {{ resultat()!.pagination.current_page }} / {{ resultat()!.pagination.last_page }}</span>
+        <button
+          type="button"
+          class="btn btn--ghost btn--sm"
+          [disabled]="resultat()!.pagination.current_page >= resultat()!.pagination.last_page"
+          (click)="changerPage(resultat()!.pagination.current_page + 1)"
+        >
+          Suivant
+        </button>
+      </nav>
+    }
+  }
+</div>
+
+@if (aSupprimer(); as annonce) {
+  <div class="modal-backdrop" (click)="annulerSuppression()" aria-hidden="true"></div>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="suppression-titre">
+    <h2 id="suppression-titre">Supprimer cette annonce ?</h2>
+    <p>
+      « {{ annonce.titre }} » sera définitivement retirée. Cette action est irréversible.
+    </p>
+    <div class="modal__actions">
+      <button type="button" class="btn btn--ghost" (click)="annulerSuppression()">Annuler</button>
+      <button type="button" class="btn btn--danger" (click)="confirmerSuppression()" [disabled]="suppressionEnCours()">
+        {{ suppressionEnCours() ? 'Suppression…' : 'Supprimer' }}
+      </button>
+    </div>
+  </div>
+}
