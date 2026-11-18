@@ -32,6 +32,7 @@ export class MesAnnoncesComponent implements OnInit {
     { valeur: 'publiee', libelle: 'Publiées', cle: 'publiee' },
     { valeur: 'suspendue', libelle: 'Suspendues', cle: 'suspendue' },
     { valeur: 'rejetee', libelle: 'Rejetées', cle: 'rejetee' },
+    { valeur: 'desactivee', libelle: 'Désactivées', cle: 'desactivee' },
   ];
 
   ngOnInit(): void {
