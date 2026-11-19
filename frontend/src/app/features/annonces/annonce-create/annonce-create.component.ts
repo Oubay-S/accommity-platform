@@ -11,7 +11,7 @@ import { AnnonceFormComponent, AnnonceFormSubmit } from '../annonce-form/annonce
   standalone: true,
   imports: [AnnonceFormComponent],
   templateUrl: './annonce-create.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './annonce-create.component.scss',
 })
 export class AnnonceCreateComponent {

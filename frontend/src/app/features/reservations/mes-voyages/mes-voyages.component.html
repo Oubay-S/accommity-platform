@@ -1,3 +1,201 @@
-<div class="mes-voyages-page">
-  <h2>Mes Voyages</h2>
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+    <div>
+      <h1 class="font-serif text-3xl font-bold text-stone-900">Mes Voyages & Réservations</h1>
+      <p class="text-sm text-stone-500 mt-1">Consultez l'historique de vos séjours passés, en cours et à venir.</p>
+    </div>
+    <div class="flex items-center space-x-3">
+      <a routerLink="/paiements/historique" class="btn-secondary self-start">
+        Historique des transactions
+      </a>
+      <a routerLink="/annonces" class="btn-primary self-start">
+        Explorer les hébergements
+      </a>
+    </div>
+  </div>
+
+  @if (messageSucces()) {
+    <div class="alert alert--success mb-6">
+      <span class="icon">check_circle</span>
+      <span style="flex: 1;">{{ messageSucces() }}</span>
+      <button type="button" class="toast__close" (click)="messageSucces.set(null)">✕</button>
+    </div>
+  }
+
+  <!-- Filtres par statut -->
+  <div class="filter-tabs mb-6 flex flex-wrap gap-2">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="filtreActif() === 'tous'"
+      (click)="filtrer('tous')"
+    >
+      Tous
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="filtreActif() === 'confirmee'"
+      (click)="filtrer('confirmee')"
+    >
+      Confirmées
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="filtreActif() === 'en_attente'"
+      (click)="filtrer('en_attente')"
+    >
+      En attente hôte
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="filtreActif() === 'en_cours'"
+      (click)="filtrer('en_cours')"
+    >
+      En cours
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="filtreActif() === 'terminee'"
+      (click)="filtrer('terminee')"
+    >
+      Terminées
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="filtreActif() === 'annulee'"
+      (click)="filtrer('annulee')"
+    >
+      Annulées
+    </button>
+  </div>
+
+  <!-- État de chargement -->
+  @if (chargement()) {
+    <div class="py-16 text-center text-stone-500">
+      <div class="spinner mx-auto mb-3"></div>
+      <p>Chargement de vos séjours...</p>
+    </div>
+  } @else if (voyagesFiltres().length === 0) {
+    <!-- Aucun résultat -->
+    <div class="empty-state">
+      <span class="icon icon--lg text-stone-300" style="font-size: 48px; margin-bottom: 0.75rem;">luggage</span>
+      <h3 class="font-serif text-lg font-bold text-stone-800">Aucun voyage trouvé</h3>
+      <p class="text-sm text-stone-500 mt-1 max-w-sm mx-auto">
+        Vous n'avez aucune réservation correspondant à ce critère.
+      </p>
+      <a routerLink="/annonces" class="btn-secondary mt-4 inline-block">Découvrir nos hébergements</a>
+    </div>
+  } @else {
+    <!-- Liste des Réservations -->
+    <div class="space-y-4">
+      @for (v of voyagesFiltres(); track v.id_reservation) {
+        <div class="trip-card">
+          <div class="trip-card__inner">
+            <!-- Vignette & Infos Hébergement -->
+            <div class="trip-card__main">
+              @if (v.annonce?.photo_principale) {
+                <img
+                  [src]="v.annonce?.photo_principale"
+                  [alt]="v.annonce?.titre"
+                  class="trip-card__thumb"
+                />
+              } @else {
+                <div class="trip-card__placeholder">
+                  🏠
+                </div>
+              }
+
+              <div class="space-y-1" style="flex: 1; min-width: 0;">
+                <div class="flex items-center space-x-2">
+                  <span class="status-pill status-{{ v.statut }}">
+                    @switch (v.statut) {
+                      @case ('en_attente') { En attente (24h max) }
+                      @case ('confirmee') { Confirmée }
+                      @case ('en_cours') { Séjour en cours }
+                      @case ('terminee') { Terminé }
+                      @case ('refusee') { Demande refusée }
+                      @case ('annulee') { Annulée }
+                      @case ('expiree') { Expirée }
+                    }
+                  </span>
+                  @if (v.mode_reservation === 'instantanee') {
+                    <span class="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded font-medium">Instantanée</span>
+                  }
+                </div>
+
+                <h3 class="font-bold text-stone-900 text-base">
+                  <a [routerLink]="['/annonces', v.id_annonce]" class="hover:text-terracotta transition-colors">
+                    {{ v.annonce?.titre || 'Hébergement Accommity' }}
+                  </a>
+                </h3>
+
+                <p class="text-xs text-stone-500">
+                  Du {{ v.date_arrivee }} au {{ v.date_depart }} ({{ v.nb_voyageurs }} voyageurs)
+                </p>
+
+                <p class="text-xs font-semibold text-terracotta">
+                  Total : {{ v.montant_total | currencyMad }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Actions Contextuelles -->
+            <div class="trip-card__actions">
+              <!-- Si confirmée et pas encore payée -->
+              @if (v.statut === 'confirmee' && (!v.paiement || v.paiement.statut !== 'reussi')) {
+                <a [routerLink]="['/paiements/checkout', v.id_reservation]" class="btn-action-pay">
+                  Régler le séjour
+                </a>
+              }
+
+              <!-- Si payée : bouton reçu -->
+              @if (v.paiement && v.paiement.statut === 'reussi') {
+                <a [routerLink]="['/paiements/recu', v.paiement.id_paiement]" class="btn-action-receipt">
+                  Reçu & Facture
+                </a>
+              }
+
+              <!-- Annulation si en attente ou confirmée -->
+              @if (v.statut === 'en_attente' || v.statut === 'confirmee') {
+                <button type="button" class="btn-action-cancel" (click)="ouvrirAnnulation(v)">
+                  Annuler
+                </button>
+              }
+
+              <!-- Laisser un avis si terminée -->
+              @if (v.statut === 'terminee') {
+                <a [routerLink]="['/evaluations/nouvelle', v.id_reservation]" class="btn-action-review">
+                  Laisser un avis
+                </a>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (pagination() && pagination()!.last_page > 1) {
+      <div class="mt-8 flex justify-center">
+        <app-pagination
+          [pagination]="pagination()!"
+          (pageChange)="changerPage($event)"
+        ></app-pagination>
+      </div>
+    }
+  }
+
+  <!-- Modale d'annulation -->
+  @if (reservationAAnnuler(); as resa) {
+    <app-annulation-modal
+      [reservation]="resa"
+      (fermer)="fermerAnnulation()"
+      (annulee)="onReservationAnnulee()"
+    ></app-annulation-modal>
+  }
 </div>

@@ -44,7 +44,7 @@ function passwordScore(value: string): number {
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './register.component.scss'
 })
 export class RegisterComponent {

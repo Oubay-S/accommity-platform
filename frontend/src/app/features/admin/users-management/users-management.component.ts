@@ -13,7 +13,7 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './users-management.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './users-management.component.scss'
 })
 export class UsersManagementComponent implements OnInit {

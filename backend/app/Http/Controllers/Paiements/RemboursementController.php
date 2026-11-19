@@ -3,19 +3,34 @@
 namespace App\Http\Controllers\Paiements;
 
 use App\Http\Controllers\Controller;
+use App\Models\Reservations\Reservation;
 use App\Services\Paiements\RemboursementService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
- * Calcul et exécution des remboursements (RG18, RG19, RG23, RG24)
+ * Calcul et exécution des remboursements (RG18, RG19, RG23, RG24).
  */
 class RemboursementController extends Controller
 {
     public function __construct(protected RemboursementService $remboursementService) {}
 
-    public function apercu(string $reservationId): JsonResponse
+    /**
+     * Calcul en temps réel du montant remboursable avant confirmation d'annulation (CdC 4.8).
+     */
+    public function apercu(Request $request, string $id): JsonResponse
     {
-        // TODO: Calcul du montant remboursable avant annulation
-        return response()->json(['montant_remboursable' => 0]);
+        $reservation = Reservation::findOrFail($id);
+
+        $user = $request->user();
+        $acteur = ($reservation->id_voyageur === $user->getKey()) ? 'voyageur' : 'hote';
+
+        $apercu = $this->remboursementService->calculerRemboursement($id, $acteur);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Aperçu du remboursement calculé avec succès.',
+            'data' => $apercu,
+        ]);
     }
 }

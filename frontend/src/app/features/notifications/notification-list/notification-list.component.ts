@@ -10,7 +10,7 @@ import { NotificationService } from '../services/notification.service';
   selector: 'app-notification-list',
   standalone: true,
   templateUrl: './notification-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './notification-list.component.scss'
 })
 export class NotificationListComponent {

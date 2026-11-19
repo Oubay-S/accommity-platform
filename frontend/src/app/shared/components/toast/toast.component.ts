@@ -5,7 +5,7 @@ import { ToastService, ToastType } from '../../../core/services/toast.service';
   selector: 'app-toast',
   standalone: true,
   templateUrl: './toast.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './toast.component.scss'
 })
 export class ToastComponent {

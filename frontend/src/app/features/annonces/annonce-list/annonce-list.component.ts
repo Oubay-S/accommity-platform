@@ -15,7 +15,7 @@ import { AnnonceService } from '../services/annonce.service';
   standalone: true,
   imports: [FormsModule, SearchBarComponent, AnnonceCardComponent, PaginationComponent],
   templateUrl: './annonce-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './annonce-list.component.scss',
 })
 export class AnnonceListComponent implements OnInit {

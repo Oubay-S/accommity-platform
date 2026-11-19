@@ -4,6 +4,7 @@ namespace Database\Factories\Utilisateurs;
 
 use App\Models\Administration\Administrateur;
 use App\Models\Utilisateurs\User;
+use App\Models\Utilisateurs\VerificationIdentite;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -47,6 +48,15 @@ class UserFactory extends Factory
             'est_hote' => true,
             'est_voyageur' => false,
         ]);
+    }
+
+    public function hoteVerifie(): static
+    {
+        return $this->hote()->afterCreating(function (User $user): void {
+            VerificationIdentite::factory()->validee()->create([
+                'id_utilisateur' => $user->getKey(),
+            ]);
+        });
     }
 
     /** Hôte ET voyageur (RG02). */

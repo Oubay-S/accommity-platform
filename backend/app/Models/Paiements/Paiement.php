@@ -7,6 +7,7 @@ use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property-read Reservation|null $reservation
@@ -25,7 +26,7 @@ class Paiement extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'id_reservation', 'id_voyageur', 'montant', 'methode_paiement', 'statut',
+        'id_paiement', 'id_reservation', 'id_voyageur', 'montant', 'methode_paiement', 'statut',
     ];
 
     protected $casts = [
@@ -43,5 +44,11 @@ class Paiement extends Model
     public function voyageur(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_voyageur');
+    }
+
+    /** @return HasOne<Recu, $this> */
+    public function recu(): HasOne
+    {
+        return $this->hasOne(Recu::class, 'id_paiement');
     }
 }

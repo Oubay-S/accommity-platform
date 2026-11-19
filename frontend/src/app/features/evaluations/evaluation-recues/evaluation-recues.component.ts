@@ -10,7 +10,7 @@ import { EvaluationService } from '../services/evaluation.service';
   standalone: true,
   imports: [RouterLink, RatingStarsComponent],
   templateUrl: './evaluation-recues.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './evaluation-recues.component.scss',
 })
 export class EvaluationRecuesComponent implements OnInit {

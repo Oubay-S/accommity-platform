@@ -6,7 +6,7 @@ import { Pagination } from '../../models/api-response.model';
   standalone: true,
   imports: [],
   templateUrl: './pagination.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './pagination.component.scss',
 })
 export class PaginationComponent {

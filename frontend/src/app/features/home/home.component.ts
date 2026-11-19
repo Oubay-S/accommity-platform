@@ -17,7 +17,7 @@ interface TypeLogementItem {
   standalone: true,
   imports: [RouterLink, SearchBarComponent, AnnonceCardComponent],
   templateUrl: './home.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './home.component.scss',
 })
 export class HomeComponent implements OnInit {

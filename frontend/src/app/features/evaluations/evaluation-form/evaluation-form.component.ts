@@ -30,7 +30,7 @@ interface Critere {
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink, StarRatingInputComponent],
   templateUrl: './evaluation-form.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './evaluation-form.component.scss',
 })
 export class EvaluationFormComponent implements OnInit {

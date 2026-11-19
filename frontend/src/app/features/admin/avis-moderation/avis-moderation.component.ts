@@ -11,7 +11,7 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './avis-moderation.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './avis-moderation.component.scss'
 })
 export class AvisModerationComponent implements OnInit {

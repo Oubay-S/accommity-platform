@@ -54,6 +54,11 @@ class Annonce extends Model
         return $this->belongsTo(PolitiqueAnnulation::class, 'id_politique');
     }
 
+    public function politique(): BelongsTo
+    {
+        return $this->politiqueAnnulation();
+    }
+
     public function calendriers(): HasMany
     {
         return $this->hasMany(Calendrier::class, 'id_annonce');

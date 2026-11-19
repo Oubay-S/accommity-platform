@@ -5,7 +5,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
   standalone: true,
   imports: [],
   templateUrl: './star-rating-input.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './star-rating-input.component.scss',
 })
 export class StarRatingInputComponent {

@@ -1,1 +1,91 @@
-.recu-paiement-page { padding: 16px; }
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6e6961;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: #1f1d1a;
+  }
+}
+
+.btn-print {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #37332f;
+  background: #ffffff;
+  border: 1px solid #d5cfc5;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: #c25e30;
+    color: #c25e30;
+  }
+}
+
+.receipt-card {
+  background: #ffffff;
+  border: 1px solid #e5e0d8;
+  border-radius: 1.25rem;
+  padding: 2.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.brand-title {
+  font-family: var(--font-serif, "Newsreader", Georgia, serif);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #c25e30;
+  letter-spacing: -0.03em;
+}
+
+.receipt-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 1.5rem;
+}
+
+.badge-paid {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  background: #dcfce7;
+  color: #166534;
+}
+
+.text-terracotta {
+  color: #c25e30;
+}
+
+.text-2xs {
+  font-size: 0.6875rem;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+  }
+
+  .receipt-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+}

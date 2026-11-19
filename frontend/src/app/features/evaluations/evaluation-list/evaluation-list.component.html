@@ -44,7 +44,8 @@
       <p class="muted">{{ erreur() }}</p>
       <button type="button" class="btn btn--ghost btn--sm" (click)="charger(1)">Réessayer</button>
     </div>
-  } @else if (page(); as p) {
+  } @else {
+    @if (page(); as p) {
     @if (p.items.length === 0) {
       <div class="avis__state">
         <span class="icon icon--lg" aria-hidden="true">reviews</span>
@@ -109,6 +110,7 @@
           </button>
         </nav>
       }
+    }
     }
   }
 

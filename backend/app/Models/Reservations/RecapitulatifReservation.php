@@ -10,13 +10,15 @@ class RecapitulatifReservation extends Model
     use HasUuids;
 
     protected $table = 'recapitulatif_reservations';
+
     protected $primaryKey = 'id_recapitulatif';
 
     const CREATED_AT = 'date_generation';
+
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'id_reservation', 'details_sejour', 'montant_total', 'frais_service',
+        'id_recapitulatif', 'id_reservation', 'details_sejour', 'montant_total', 'frais_service',
         'montant_hote', 'coordonnees_voyageur', 'coordonnees_hote',
     ];
 }

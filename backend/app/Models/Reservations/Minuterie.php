@@ -10,10 +10,12 @@ class Minuterie extends Model
     use HasUuids;
 
     protected $table = 'minuteries';
+
     protected $primaryKey = 'id_minuterie';
+
     public $timestamps = false;
 
-    protected $fillable = ['id_reservation', 'type_minuterie', 'date_echeance', 'est_active'];
+    protected $fillable = ['id_minuterie', 'id_reservation', 'type_minuterie', 'date_echeance', 'est_active'];
 
     protected $casts = [
         'date_echeance' => 'datetime',

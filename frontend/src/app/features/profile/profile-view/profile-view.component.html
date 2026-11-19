@@ -20,6 +20,9 @@
         <a routerLink="/profil/evaluations" routerLinkActive="side-nav__item--active" class="side-nav__item">
           <span class="icon">reviews</span> Mes évaluations
         </a>
+        <a routerLink="/paiements/historique" routerLinkActive="side-nav__item--active" class="side-nav__item">
+          <span class="icon">receipt_long</span> Historique des paiements
+        </a>
         <a routerLink="/notifications" routerLinkActive="side-nav__item--active" class="side-nav__item">
           <span class="icon">notifications</span> Notifications
         </a>
@@ -34,7 +37,7 @@
         <section class="card profile-hero">
           <span class="avatar avatar--lg">
             @if (u.profil?.photo_url) {
-              <img [src]="$safeNavigationMigration(u.profil?.photo_url)" [alt]="fullName()" />
+              <img [src]="u.profil?.photo_url" [alt]="fullName()" />
             } @else {
               {{ initials() }}
             }
