@@ -16,7 +16,7 @@ class RecapitulatifReservation extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'id_reservation', 'details_sejour', 'montant_total', 'frais_service',
+        'id_recapitulatif', 'id_reservation', 'details_sejour', 'montant_total', 'frais_service',
         'montant_hote', 'coordonnees_voyageur', 'coordonnees_hote',
     ];
 }

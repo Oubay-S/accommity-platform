@@ -24,7 +24,7 @@ class Reservation extends Model
     const UPDATED_AT = 'date_modification';
 
     protected $fillable = [
-        'id_annonce', 'id_voyageur', 'id_hote', 'id_politique',
+        'id_reservation', 'id_annonce', 'id_voyageur', 'id_hote', 'id_politique',
         'date_arrivee', 'date_depart', 'nb_voyageurs', 'statut',
         'mode_reservation', 'montant_total', 'frais_service',
         'message_optionnel', 'motif_refus', 'motif_annulation',
@@ -58,5 +58,29 @@ class Reservation extends Model
     public function annonce(): BelongsTo
     {
         return $this->belongsTo(Annonce::class, 'id_annonce');
+    }
+
+    /** @return BelongsTo<\App\Models\Annonces\PolitiqueAnnulation, $this> */
+    public function politique(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Annonces\PolitiqueAnnulation::class, 'id_politique');
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Paiements\Paiement, $this> */
+    public function paiement(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\Paiements\Paiement::class, 'id_reservation');
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Reservations\Minuterie, $this> */
+    public function minuterie(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\Reservations\Minuterie::class, 'id_reservation');
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Reservations\RecapitulatifReservation, $this> */
+    public function recapitulatif(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\Reservations\RecapitulatifReservation::class, 'id_reservation');
     }
 }

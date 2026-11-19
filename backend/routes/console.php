@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // RO07 : rappels check-in à l'hôte (48 h) et au voyageur (24 h).
 Schedule::command('reminders:send')->dailyAt('09:00')->withoutOverlapping();
+
+// RG15 : annulation automatique des demandes de réservation en attente après 24h sans réponse de l'hôte.
+Schedule::command('reservations:expire')->hourly()->withoutOverlapping();
