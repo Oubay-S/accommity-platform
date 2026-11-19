@@ -33,6 +33,19 @@ class AnnoncesDemoSeeder extends Seeder
             ]
         );
 
+        User::firstOrCreate(
+            ['email' => 'voyageur.demo@accommity.ma'],
+            [
+                'nom' => 'Alami',
+                'prenom' => 'Yassine',
+                'mot_de_passe' => 'Password123!',
+                'telephone' => '0622334455',
+                'est_hote' => false,
+                'est_voyageur' => true,
+                'est_actif' => true,
+            ]
+        );
+
         Profil::firstOrCreate(
             ['id_utilisateur' => $hote->getKey()],
             ['description' => 'Hôte passionné par l\'hospitalité marocaine.']
