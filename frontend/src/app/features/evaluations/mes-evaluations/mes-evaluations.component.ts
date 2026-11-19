@@ -15,7 +15,7 @@ type Onglet = 'a-evaluer' | 'donnees';
   standalone: true,
   imports: [RouterLink, RatingStarsComponent],
   templateUrl: './mes-evaluations.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './mes-evaluations.component.scss',
 })
 export class MesEvaluationsComponent implements OnInit {

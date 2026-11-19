@@ -40,7 +40,7 @@ const EQUIPEMENTS_SUGGESTIONS = [
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './annonce-form.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './annonce-form.component.scss',
 })
 export class AnnonceFormComponent implements OnChanges, OnDestroy {

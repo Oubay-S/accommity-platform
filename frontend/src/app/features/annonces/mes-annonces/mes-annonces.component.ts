@@ -12,7 +12,7 @@ import { AnnonceService } from '../services/annonce.service';
   standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './mes-annonces.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './mes-annonces.component.scss',
 })
 export class MesAnnoncesComponent implements OnInit {

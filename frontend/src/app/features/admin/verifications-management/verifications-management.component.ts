@@ -18,7 +18,7 @@ const EMPTY_STATS: AdminVerificationStats = { tous: 0, en_cours: 0, validee: 0, 
   selector: 'app-verifications-management',
   standalone: true,
   templateUrl: './verifications-management.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './verifications-management.component.scss'
 })
 export class VerificationsManagementComponent {

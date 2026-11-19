@@ -15,7 +15,7 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './admin-layout.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './admin-layout.component.scss'
 })
 export class AdminLayoutComponent {

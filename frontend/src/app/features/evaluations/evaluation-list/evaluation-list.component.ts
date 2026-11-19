@@ -27,7 +27,7 @@ interface RepartitionLigne {
   standalone: true,
   imports: [FormsModule, RouterLink, RatingStarsComponent],
   templateUrl: './evaluation-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './evaluation-list.component.scss',
 })
 export class EvaluationListComponent implements OnInit {

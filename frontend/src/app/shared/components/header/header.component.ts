@@ -11,7 +11,7 @@ import { Notification, TypeAlerte } from '../../../shared/models/notification.mo
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './header.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {

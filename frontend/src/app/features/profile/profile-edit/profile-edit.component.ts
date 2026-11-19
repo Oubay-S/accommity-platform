@@ -27,7 +27,7 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink, RouterLinkActive],
   templateUrl: './profile-edit.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './profile-edit.component.scss'
 })
 export class ProfileEditComponent {

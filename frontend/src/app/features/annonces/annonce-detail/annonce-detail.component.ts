@@ -37,7 +37,7 @@ interface CalendarMonth {
   standalone: true,
   imports: [RouterLink, CurrencyMadPipe, RatingStarsComponent, EvaluationListComponent],
   templateUrl: './annonce-detail.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './annonce-detail.component.scss',
 })
 export class AnnonceDetailComponent implements OnInit {

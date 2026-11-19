@@ -9,7 +9,7 @@ import { AdminDashboardStats } from '../models/admin-dashboard.model';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {

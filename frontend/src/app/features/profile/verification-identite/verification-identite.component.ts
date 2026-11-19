@@ -11,7 +11,7 @@ import { VerificationService } from '../services/verification.service';
   standalone: true,
   imports: [RouterLink],
   templateUrl: './verification-identite.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './verification-identite.component.scss'
 })
 export class VerificationIdentiteComponent {

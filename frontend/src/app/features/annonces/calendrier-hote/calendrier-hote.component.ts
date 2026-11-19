@@ -20,7 +20,7 @@ interface MoisAffiche {
   standalone: true,
   imports: [RouterLink],
   templateUrl: './calendrier-hote.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './calendrier-hote.component.scss',
 })
 export class CalendrierHoteComponent implements OnInit {

@@ -8,7 +8,7 @@ import { EvaluationRecuesComponent } from '../../evaluations/evaluation-recues/e
   standalone: true,
   imports: [RouterLink, RouterLinkActive, EvaluationRecuesComponent],
   templateUrl: './profile-view.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './profile-view.component.scss'
 })
 export class ProfileViewComponent {

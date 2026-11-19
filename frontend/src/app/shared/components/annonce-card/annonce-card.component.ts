@@ -9,7 +9,7 @@ import { RatingStarsComponent } from '../rating-stars/rating-stars.component';
   standalone: true,
   imports: [RouterLink, CurrencyMadPipe, RatingStarsComponent],
   templateUrl: './annonce-card.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './annonce-card.component.scss',
 })
 export class AnnonceCardComponent {

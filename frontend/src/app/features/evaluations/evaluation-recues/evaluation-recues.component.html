@@ -11,7 +11,8 @@
     <p class="muted small">Chargement des avis…</p>
   } @else if (erreur()) {
     <p class="muted small">{{ erreur() }}</p>
-  } @else if (page(); as p) {
+  } @else {
+    @if (page(); as p) {
     @if (p.statistiques.nb_avis > 0) {
       <div class="recues__summary">
         <strong>{{ p.statistiques.note_moyenne.toFixed(1) }}</strong>
@@ -36,6 +37,7 @@
           </li>
         }
       </ul>
+    }
     }
   }
 </section>

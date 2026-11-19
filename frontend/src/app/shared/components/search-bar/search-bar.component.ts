@@ -8,7 +8,7 @@ import { CriteresRecherche } from '../../models/annonce.model';
   standalone: true,
   imports: [FormsModule],
   templateUrl: './search-bar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './search-bar.component.scss',
 })
 export class SearchBarComponent implements OnChanges {

@@ -10,7 +10,7 @@ import { ApiError } from '../../../shared/models/api-response.model';
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
