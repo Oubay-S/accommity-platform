@@ -116,7 +116,7 @@
             <p class="muted tabular">
               Jusqu'à {{ item.capacite }} voyageur{{ item.capacite > 1 ? 's' : '' }}
               @if (item.hote?.date_creation) {
-                · Hôte depuis {{ getHoteYear($safeNavigationMigration(item.hote?.date_creation)) }}
+                · Hôte depuis {{ getHoteYear(item.hote?.date_creation) }}
               }
             </p>
           </div>
@@ -124,7 +124,7 @@
             @if (item.hote?.photo_url) {
               <img [src]="item.hote!.photo_url!" [alt]="item.hote!.prenom" />
             } @else {
-              <span>{{ getHoteInitial($safeNavigationMigration(item.hote?.prenom)) }}</span>
+              <span>{{ getHoteInitial(item.hote?.prenom) }}</span>
             }
           </div>
         </section>
