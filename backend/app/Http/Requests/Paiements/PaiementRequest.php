@@ -14,10 +14,10 @@ class PaiementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'numero_carte'    => ['nullable', 'string'],
+            'numero_carte' => ['nullable', 'string'],
             'date_expiration' => ['nullable', 'string'],
-            'cvv'             => ['nullable', 'string'],
-            'nom_titulaire'   => ['nullable', 'string', 'max:100'],
+            'cvv' => ['nullable', 'string'],
+            'nom_titulaire' => ['nullable', 'string', 'max:100'],
         ];
     }
 }

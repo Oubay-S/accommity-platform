@@ -63,15 +63,15 @@ class PaiementService
         $succes = ($numero !== '4000000000001111');
 
         $paiement = $this->paiementRepository->create([
-            'id_paiement'      => Str::uuid()->toString(),
-            'id_reservation'   => $reservationId,
-            'id_voyageur'      => $voyageur->getKey(),
-            'montant'          => $reservation->montant_total,
+            'id_paiement' => Str::uuid()->toString(),
+            'id_reservation' => $reservationId,
+            'id_voyageur' => $voyageur->getKey(),
+            'montant' => $reservation->montant_total,
             'methode_paiement' => 'carte_bancaire',
-            'statut'           => $succes ? 'reussi' : 'echoue',
+            'statut' => $succes ? 'reussi' : 'echoue',
         ]);
 
-        if (!$succes) {
+        if (! $succes) {
             throw new ApiException(
                 'La transaction a été refusée par la banque émettrice. Veuillez vérifier vos coordonnées bancaires.',
                 402,
@@ -113,7 +113,7 @@ class PaiementService
 
         return [
             'paiement' => $paiement->fresh(['recu']),
-            'recu'     => $recu,
+            'recu' => $recu,
         ];
     }
 
@@ -123,13 +123,13 @@ class PaiementService
     public function genererRecu(string $paiementId): Recu
     {
         $hash = strtoupper(substr(str_replace('-', '', $paiementId), 0, 8));
-        $numeroFacture = 'ACM-' . now()->format('Ymd') . '-' . $hash;
+        $numeroFacture = 'ACM-'.now()->format('Ymd').'-'.$hash;
 
         return Recu::create([
-            'id_recu'         => Str::uuid()->toString(),
-            'id_paiement'     => $paiementId,
-            'numero_facture'  => $numeroFacture,
-            'chemin_pdf'      => null,
+            'id_recu' => Str::uuid()->toString(),
+            'id_paiement' => $paiementId,
+            'numero_facture' => $numeroFacture,
+            'chemin_pdf' => null,
         ]);
     }
 
@@ -146,27 +146,27 @@ class PaiementService
         $montantHote = round((float) $reservation->montant_total - (float) $reservation->frais_service, 2);
 
         return RecapitulatifReservation::create([
-            'id_recapitulatif'     => Str::uuid()->toString(),
-            'id_reservation'       => $reservation->id_reservation,
-            'details_sejour'       => json_encode([
-                'nb_nuits'    => $nbNuits,
-                'tarif_nuit'  => (float) $reservation->annonce?->tarif_nuit,
-                'arrivee'     => Carbon::parse($reservation->date_arrivee)->format('Y-m-d'),
-                'depart'      => Carbon::parse($reservation->date_depart)->format('Y-m-d'),
+            'id_recapitulatif' => Str::uuid()->toString(),
+            'id_reservation' => $reservation->id_reservation,
+            'details_sejour' => json_encode([
+                'nb_nuits' => $nbNuits,
+                'tarif_nuit' => (float) $reservation->annonce?->tarif_nuit,
+                'arrivee' => Carbon::parse($reservation->date_arrivee)->format('Y-m-d'),
+                'depart' => Carbon::parse($reservation->date_depart)->format('Y-m-d'),
             ], JSON_UNESCAPED_UNICODE),
-            'montant_total'        => $reservation->montant_total,
-            'frais_service'        => $reservation->frais_service,
-            'montant_hote'         => $montantHote,
+            'montant_total' => $reservation->montant_total,
+            'frais_service' => $reservation->frais_service,
+            'montant_hote' => $montantHote,
             'coordonnees_voyageur' => json_encode([
-                'nom'       => $reservation->voyageur?->nom,
-                'prenom'    => $reservation->voyageur?->prenom,
-                'email'     => $reservation->voyageur?->email,
+                'nom' => $reservation->voyageur?->nom,
+                'prenom' => $reservation->voyageur?->prenom,
+                'email' => $reservation->voyageur?->email,
                 'telephone' => $reservation->voyageur?->telephone,
             ], JSON_UNESCAPED_UNICODE),
-            'coordonnees_hote'     => json_encode([
-                'nom'       => $reservation->hote?->nom,
-                'prenom'    => $reservation->hote?->prenom,
-                'email'     => $reservation->hote?->email,
+            'coordonnees_hote' => json_encode([
+                'nom' => $reservation->hote?->nom,
+                'prenom' => $reservation->hote?->prenom,
+                'email' => $reservation->hote?->email,
             ], JSON_UNESCAPED_UNICODE),
         ]);
     }
@@ -178,15 +178,15 @@ class PaiementService
     {
         $paiement = $this->paiementRepository->findById($paiementId);
 
-        if (!$paiement) {
+        if (! $paiement) {
             throw new ApiException('Paiement introuvable.', 404, 'PAIEMENT_INTROUVABLE');
         }
 
         $estVoyageur = $paiement->id_voyageur === $user->getKey();
-        $estHote     = $paiement->reservation?->id_hote === $user->getKey();
-        $estAdmin    = method_exists($user, 'estAdmin') ? $user->estAdmin() : false;
+        $estHote = $paiement->reservation?->id_hote === $user->getKey();
+        $estAdmin = method_exists($user, 'estAdmin') ? $user->estAdmin() : false;
 
-        if (!$estVoyageur && !$estHote && !$estAdmin) {
+        if (! $estVoyageur && ! $estHote && ! $estAdmin) {
             throw new ApiException('Accès non autorisé à ce reçu.', 403, 'ACCES_REFUSE');
         }
 

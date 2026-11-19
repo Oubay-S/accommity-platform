@@ -43,7 +43,7 @@ class ReservationRepository implements ReservationRepositoryInterface
             ->when($excludeId, fn ($q) => $q->where('id_reservation', '!=', $excludeId))
             ->where(function ($q) use ($dateArrivee, $dateDepart) {
                 $q->where('date_arrivee', '<', $dateDepart)
-                  ->where('date_depart', '>', $dateArrivee);
+                    ->where('date_depart', '>', $dateArrivee);
             })
             ->exists();
     }
@@ -51,8 +51,7 @@ class ReservationRepository implements ReservationRepositoryInterface
     public function getDemandesExpirees(): Collection
     {
         return Reservation::where('statut', 'en_attente')
-            ->whereHas('minuterie', fn ($q) =>
-                $q->where('est_active', true)->where('date_echeance', '<=', now())
+            ->whereHas('minuterie', fn ($q) => $q->where('est_active', true)->where('date_echeance', '<=', now())
             )
             ->get();
     }

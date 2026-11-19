@@ -26,21 +26,21 @@ class ReservationTest extends TestCase
         $voyageur = User::factory()->voyageur()->create();
 
         $annonce = Annonce::factory()->create([
-            'id_hote'          => $hote->getKey(),
+            'id_hote' => $hote->getKey(),
             'mode_reservation' => ModeReservation::INSTANTANEE,
-            'statut'           => StatutAnnonce::PUBLIEE,
-            'tarif_nuit'       => 1000,
-            'capacite'         => 4,
+            'statut' => StatutAnnonce::PUBLIEE,
+            'tarif_nuit' => 1000,
+            'capacite' => 4,
         ]);
 
         $arrivee = now()->addDays(5)->format('Y-m-d');
-        $depart  = now()->addDays(8)->format('Y-m-d'); // 3 nuits = 3000 + 12% = 3360
+        $depart = now()->addDays(8)->format('Y-m-d'); // 3 nuits = 3000 + 12% = 3360
 
         $response = $this->actingAs($voyageur, 'sanctum')
             ->postJson('/api/reservations', [
-                'id_annonce'   => $annonce->id_annonce,
+                'id_annonce' => $annonce->id_annonce,
                 'date_arrivee' => $arrivee,
-                'date_depart'  => $depart,
+                'date_depart' => $depart,
                 'nb_voyageurs' => 2,
             ]);
 
@@ -51,9 +51,9 @@ class ReservationTest extends TestCase
             ->assertJsonPath('data.frais_service', 360);
 
         $this->assertDatabaseHas('reservations', [
-            'id_annonce'  => $annonce->id_annonce,
+            'id_annonce' => $annonce->id_annonce,
             'id_voyageur' => $voyageur->getKey(),
-            'statut'      => 'confirmee',
+            'statut' => 'confirmee',
         ]);
     }
 
@@ -63,21 +63,21 @@ class ReservationTest extends TestCase
         $voyageur = User::factory()->voyageur()->create();
 
         $annonce = Annonce::factory()->create([
-            'id_hote'          => $hote->getKey(),
+            'id_hote' => $hote->getKey(),
             'mode_reservation' => ModeReservation::SUR_DEMANDE,
-            'statut'           => StatutAnnonce::PUBLIEE,
-            'tarif_nuit'       => 500,
-            'capacite'         => 2,
+            'statut' => StatutAnnonce::PUBLIEE,
+            'tarif_nuit' => 500,
+            'capacite' => 2,
         ]);
 
         $arrivee = now()->addDays(10)->format('Y-m-d');
-        $depart  = now()->addDays(12)->format('Y-m-d');
+        $depart = now()->addDays(12)->format('Y-m-d');
 
         $response = $this->actingAs($voyageur, 'sanctum')
             ->postJson('/api/reservations', [
-                'id_annonce'   => $annonce->id_annonce,
+                'id_annonce' => $annonce->id_annonce,
                 'date_arrivee' => $arrivee,
-                'date_depart'  => $depart,
+                'date_depart' => $depart,
                 'nb_voyageurs' => 1,
             ]);
 
@@ -90,7 +90,7 @@ class ReservationTest extends TestCase
         $this->assertDatabaseHas('minuteries', [
             'id_reservation' => $reservationId,
             'type_minuterie' => 'expiration_demande',
-            'est_active'     => true,
+            'est_active' => true,
         ]);
     }
 
@@ -101,27 +101,27 @@ class ReservationTest extends TestCase
         $voyageur2 = User::factory()->voyageur()->create();
 
         $annonce = Annonce::factory()->create([
-            'id_hote'          => $hote->getKey(),
+            'id_hote' => $hote->getKey(),
             'mode_reservation' => ModeReservation::INSTANTANEE,
-            'statut'           => StatutAnnonce::PUBLIEE,
+            'statut' => StatutAnnonce::PUBLIEE,
         ]);
 
         // Première réservation confirmée du 10 au 15
         Reservation::factory()->create([
-            'id_annonce'   => $annonce->id_annonce,
-            'id_voyageur'  => $voyageur1->getKey(),
-            'id_hote'      => $hote->getKey(),
+            'id_annonce' => $annonce->id_annonce,
+            'id_voyageur' => $voyageur1->getKey(),
+            'id_hote' => $hote->getKey(),
             'date_arrivee' => now()->addDays(10)->toDateString(),
-            'date_depart'  => now()->addDays(15)->toDateString(),
-            'statut'       => StatutReservation::CONFIRMEE,
+            'date_depart' => now()->addDays(15)->toDateString(),
+            'statut' => StatutReservation::CONFIRMEE,
         ]);
 
         // Deuxième réservation chevauchant du 12 au 18
         $response = $this->actingAs($voyageur2, 'sanctum')
             ->postJson('/api/reservations', [
-                'id_annonce'   => $annonce->id_annonce,
+                'id_annonce' => $annonce->id_annonce,
                 'date_arrivee' => now()->addDays(12)->toDateString(),
-                'date_depart'  => now()->addDays(18)->toDateString(),
+                'date_depart' => now()->addDays(18)->toDateString(),
                 'nb_voyageurs' => 2,
             ]);
 
@@ -136,14 +136,14 @@ class ReservationTest extends TestCase
 
         $annonce = Annonce::factory()->create([
             'id_hote' => $hote->getKey(),
-            'statut'  => StatutAnnonce::PUBLIEE,
+            'statut' => StatutAnnonce::PUBLIEE,
         ]);
 
         $response = $this->actingAs($hote, 'sanctum')
             ->postJson('/api/reservations', [
-                'id_annonce'   => $annonce->id_annonce,
+                'id_annonce' => $annonce->id_annonce,
                 'date_arrivee' => now()->addDays(1)->toDateString(),
-                'date_depart'  => now()->addDays(3)->toDateString(),
+                'date_depart' => now()->addDays(3)->toDateString(),
                 'nb_voyageurs' => 1,
             ]);
 
@@ -157,17 +157,17 @@ class ReservationTest extends TestCase
         $voyageur = User::factory()->voyageur()->create();
 
         $reservation = Reservation::factory()->enAttente()->create([
-            'id_hote'          => $hote->getKey(),
-            'id_voyageur'      => $voyageur->getKey(),
+            'id_hote' => $hote->getKey(),
+            'id_voyageur' => $voyageur->getKey(),
             'mode_reservation' => ModeReservation::SUR_DEMANDE,
         ]);
 
         Minuterie::create([
-            'id_minuterie'   => Str::uuid()->toString(),
+            'id_minuterie' => Str::uuid()->toString(),
             'id_reservation' => $reservation->id_reservation,
             'type_minuterie' => 'expiration_demande',
-            'date_echeance'  => now()->addDay(),
-            'est_active'     => true,
+            'date_echeance' => now()->addDay(),
+            'est_active' => true,
         ]);
 
         $response = $this->actingAs($hote, 'sanctum')
@@ -181,12 +181,12 @@ class ReservationTest extends TestCase
 
         $this->assertDatabaseHas('reservations', [
             'id_reservation' => $reservation->id_reservation,
-            'statut'         => 'confirmee',
+            'statut' => 'confirmee',
         ]);
 
         $this->assertDatabaseHas('minuteries', [
             'id_reservation' => $reservation->id_reservation,
-            'est_active'     => false,
+            'est_active' => false,
         ]);
     }
 
@@ -196,7 +196,7 @@ class ReservationTest extends TestCase
         $voyageur = User::factory()->voyageur()->create();
 
         $reservation = Reservation::factory()->enAttente()->create([
-            'id_hote'     => $hote->getKey(),
+            'id_hote' => $hote->getKey(),
             'id_voyageur' => $voyageur->getKey(),
         ]);
 
@@ -211,15 +211,15 @@ class ReservationTest extends TestCase
         $this->actingAs($hote, 'sanctum')
             ->postJson("/api/hote/reservations/{$reservation->id_reservation}/repondre", [
                 'decision' => 'refuser',
-                'motif'    => 'Indisponibilité imprévue pour travaux.',
+                'motif' => 'Indisponibilité imprévue pour travaux.',
             ])
             ->assertOk()
             ->assertJsonPath('data.statut', 'refusee');
 
         $this->assertDatabaseHas('reservations', [
             'id_reservation' => $reservation->id_reservation,
-            'statut'         => 'refusee',
-            'motif_refus'    => 'Indisponibilité imprévue pour travaux.',
+            'statut' => 'refusee',
+            'motif_refus' => 'Indisponibilité imprévue pour travaux.',
         ]);
     }
 
@@ -229,11 +229,11 @@ class ReservationTest extends TestCase
         $voyageur = User::factory()->voyageur()->create();
 
         $reservation = Reservation::factory()->create([
-            'id_hote'      => $hote->getKey(),
-            'id_voyageur'  => $voyageur->getKey(),
-            'statut'       => StatutReservation::CONFIRMEE,
+            'id_hote' => $hote->getKey(),
+            'id_voyageur' => $voyageur->getKey(),
+            'statut' => StatutReservation::CONFIRMEE,
             'date_arrivee' => now()->addDays(10)->toDateString(),
-            'date_depart'  => now()->addDays(14)->toDateString(),
+            'date_depart' => now()->addDays(14)->toDateString(),
         ]);
 
         $response = $this->actingAs($voyageur, 'sanctum')
@@ -245,10 +245,10 @@ class ReservationTest extends TestCase
             ->assertJsonPath('success', true);
 
         $this->assertDatabaseHas('reservations', [
-            'id_reservation'    => $reservation->id_reservation,
-            'statut'            => 'annulee',
+            'id_reservation' => $reservation->id_reservation,
+            'statut' => 'annulee',
             'acteur_annulation' => 'voyageur',
-            'motif_annulation'  => 'Imprévu de calendrier personnel.',
+            'motif_annulation' => 'Imprévu de calendrier personnel.',
         ]);
     }
 
@@ -258,11 +258,11 @@ class ReservationTest extends TestCase
 
         // Minuterie expirée dans le passé
         Minuterie::create([
-            'id_minuterie'   => Str::uuid()->toString(),
+            'id_minuterie' => Str::uuid()->toString(),
             'id_reservation' => $reservation->id_reservation,
             'type_minuterie' => 'expiration_demande',
-            'date_echeance'  => now()->subHour(),
-            'est_active'     => true,
+            'date_echeance' => now()->subHour(),
+            'est_active' => true,
         ]);
 
         $this->artisan('reservations:expire')
@@ -271,7 +271,7 @@ class ReservationTest extends TestCase
 
         $this->assertDatabaseHas('reservations', [
             'id_reservation' => $reservation->id_reservation,
-            'statut'         => 'expiree',
+            'statut' => 'expiree',
         ]);
     }
 }

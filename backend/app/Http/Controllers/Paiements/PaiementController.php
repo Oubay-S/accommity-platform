@@ -32,11 +32,11 @@ class PaiementController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Paiement effectué avec succès.',
-            'data'    => [
-                'id_paiement'    => $result['paiement']->id_paiement,
-                'statut'         => $result['paiement']->statut,
+            'data' => [
+                'id_paiement' => $result['paiement']->id_paiement,
+                'statut' => $result['paiement']->statut,
                 'numero_facture' => $result['recu']->numero_facture,
-                'id_recu'        => $result['recu']->id_recu,
+                'id_recu' => $result['recu']->id_recu,
             ],
         ], 201);
     }
@@ -54,7 +54,7 @@ class PaiementController extends Controller
 
         $montantTotal = (float) ($reservation?->montant_total ?? $paiement->montant);
         $fraisService = (float) ($reservation?->frais_service ?? 0);
-        $montantHote  = round($montantTotal - $fraisService, 2);
+        $montantHote = round($montantTotal - $fraisService, 2);
 
         $typeLogement = $annonce?->type_logement;
         if ($typeLogement instanceof \BackedEnum) {
@@ -62,35 +62,35 @@ class PaiementController extends Controller
         }
 
         $data = [
-            'id_recu'         => $recu?->id_recu ?? '',
-            'id_paiement'     => $paiement->id_paiement,
-            'numero_facture'  => $recu?->numero_facture ?? '',
-            'chemin_pdf'      => $recu?->chemin_pdf,
+            'id_recu' => $recu?->id_recu ?? '',
+            'id_paiement' => $paiement->id_paiement,
+            'numero_facture' => $recu?->numero_facture ?? '',
+            'chemin_pdf' => $recu?->chemin_pdf,
             'date_generation' => $recu?->date_generation ? Carbon::parse($recu->date_generation)->toIso8601String() : null,
-            'paiement'        => new PaiementResource($paiement),
-            'reservation'     => $reservation ? new ReservationResource($reservation) : null,
-            'montant_total'   => $montantTotal,
-            'frais_service'   => $fraisService,
-            'montant_hote'    => $montantHote,
-            'voyageur'        => [
+            'paiement' => new PaiementResource($paiement),
+            'reservation' => $reservation ? new ReservationResource($reservation) : null,
+            'montant_total' => $montantTotal,
+            'frais_service' => $fraisService,
+            'montant_hote' => $montantHote,
+            'voyageur' => [
                 'id_utilisateur' => $voyageur?->id_utilisateur ?? '',
-                'nom'            => $voyageur?->nom ?? '',
-                'prenom'         => $voyageur?->prenom ?? '',
-                'email'          => $voyageur?->email ?? '',
+                'nom' => $voyageur?->nom ?? '',
+                'prenom' => $voyageur?->prenom ?? '',
+                'email' => $voyageur?->email ?? '',
             ],
-            'annonce'         => [
-                'id_annonce'     => $annonce?->id_annonce ?? '',
-                'titre'          => $annonce?->titre ?? '',
-                'adresse'        => $annonce?->adresse ?? '',
-                'ville'          => $annonce?->ville ?? '',
-                'type_logement'  => (string) $typeLogement,
+            'annonce' => [
+                'id_annonce' => $annonce?->id_annonce ?? '',
+                'titre' => $annonce?->titre ?? '',
+                'adresse' => $annonce?->adresse ?? '',
+                'ville' => $annonce?->ville ?? '',
+                'type_logement' => (string) $typeLogement,
             ],
         ];
 
         return response()->json([
             'success' => true,
             'message' => 'Détails du reçu récupérés.',
-            'data'    => $data,
+            'data' => $data,
         ]);
     }
 
@@ -105,13 +105,13 @@ class PaiementController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Historique des transactions récupéré.',
-            'data'    => [
-                'items'      => PaiementResource::collection($paginated->items()),
+            'data' => [
+                'items' => PaiementResource::collection($paginated->items()),
                 'pagination' => [
-                    'total'        => $paginated->total(),
-                    'per_page'     => $paginated->perPage(),
+                    'total' => $paginated->total(),
+                    'per_page' => $paginated->perPage(),
                     'current_page' => $paginated->currentPage(),
-                    'last_page'    => $paginated->lastPage(),
+                    'last_page' => $paginated->lastPage(),
                 ],
             ],
         ]);

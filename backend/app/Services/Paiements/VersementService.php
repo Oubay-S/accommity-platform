@@ -25,14 +25,14 @@ class VersementService
         $montantHote = round((float) $reservation->montant_total - (float) $reservation->frais_service, 2);
 
         return Versement::create([
-            'id_versement'           => Str::uuid()->toString(),
-            'id_reservation'         => $reservationId,
-            'id_hote'                => $reservation->id_hote,
-            'montant'                => $montantHote,
-            'date_versement'         => null,
-            'reference_bancaire'     => null,
+            'id_versement' => Str::uuid()->toString(),
+            'id_reservation' => $reservationId,
+            'id_hote' => $reservation->id_hote,
+            'montant' => $montantHote,
+            'date_versement' => null,
+            'reference_bancaire' => null,
             'date_liberation_prevue' => $dateLiberationPrevue,
-            'statut'                 => 'en_attente',
+            'statut' => 'en_attente',
         ]);
     }
 
@@ -44,9 +44,9 @@ class VersementService
         $versement = Versement::where('id_reservation', $reservationId)->firstOrFail();
 
         $versement->update([
-            'statut'             => 'traite',
-            'date_versement'     => now(),
-            'reference_bancaire' => 'VIR-' . strtoupper(Str::random(10)),
+            'statut' => 'traite',
+            'date_versement' => now(),
+            'reference_bancaire' => 'VIR-'.strtoupper(Str::random(10)),
         ]);
 
         return $versement->fresh();

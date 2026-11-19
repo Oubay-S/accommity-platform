@@ -14,10 +14,10 @@ class StoreReservationRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // Tolérance sur les conventions d'attributs
-        if ($this->has('annonce_id') && !$this->has('id_annonce')) {
+        if ($this->has('annonce_id') && ! $this->has('id_annonce')) {
             $this->merge(['id_annonce' => $this->input('annonce_id')]);
         }
-        if ($this->has('nombre_voyageurs') && !$this->has('nb_voyageurs')) {
+        if ($this->has('nombre_voyageurs') && ! $this->has('nb_voyageurs')) {
             $this->merge(['nb_voyageurs' => $this->input('nombre_voyageurs')]);
         }
     }
@@ -25,10 +25,10 @@ class StoreReservationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id_annonce'        => ['required', 'string', 'exists:annonces,id_annonce'],
-            'date_arrivee'      => ['required', 'date', 'after_or_equal:today'],
-            'date_depart'       => ['required', 'date', 'after:date_arrivee'],
-            'nb_voyageurs'      => ['required', 'integer', 'min:1'],
+            'id_annonce' => ['required', 'string', 'exists:annonces,id_annonce'],
+            'date_arrivee' => ['required', 'date', 'after_or_equal:today'],
+            'date_depart' => ['required', 'date', 'after:date_arrivee'],
+            'nb_voyageurs' => ['required', 'integer', 'min:1'],
             'message_optionnel' => ['nullable', 'string', 'max:1000'],
         ];
     }

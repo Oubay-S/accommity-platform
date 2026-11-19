@@ -16,8 +16,8 @@ class StatutService
      */
     protected array $transitionsValides = [
         'en_attente' => ['confirmee', 'refusee', 'annulee', 'expiree'],
-        'confirmee'  => ['en_cours', 'annulee'],
-        'en_cours'   => ['terminee'],
+        'confirmee' => ['en_cours', 'annulee'],
+        'en_cours' => ['terminee'],
     ];
 
     /**
@@ -42,8 +42,8 @@ class StatutService
         }
 
         if (
-            !isset($this->transitionsValides[$valeurActuelle]) ||
-            !in_array($valeurNouveau, $this->transitionsValides[$valeurActuelle], true)
+            ! isset($this->transitionsValides[$valeurActuelle]) ||
+            ! in_array($valeurNouveau, $this->transitionsValides[$valeurActuelle], true)
         ) {
             throw new ApiException(
                 "Transition de statut invalide : impossible de passer de '{$valeurActuelle}' à '{$valeurNouveau}'.",

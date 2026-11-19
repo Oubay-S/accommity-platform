@@ -5,11 +5,14 @@ namespace App\Models\Reservations;
 use App\Enums\ModeReservation;
 use App\Enums\StatutReservation;
 use App\Models\Annonces\Annonce;
+use App\Models\Annonces\PolitiqueAnnulation;
+use App\Models\Paiements\Paiement;
 use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Reservation extends Model
 {
@@ -60,27 +63,27 @@ class Reservation extends Model
         return $this->belongsTo(Annonce::class, 'id_annonce');
     }
 
-    /** @return BelongsTo<\App\Models\Annonces\PolitiqueAnnulation, $this> */
+    /** @return BelongsTo<PolitiqueAnnulation, $this> */
     public function politique(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Annonces\PolitiqueAnnulation::class, 'id_politique');
+        return $this->belongsTo(PolitiqueAnnulation::class, 'id_politique');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Paiements\Paiement, $this> */
-    public function paiement(): \Illuminate\Database\Eloquent\Relations\HasOne
+    /** @return HasOne<Paiement, $this> */
+    public function paiement(): HasOne
     {
-        return $this->hasOne(\App\Models\Paiements\Paiement::class, 'id_reservation');
+        return $this->hasOne(Paiement::class, 'id_reservation');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Reservations\Minuterie, $this> */
-    public function minuterie(): \Illuminate\Database\Eloquent\Relations\HasOne
+    /** @return HasOne<Minuterie, $this> */
+    public function minuterie(): HasOne
     {
-        return $this->hasOne(\App\Models\Reservations\Minuterie::class, 'id_reservation');
+        return $this->hasOne(Minuterie::class, 'id_reservation');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Reservations\RecapitulatifReservation, $this> */
-    public function recapitulatif(): \Illuminate\Database\Eloquent\Relations\HasOne
+    /** @return HasOne<RecapitulatifReservation, $this> */
+    public function recapitulatif(): HasOne
     {
-        return $this->hasOne(\App\Models\Reservations\RecapitulatifReservation::class, 'id_reservation');
+        return $this->hasOne(RecapitulatifReservation::class, 'id_reservation');
     }
 }

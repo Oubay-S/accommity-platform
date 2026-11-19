@@ -58,14 +58,14 @@ class ReservationService
         }
 
         $dateArrivee = Carbon::parse($data['date_arrivee'])->startOfDay();
-        $dateDepart  = Carbon::parse($data['date_depart'])->startOfDay();
+        $dateDepart = Carbon::parse($data['date_depart'])->startOfDay();
 
         if ($dateDepart->lte($dateArrivee)) {
             throw new ApiException('La date de départ doit être strictement postérieure à l\'arrivée.', 422, 'DATES_INVALIDES');
         }
 
         $strArrivee = $dateArrivee->toDateString();
-        $strDepart  = $dateDepart->toDateString();
+        $strDepart = $dateDepart->toDateString();
 
         // RG12 : Contrôle anti-chevauchement avec les réservations existantes
         if ($this->reservationRepository->existeChevauchement($annonce->id_annonce, $strArrivee, $strDepart)) {
@@ -90,28 +90,28 @@ class ReservationService
             $nbNuits = 1;
         }
 
-        $montantBrut    = $nbNuits * (float) $annonce->tarif_nuit;
+        $montantBrut = $nbNuits * (float) $annonce->tarif_nuit;
         $commissionRate = (float) config('hebergement.commission_rate', 0.12);
-        $fraisService   = round($montantBrut * $commissionRate, 2);
-        $montantTotal   = round($montantBrut + $fraisService, 2);
+        $fraisService = round($montantBrut * $commissionRate, 2);
+        $montantTotal = round($montantBrut + $fraisService, 2);
 
         $isInstant = $annonce->mode_reservation === ModeReservation::INSTANTANEE;
 
         $reservation = $this->reservationRepository->create([
-            'id_reservation'   => Str::uuid()->toString(),
-            'id_annonce'       => $annonce->id_annonce,
-            'id_voyageur'      => $voyageur->getKey(),
-            'id_hote'          => $annonce->id_hote,
-            'id_politique'     => $annonce->id_politique,
-            'date_arrivee'     => $strArrivee,
-            'date_depart'      => $strDepart,
-            'nb_voyageurs'     => $nbVoyageurs,
+            'id_reservation' => Str::uuid()->toString(),
+            'id_annonce' => $annonce->id_annonce,
+            'id_voyageur' => $voyageur->getKey(),
+            'id_hote' => $annonce->id_hote,
+            'id_politique' => $annonce->id_politique,
+            'date_arrivee' => $strArrivee,
+            'date_depart' => $strDepart,
+            'nb_voyageurs' => $nbVoyageurs,
             'mode_reservation' => $annonce->mode_reservation,
-            'montant_total'    => $montantTotal,
-            'frais_service'    => $fraisService,
-            'message_optionnel'=> $data['message_optionnel'] ?? null,
-            'statut'           => $isInstant ? StatutReservation::CONFIRMEE->value : StatutReservation::EN_ATTENTE->value,
-            'date_confirmation'=> $isInstant ? now() : null,
+            'montant_total' => $montantTotal,
+            'frais_service' => $fraisService,
+            'message_optionnel' => $data['message_optionnel'] ?? null,
+            'statut' => $isInstant ? StatutReservation::CONFIRMEE->value : StatutReservation::EN_ATTENTE->value,
+            'date_confirmation' => $isInstant ? now() : null,
         ]);
 
         if ($isInstant) {
@@ -155,7 +155,7 @@ class ReservationService
     {
         $reservation = $this->reservationRepository->findById($reservationId);
 
-        if (!$reservation) {
+        if (! $reservation) {
             throw new ApiException('Réservation introuvable.', 404, 'RESERVATION_INTROUVABLE');
         }
 
@@ -229,15 +229,15 @@ class ReservationService
     {
         $reservation = $this->reservationRepository->findById($reservationId);
 
-        if (!$reservation) {
+        if (! $reservation) {
             throw new ApiException('Réservation introuvable.', 404, 'RESERVATION_INTROUVABLE');
         }
 
         $estVoyageur = $reservation->id_voyageur === $user->getKey();
-        $estHote     = $reservation->id_hote === $user->getKey();
-        $estAdmin    = method_exists($user, 'estAdmin') ? $user->estAdmin() : false;
+        $estHote = $reservation->id_hote === $user->getKey();
+        $estAdmin = method_exists($user, 'estAdmin') ? $user->estAdmin() : false;
 
-        if (!$estVoyageur && !$estHote && !$estAdmin) {
+        if (! $estVoyageur && ! $estHote && ! $estAdmin) {
             throw new ApiException('Vous n\'avez pas le droit d\'annuler cette réservation.', 403, 'ACCES_REFUSE');
         }
 
@@ -250,9 +250,9 @@ class ReservationService
         $this->statutService->transitionnerStatut($reservationId, 'annulee');
 
         $this->reservationRepository->update($reservationId, [
-            'motif_annulation'  => $motif,
+            'motif_annulation' => $motif,
             'acteur_annulation' => $acteur,
-            'date_annulation'   => now(),
+            'date_annulation' => now(),
         ]);
 
         $this->minuterieService->annulerMinuterie($reservationId);

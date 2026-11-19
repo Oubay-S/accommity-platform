@@ -36,7 +36,7 @@ class ReservationController extends Controller
             'message' => $isInstant
                 ? 'Réservation confirmée avec succès.'
                 : 'Demande de réservation enregistrée. L\'hôte a 24h pour répondre.',
-            'data'    => new ReservationResource($reservation),
+            'data' => new ReservationResource($reservation),
         ], 201);
     }
 
@@ -47,30 +47,30 @@ class ReservationController extends Controller
     {
         $reservation = $this->reservationService->getReservation($id);
 
-        if (!$reservation) {
+        if (! $reservation) {
             return response()->json([
-                'success'    => false,
-                'message'    => 'Réservation introuvable.',
+                'success' => false,
+                'message' => 'Réservation introuvable.',
                 'error_code' => 'RESERVATION_INTROUVABLE',
             ], 404);
         }
 
         $user = $request->user();
         $estVoyageur = $reservation->id_voyageur === $user->getKey();
-        $estHote     = $reservation->id_hote === $user->getKey();
-        $estAdmin    = method_exists($user, 'estAdmin') ? $user->estAdmin() : false;
+        $estHote = $reservation->id_hote === $user->getKey();
+        $estAdmin = method_exists($user, 'estAdmin') ? $user->estAdmin() : false;
 
-        if (!$estVoyageur && !$estHote && !$estAdmin) {
+        if (! $estVoyageur && ! $estHote && ! $estAdmin) {
             return response()->json([
-                'success'    => false,
-                'message'    => 'Accès non autorisé à cette réservation.',
+                'success' => false,
+                'message' => 'Accès non autorisé à cette réservation.',
                 'error_code' => 'ACCES_REFUSE',
             ], 403);
         }
 
         return response()->json([
             'success' => true,
-            'data'    => new ReservationResource($reservation),
+            'data' => new ReservationResource($reservation),
         ]);
     }
 
@@ -80,7 +80,7 @@ class ReservationController extends Controller
     public function mesVoyages(Request $request): JsonResponse
     {
         $perPage = max(1, min(50, (int) $request->query('per_page', 10)));
-        $statut  = $request->query('statut');
+        $statut = $request->query('statut');
 
         $paginated = $this->reservationService->getParVoyageur(
             $request->user()->getKey(),
@@ -91,13 +91,13 @@ class ReservationController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Liste des voyages récupérée.',
-            'data'    => [
-                'items'      => ReservationResource::collection($paginated->items()),
+            'data' => [
+                'items' => ReservationResource::collection($paginated->items()),
                 'pagination' => [
-                    'total'        => $paginated->total(),
-                    'per_page'     => $paginated->perPage(),
+                    'total' => $paginated->total(),
+                    'per_page' => $paginated->perPage(),
                     'current_page' => $paginated->currentPage(),
-                    'last_page'    => $paginated->lastPage(),
+                    'last_page' => $paginated->lastPage(),
                 ],
             ],
         ]);
@@ -109,7 +109,7 @@ class ReservationController extends Controller
     public function demandesHote(Request $request): JsonResponse
     {
         $perPage = max(1, min(50, (int) $request->query('per_page', 10)));
-        $statut  = $request->query('statut');
+        $statut = $request->query('statut');
 
         $paginated = $this->reservationService->getDemandesHote(
             $request->user()->getKey(),
@@ -120,13 +120,13 @@ class ReservationController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Demandes de réservations récupérées.',
-            'data'    => [
-                'items'      => ReservationResource::collection($paginated->items()),
+            'data' => [
+                'items' => ReservationResource::collection($paginated->items()),
                 'pagination' => [
-                    'total'        => $paginated->total(),
-                    'per_page'     => $paginated->perPage(),
+                    'total' => $paginated->total(),
+                    'per_page' => $paginated->perPage(),
                     'current_page' => $paginated->currentPage(),
-                    'last_page'    => $paginated->lastPage(),
+                    'last_page' => $paginated->lastPage(),
                 ],
             ],
         ]);
@@ -138,7 +138,7 @@ class ReservationController extends Controller
     public function repondre(RepondreReservationRequest $request, string $id): JsonResponse
     {
         $acceptee = $request->isAcceptee();
-        $motif    = $request->getMotif();
+        $motif = $request->getMotif();
 
         $reservation = $this->reservationService->repondreDemande(
             $id,
@@ -152,7 +152,7 @@ class ReservationController extends Controller
             'message' => $acceptee
                 ? 'Demande de réservation acceptée avec succès.'
                 : 'Demande de réservation refusée.',
-            'data'    => new ReservationResource($reservation),
+            'data' => new ReservationResource($reservation),
         ]);
     }
 
@@ -170,7 +170,7 @@ class ReservationController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Réservation annulée avec succès.',
-            'data'    => $apercu,
+            'data' => $apercu,
         ]);
     }
 }

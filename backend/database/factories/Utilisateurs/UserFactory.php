@@ -4,6 +4,7 @@ namespace Database\Factories\Utilisateurs;
 
 use App\Models\Administration\Administrateur;
 use App\Models\Utilisateurs\User;
+use App\Models\Utilisateurs\VerificationIdentite;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -52,7 +53,7 @@ class UserFactory extends Factory
     public function hoteVerifie(): static
     {
         return $this->hote()->afterCreating(function (User $user): void {
-            \App\Models\Utilisateurs\VerificationIdentite::factory()->validee()->create([
+            VerificationIdentite::factory()->validee()->create([
                 'id_utilisateur' => $user->getKey(),
             ]);
         });

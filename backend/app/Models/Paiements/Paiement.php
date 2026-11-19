@@ -7,6 +7,7 @@ use App\Models\Utilisateurs\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property-read Reservation|null $reservation
@@ -45,8 +46,8 @@ class Paiement extends Model
         return $this->belongsTo(User::class, 'id_voyageur');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<Recu, $this> */
-    public function recu(): \Illuminate\Database\Eloquent\Relations\HasOne
+    /** @return HasOne<Recu, $this> */
+    public function recu(): HasOne
     {
         return $this->hasOne(Recu::class, 'id_paiement');
     }

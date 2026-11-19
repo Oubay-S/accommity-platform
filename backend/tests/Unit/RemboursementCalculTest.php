@@ -96,32 +96,32 @@ class RemboursementCalculTest extends TestCase
         $voyageur = User::factory()->voyageur()->create();
 
         $annonce = Annonce::factory()->create([
-            'id_hote'      => $hote->getKey(),
+            'id_hote' => $hote->getKey(),
             'id_politique' => $politique->id_politique,
         ]);
 
         $reservation = Reservation::create([
-            'id_reservation'    => Str::uuid()->toString(),
-            'id_annonce'        => $annonce->id_annonce,
-            'id_voyageur'       => $voyageur->getKey(),
-            'id_hote'           => $hote->getKey(),
-            'id_politique'      => $politique->id_politique,
-            'date_arrivee'      => $dateArrivee->format('Y-m-d'),
-            'date_depart'       => $dateArrivee->copy()->addDays(3)->format('Y-m-d'),
-            'nb_voyageurs'      => 2,
-            'statut'            => StatutReservation::CONFIRMEE,
-            'mode_reservation'  => ModeReservation::INSTANTANEE,
-            'montant_total'     => $montant,
-            'frais_service'     => round($montant * 0.12, 2),
+            'id_reservation' => Str::uuid()->toString(),
+            'id_annonce' => $annonce->id_annonce,
+            'id_voyageur' => $voyageur->getKey(),
+            'id_hote' => $hote->getKey(),
+            'id_politique' => $politique->id_politique,
+            'date_arrivee' => $dateArrivee->format('Y-m-d'),
+            'date_depart' => $dateArrivee->copy()->addDays(3)->format('Y-m-d'),
+            'nb_voyageurs' => 2,
+            'statut' => StatutReservation::CONFIRMEE,
+            'mode_reservation' => ModeReservation::INSTANTANEE,
+            'montant_total' => $montant,
+            'frais_service' => round($montant * 0.12, 2),
         ]);
 
         Paiement::create([
-            'id_paiement'      => Str::uuid()->toString(),
-            'id_reservation'   => $reservation->id_reservation,
-            'id_voyageur'      => $voyageur->getKey(),
-            'montant'          => $montant,
+            'id_paiement' => Str::uuid()->toString(),
+            'id_reservation' => $reservation->id_reservation,
+            'id_voyageur' => $voyageur->getKey(),
+            'montant' => $montant,
             'methode_paiement' => 'carte_bancaire',
-            'statut'           => 'reussi',
+            'statut' => 'reussi',
         ]);
 
         return $reservation->fresh();

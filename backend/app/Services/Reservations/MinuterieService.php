@@ -18,11 +18,11 @@ class MinuterieService
         $delaiHeures = (int) config('hebergement.delai_reponse_hote_heures', 24);
 
         return Minuterie::create([
-            'id_minuterie'   => Str::uuid()->toString(),
+            'id_minuterie' => Str::uuid()->toString(),
             'id_reservation' => $reservationId,
             'type_minuterie' => 'expiration_demande',
-            'date_echeance'  => now()->addHours($delaiHeures),
-            'est_active'     => true,
+            'date_echeance' => now()->addHours($delaiHeures),
+            'est_active' => true,
         ]);
     }
 

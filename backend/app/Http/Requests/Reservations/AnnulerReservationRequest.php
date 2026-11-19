@@ -13,7 +13,7 @@ class AnnulerReservationRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        if ($this->has('motif_annulation') && !$this->has('motif')) {
+        if ($this->has('motif_annulation') && ! $this->has('motif')) {
             $this->merge(['motif' => $this->input('motif_annulation')]);
         }
     }

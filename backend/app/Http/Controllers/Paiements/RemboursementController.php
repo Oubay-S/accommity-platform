@@ -30,7 +30,7 @@ class RemboursementController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Aperçu du remboursement calculé avec succès.',
-            'data'    => $apercu,
+            'data' => $apercu,
         ]);
     }
 }

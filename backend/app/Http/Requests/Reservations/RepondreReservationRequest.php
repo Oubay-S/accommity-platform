@@ -14,13 +14,13 @@ class RepondreReservationRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // Supporte 'acceptee' (bool), 'decision' ou 'action' ('accepter'/'refuser')
-        if ($this->has('action') && !$this->has('decision')) {
+        if ($this->has('action') && ! $this->has('decision')) {
             $this->merge(['decision' => $this->input('action')]);
         }
-        if ($this->has('acceptee') && !$this->has('decision')) {
+        if ($this->has('acceptee') && ! $this->has('decision')) {
             $this->merge(['decision' => $this->boolean('acceptee') ? 'accepter' : 'refuser']);
         }
-        if ($this->has('motif_refus') && !$this->has('motif')) {
+        if ($this->has('motif_refus') && ! $this->has('motif')) {
             $this->merge(['motif' => $this->input('motif_refus')]);
         }
     }
@@ -29,7 +29,7 @@ class RepondreReservationRequest extends FormRequest
     {
         return [
             'decision' => ['required', 'in:accepter,refuser'],
-            'motif'    => ['nullable', 'string', 'required_if:decision,refuser', 'max:1000'],
+            'motif' => ['nullable', 'string', 'required_if:decision,refuser', 'max:1000'],
         ];
     }
 

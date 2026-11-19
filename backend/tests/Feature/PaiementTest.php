@@ -32,33 +32,33 @@ class PaiementTest extends TestCase
         $voyageur = User::factory()->voyageur()->create();
 
         $annonce = Annonce::factory()->create([
-            'id_hote'          => $hote->getKey(),
-            'statut'           => StatutAnnonce::PUBLIEE,
+            'id_hote' => $hote->getKey(),
+            'statut' => StatutAnnonce::PUBLIEE,
             'mode_reservation' => ModeReservation::INSTANTANEE,
-            'tarif_nuit'       => 500,
+            'tarif_nuit' => 500,
         ]);
 
         $reservation = Reservation::create([
-            'id_reservation'   => Str::uuid()->toString(),
-            'id_annonce'       => $annonce->id_annonce,
-            'id_voyageur'      => $voyageur->getKey(),
-            'id_hote'          => $hote->getKey(),
-            'id_politique'     => $annonce->id_politique,
-            'date_arrivee'     => now()->addDays(5)->format('Y-m-d'),
-            'date_depart'      => now()->addDays(7)->format('Y-m-d'),
-            'nb_voyageurs'     => 2,
-            'statut'           => StatutReservation::CONFIRMEE,
+            'id_reservation' => Str::uuid()->toString(),
+            'id_annonce' => $annonce->id_annonce,
+            'id_voyageur' => $voyageur->getKey(),
+            'id_hote' => $hote->getKey(),
+            'id_politique' => $annonce->id_politique,
+            'date_arrivee' => now()->addDays(5)->format('Y-m-d'),
+            'date_depart' => now()->addDays(7)->format('Y-m-d'),
+            'nb_voyageurs' => 2,
+            'statut' => StatutReservation::CONFIRMEE,
             'mode_reservation' => ModeReservation::INSTANTANEE,
-            'montant_total'    => 1120.0,
-            'frais_service'    => 120.0,
+            'montant_total' => 1120.0,
+            'frais_service' => 120.0,
         ]);
 
         $response = $this->actingAs($voyageur, 'sanctum')
             ->postJson("/api/paiements/{$reservation->id_reservation}", [
-                'numero_carte'    => '4242 4242 4242 4242',
+                'numero_carte' => '4242 4242 4242 4242',
                 'date_expiration' => '12/28',
-                'cvv'             => '123',
-                'nom_titulaire'   => 'Taha Asrar',
+                'cvv' => '123',
+                'nom_titulaire' => 'Taha Asrar',
             ]);
 
         $response->assertCreated()
@@ -73,9 +73,9 @@ class PaiementTest extends TestCase
         $paiementId = $response->json('data.id_paiement');
 
         $this->assertDatabaseHas('paiements', [
-            'id_paiement'    => $paiementId,
+            'id_paiement' => $paiementId,
             'id_reservation' => $reservation->id_reservation,
-            'statut'         => 'reussi',
+            'statut' => 'reussi',
         ]);
 
         $this->assertDatabaseHas('recus', [
@@ -85,7 +85,7 @@ class PaiementTest extends TestCase
         // Vérification de la planification du versement en séquestre (RG21)
         $this->assertDatabaseHas('versements', [
             'id_reservation' => $reservation->id_reservation,
-            'statut'         => 'en_attente',
+            'statut' => 'en_attente',
         ]);
     }
 
@@ -98,23 +98,23 @@ class PaiementTest extends TestCase
 
         $reservation = Reservation::create([
             'id_reservation' => Str::uuid()->toString(),
-            'id_annonce'     => $annonce->id_annonce,
-            'id_voyageur'    => $voyageur->getKey(),
-            'id_hote'        => $hote->getKey(),
-            'date_arrivee'   => now()->addDays(5)->format('Y-m-d'),
-            'date_depart'    => now()->addDays(7)->format('Y-m-d'),
-            'nb_voyageurs'   => 1,
-            'statut'         => StatutReservation::CONFIRMEE,
+            'id_annonce' => $annonce->id_annonce,
+            'id_voyageur' => $voyageur->getKey(),
+            'id_hote' => $hote->getKey(),
+            'date_arrivee' => now()->addDays(5)->format('Y-m-d'),
+            'date_depart' => now()->addDays(7)->format('Y-m-d'),
+            'nb_voyageurs' => 1,
+            'statut' => StatutReservation::CONFIRMEE,
             'mode_reservation' => ModeReservation::INSTANTANEE,
-            'montant_total'  => 600.0,
-            'frais_service'  => 60.0,
+            'montant_total' => 600.0,
+            'frais_service' => 60.0,
         ]);
 
         $response = $this->actingAs($voyageur, 'sanctum')
             ->postJson("/api/paiements/{$reservation->id_reservation}", [
-                'numero_carte'    => '4000 0000 0000 1111',
+                'numero_carte' => '4000 0000 0000 1111',
                 'date_expiration' => '05/27',
-                'cvv'             => '999',
+                'cvv' => '999',
             ]);
 
         $response->assertStatus(402)
@@ -123,7 +123,7 @@ class PaiementTest extends TestCase
 
         $this->assertDatabaseHas('paiements', [
             'id_reservation' => $reservation->id_reservation,
-            'statut'         => 'echoue',
+            'statut' => 'echoue',
         ]);
     }
 
@@ -134,29 +134,29 @@ class PaiementTest extends TestCase
 
         $annonce = Annonce::factory()->create([
             'id_hote' => $hote->getKey(),
-            'titre'   => 'Superbe Riad Marrakech',
+            'titre' => 'Superbe Riad Marrakech',
         ]);
 
         $reservation = Reservation::create([
             'id_reservation' => Str::uuid()->toString(),
-            'id_annonce'     => $annonce->id_annonce,
-            'id_voyageur'    => $voyageur->getKey(),
-            'id_hote'        => $hote->getKey(),
-            'date_arrivee'   => now()->addDays(2)->format('Y-m-d'),
-            'date_depart'    => now()->addDays(5)->format('Y-m-d'),
-            'nb_voyageurs'   => 2,
-            'statut'         => StatutReservation::CONFIRMEE,
+            'id_annonce' => $annonce->id_annonce,
+            'id_voyageur' => $voyageur->getKey(),
+            'id_hote' => $hote->getKey(),
+            'date_arrivee' => now()->addDays(2)->format('Y-m-d'),
+            'date_depart' => now()->addDays(5)->format('Y-m-d'),
+            'nb_voyageurs' => 2,
+            'statut' => StatutReservation::CONFIRMEE,
             'mode_reservation' => ModeReservation::INSTANTANEE,
-            'montant_total'  => 1500.0,
-            'frais_service'  => 180.0,
+            'montant_total' => 1500.0,
+            'frais_service' => 180.0,
         ]);
 
         // Pay reservation
         $resPay = $this->actingAs($voyageur, 'sanctum')
             ->postJson("/api/paiements/{$reservation->id_reservation}", [
-                'numero_carte'    => '4242 4242 4242 4242',
+                'numero_carte' => '4242 4242 4242 4242',
                 'date_expiration' => '12/28',
-                'cvv'             => '123',
+                'cvv' => '123',
             ]);
 
         $paiementId = $resPay->json('data.id_paiement');
@@ -183,23 +183,23 @@ class PaiementTest extends TestCase
 
         $reservation = Reservation::create([
             'id_reservation' => Str::uuid()->toString(),
-            'id_annonce'     => $annonce->id_annonce,
-            'id_voyageur'    => $voyageur->getKey(),
-            'id_hote'        => $hote->getKey(),
-            'date_arrivee'   => now()->addDays(2)->format('Y-m-d'),
-            'date_depart'    => now()->addDays(5)->format('Y-m-d'),
-            'nb_voyageurs'   => 2,
-            'statut'         => StatutReservation::CONFIRMEE,
+            'id_annonce' => $annonce->id_annonce,
+            'id_voyageur' => $voyageur->getKey(),
+            'id_hote' => $hote->getKey(),
+            'date_arrivee' => now()->addDays(2)->format('Y-m-d'),
+            'date_depart' => now()->addDays(5)->format('Y-m-d'),
+            'nb_voyageurs' => 2,
+            'statut' => StatutReservation::CONFIRMEE,
             'mode_reservation' => ModeReservation::INSTANTANEE,
-            'montant_total'  => 1500.0,
-            'frais_service'  => 180.0,
+            'montant_total' => 1500.0,
+            'frais_service' => 180.0,
         ]);
 
         $resPay = $this->actingAs($voyageur, 'sanctum')
             ->postJson("/api/paiements/{$reservation->id_reservation}", [
-                'numero_carte'    => '4242 4242 4242 4242',
+                'numero_carte' => '4242 4242 4242 4242',
                 'date_expiration' => '12/28',
-                'cvv'             => '123',
+                'cvv' => '123',
             ]);
 
         $paiementId = $resPay->json('data.id_paiement');
@@ -219,23 +219,23 @@ class PaiementTest extends TestCase
 
         $reservation = Reservation::create([
             'id_reservation' => Str::uuid()->toString(),
-            'id_annonce'     => $annonce->id_annonce,
-            'id_voyageur'    => $voyageur->getKey(),
-            'id_hote'        => $hote->getKey(),
-            'date_arrivee'   => now()->addDays(2)->format('Y-m-d'),
-            'date_depart'    => now()->addDays(5)->format('Y-m-d'),
-            'nb_voyageurs'   => 2,
-            'statut'         => StatutReservation::CONFIRMEE,
+            'id_annonce' => $annonce->id_annonce,
+            'id_voyageur' => $voyageur->getKey(),
+            'id_hote' => $hote->getKey(),
+            'date_arrivee' => now()->addDays(2)->format('Y-m-d'),
+            'date_depart' => now()->addDays(5)->format('Y-m-d'),
+            'nb_voyageurs' => 2,
+            'statut' => StatutReservation::CONFIRMEE,
             'mode_reservation' => ModeReservation::INSTANTANEE,
-            'montant_total'  => 800.0,
-            'frais_service'  => 96.0,
+            'montant_total' => 800.0,
+            'frais_service' => 96.0,
         ]);
 
         $this->actingAs($voyageur, 'sanctum')
             ->postJson("/api/paiements/{$reservation->id_reservation}", [
-                'numero_carte'    => '4242 4242 4242 4242',
+                'numero_carte' => '4242 4242 4242 4242',
                 'date_expiration' => '12/28',
-                'cvv'             => '123',
+                'cvv' => '123',
             ]);
 
         $response = $this->actingAs($voyageur, 'sanctum')

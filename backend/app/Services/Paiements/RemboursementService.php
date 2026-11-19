@@ -30,14 +30,14 @@ class RemboursementService
         $reservation = Reservation::with(['politique', 'paiement'])->findOrFail($reservationId);
         $paiement = $reservation->paiement;
 
-        if (!$paiement || $paiement->statut !== 'reussi') {
+        if (! $paiement || $paiement->statut !== 'reussi') {
             return [
-                'montant_paye'      => 0.0,
+                'montant_paye' => 0.0,
                 'montant_rembourse' => 0.0,
-                'montant_non_remb'  => 0.0,
-                'taux_applique'     => 0.0,
-                'politique'         => $reservation->politique?->type_politique,
-                'description'       => 'Aucun paiement n\'a été débité.',
+                'montant_non_remb' => 0.0,
+                'taux_applique' => 0.0,
+                'politique' => $reservation->politique?->type_politique,
+                'description' => 'Aucun paiement n\'a été débité.',
             ];
         }
 
@@ -46,37 +46,37 @@ class RemboursementService
         // RG24 : Si l'hôte annule -> remboursement intégral garanti (100%)
         if ($acteur === 'hote') {
             return [
-                'montant_paye'      => $montantPaye,
+                'montant_paye' => $montantPaye,
                 'montant_rembourse' => $montantPaye,
-                'montant_non_remb'  => 0.0,
-                'taux_applique'     => 100.0,
-                'politique'         => $reservation->politique?->type_politique,
-                'description'       => 'Annulation par l\'hôte : remboursement intégral garanti (100%).',
+                'montant_non_remb' => 0.0,
+                'taux_applique' => 100.0,
+                'politique' => $reservation->politique?->type_politique,
+                'description' => 'Annulation par l\'hôte : remboursement intégral garanti (100%).',
             ];
         }
 
         // Si la réservation est encore en attente -> remboursement intégral
         if ($reservation->statut === StatutReservation::EN_ATTENTE) {
             return [
-                'montant_paye'      => $montantPaye,
+                'montant_paye' => $montantPaye,
                 'montant_rembourse' => $montantPaye,
-                'montant_non_remb'  => 0.0,
-                'taux_applique'     => 100.0,
-                'politique'         => $reservation->politique?->type_politique,
-                'description'       => 'Demande en attente : remboursement intégral.',
+                'montant_non_remb' => 0.0,
+                'taux_applique' => 100.0,
+                'politique' => $reservation->politique?->type_politique,
+                'description' => 'Demande en attente : remboursement intégral.',
             ];
         }
 
         // RG17, RG18, RG19 : Calcul selon la politique d'annulation rattachée
         $politique = $reservation->politique;
-        if (!$politique) {
+        if (! $politique) {
             return [
-                'montant_paye'      => $montantPaye,
+                'montant_paye' => $montantPaye,
                 'montant_rembourse' => $montantPaye,
-                'montant_non_remb'  => 0.0,
-                'taux_applique'     => 100.0,
-                'politique'         => 'flexible',
-                'description'       => 'Politique par défaut (remboursement intégral).',
+                'montant_non_remb' => 0.0,
+                'taux_applique' => 100.0,
+                'politique' => 'flexible',
+                'description' => 'Politique par défaut (remboursement intégral).',
             ];
         }
 
@@ -99,12 +99,12 @@ class RemboursementService
         $montantNonRemb = round($montantPaye - $montantRembourse, 2);
 
         return [
-            'montant_paye'      => $montantPaye,
+            'montant_paye' => $montantPaye,
             'montant_rembourse' => $montantRembourse,
-            'montant_non_remb'  => $montantNonRemb,
-            'taux_applique'     => $taux,
-            'politique'         => $politique->type_politique,
-            'description'       => $politique->description,
+            'montant_non_remb' => $montantNonRemb,
+            'taux_applique' => $taux,
+            'politique' => $politique->type_politique,
+            'description' => $politique->description,
         ];
     }
 
@@ -118,14 +118,14 @@ class RemboursementService
         $reservation = Reservation::with('paiement')->findOrFail($reservationId);
         $paiement = $reservation->paiement;
 
-        if (!$paiement || $paiement->statut !== 'reussi') {
+        if (! $paiement || $paiement->statut !== 'reussi') {
             return null;
         }
 
         $motifMap = [
             'voyageur' => 'annulation_voyageur',
-            'hote'     => 'annulation_hote',
-            'systeme'  => 'expiration_demande',
+            'hote' => 'annulation_hote',
+            'systeme' => 'expiration_demande',
         ];
 
         $motif = $motifMap[$acteur] ?? 'annulation_voyageur';
@@ -136,12 +136,12 @@ class RemboursementService
 
         return Remboursement::create([
             'id_remboursement' => Str::uuid()->toString(),
-            'id_reservation'   => $reservationId,
-            'id_voyageur'      => $reservation->id_voyageur,
-            'id_paiement'      => $paiement->id_paiement,
-            'montant'          => $apercu['montant_rembourse'],
-            'taux_applique'    => $apercu['taux_applique'],
-            'motif'            => $motif,
+            'id_reservation' => $reservationId,
+            'id_voyageur' => $reservation->id_voyageur,
+            'id_paiement' => $paiement->id_paiement,
+            'montant' => $apercu['montant_rembourse'],
+            'taux_applique' => $apercu['taux_applique'],
+            'motif' => $motif,
         ]);
     }
 }
