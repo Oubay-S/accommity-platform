@@ -26,7 +26,7 @@ class Remboursement extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'id_reservation', 'id_voyageur', 'id_paiement', 'montant',
+        'id_remboursement', 'id_reservation', 'id_voyageur', 'id_paiement', 'montant',
         'taux_applique', 'motif',
     ];
 

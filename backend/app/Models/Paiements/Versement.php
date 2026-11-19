@@ -23,7 +23,7 @@ class Versement extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_reservation', 'id_hote', 'montant', 'date_versement',
+        'id_versement', 'id_reservation', 'id_hote', 'montant', 'date_versement',
         'reference_bancaire', 'date_liberation_prevue', 'statut',
     ];
 

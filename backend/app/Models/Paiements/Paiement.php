@@ -25,7 +25,7 @@ class Paiement extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'id_reservation', 'id_voyageur', 'montant', 'methode_paiement', 'statut',
+        'id_paiement', 'id_reservation', 'id_voyageur', 'montant', 'methode_paiement', 'statut',
     ];
 
     protected $casts = [
@@ -43,5 +43,11 @@ class Paiement extends Model
     public function voyageur(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_voyageur');
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<Recu, $this> */
+    public function recu(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Recu::class, 'id_paiement');
     }
 }

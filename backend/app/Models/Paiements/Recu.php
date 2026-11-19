@@ -15,5 +15,5 @@ class Recu extends Model
     const CREATED_AT = 'date_generation';
     const UPDATED_AT = null;
 
-    protected $fillable = ['id_paiement', 'numero_facture', 'chemin_pdf'];
+    protected $fillable = ['id_recu', 'id_paiement', 'numero_facture', 'chemin_pdf'];
 }
