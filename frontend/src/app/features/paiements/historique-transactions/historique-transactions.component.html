@@ -1,3 +1,97 @@
-<div class="historique-transactions-page">
-  <h2>Historique Transactions</h2>
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+    <div>
+      <h1 class="font-serif text-3xl font-bold text-stone-900">Historique des transactions</h1>
+      <p class="text-sm text-stone-500 mt-1">Retrouvez l'ensemble de vos règlements, factures et reçus.</p>
+    </div>
+    <a routerLink="/reservations/mes-voyages" class="btn-secondary self-start">
+      Voir mes voyages
+    </a>
+  </div>
+
+  @if (chargement()) {
+    <div class="py-16 text-center text-stone-500">
+      <div class="spinner mx-auto mb-3"></div>
+      <p>Chargement de vos transactions...</p>
+    </div>
+  } @else if (erreur()) {
+    <div class="alert-error">
+      <p>{{ erreur() }}</p>
+    </div>
+  } @else if (transactions().length === 0) {
+    <div class="empty-state">
+      <span class="icon icon--lg text-stone-300" style="font-size: 48px; margin-bottom: 0.75rem;">receipt_long</span>
+      <h3 class="font-serif text-lg font-bold text-stone-800">Aucune transaction</h3>
+      <p class="text-sm text-stone-500 mt-1 max-w-sm mx-auto">
+        Vous n'avez effectué aucun paiement pour l'instant.
+      </p>
+    </div>
+  } @else {
+    <div class="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-stone-50 border-b border-stone-200 text-stone-500 text-xs uppercase tracking-wider">
+            <tr>
+              <th class="py-3 px-4">Date</th>
+              <th class="py-3 px-4">Réf. Facture</th>
+              <th class="py-3 px-4">Hébergement</th>
+              <th class="py-3 px-4">Méthode</th>
+              <th class="py-3 px-4">Montant</th>
+              <th class="py-3 px-4">Statut</th>
+              <th class="py-3 px-4 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100 text-stone-700">
+            @for (t of transactions(); track t.id_paiement) {
+              <tr class="hover:bg-stone-50/60 transition-colors">
+                <td class="py-3.5 px-4 text-xs text-stone-500 whitespace-nowrap">
+                  {{ t.date_transaction | date:'dd/MM/yyyy HH:mm' }}
+                </td>
+                <td class="py-3.5 px-4 font-mono text-xs font-semibold text-stone-800">
+                  {{ t.recu?.numero_facture || ('ACM-' + t.id_paiement.substring(0, 8)) }}
+                </td>
+                <td class="py-3.5 px-4 font-medium text-stone-900 max-w-xs truncate">
+                  {{ t.reservation?.annonce?.titre || 'Séjour Accommity' }}
+                </td>
+                <td class="py-3.5 px-4 text-xs capitalize text-stone-600">
+                  Carte bancaire
+                </td>
+                <td class="py-3.5 px-4 font-bold text-stone-900 whitespace-nowrap">
+                  {{ t.montant | currencyMad }}
+                </td>
+                <td class="py-3.5 px-4 whitespace-nowrap">
+                  <span class="status-pill status-{{ t.statut }}">
+                    @switch (t.statut) {
+                      @case ('reussi') { Réglé }
+                      @case ('echoue') { Échoué }
+                      @case ('rembourse') { Remboursé }
+                      @default { En attente }
+                    }
+                  </span>
+                </td>
+                <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                  @if (t.statut === 'reussi') {
+                    <a [routerLink]="['/paiements/recu', t.id_paiement]" class="btn-receipt-link">
+                      Voir le reçu →
+                    </a>
+                  } @else {
+                    <span class="text-xs text-stone-400">-</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    @if (pagination() && pagination()!.last_page > 1) {
+      <div class="mt-8 flex justify-center">
+        <app-pagination
+          [pagination]="pagination()!"
+          (pageChange)="changerPage($event)"
+        ></app-pagination>
+      </div>
+    }
+  }
 </div>

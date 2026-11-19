@@ -1,3 +1,208 @@
-<div class="checkout-page">
-  <h2>Checkout</h2>
+<div class="max-w-5xl mx-auto px-4 py-8">
+  <!-- Fil d'Ariane -->
+  <div class="mb-6">
+    <a routerLink="/reservations/mes-voyages" class="btn-back">
+      <span class="icon icon--sm" style="margin-right: 4px;">arrow_back</span>
+      Retour à mes voyages
+    </a>
+  </div>
+
+  @if (chargement()) {
+    <div class="py-16 text-center text-stone-500">
+      <div class="spinner mx-auto mb-3"></div>
+      <p>Chargement du récapitulatif de paiement...</p>
+    </div>
+  } @else {
+    @if (erreur() && !reservation()) {
+      <div class="alert-error">
+        <p>{{ erreur() }}</p>
+        <a routerLink="/reservations/mes-voyages" class="btn-primary mt-4 inline-block">Retour à mes voyages</a>
+      </div>
+    } @else {
+      @if (reservation(); as r) {
+    <div class="page-header mb-8">
+      <div class="flex items-center space-x-2 text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">
+        <span>Étape 2 sur 2</span>
+        <span>•</span>
+        <span>Règlement sécurisé</span>
+      </div>
+      <h1 class="page-title">Paiement sécurisé par carte</h1>
+      <p class="page-subtitle">Réglez votre séjour pour confirmer définitivement votre réservation.</p>
+    </div>
+
+    @if (erreur()) {
+      <div class="alert alert--danger mb-6">
+        <span class="icon">error</span>
+        <span>{{ erreur() }}</span>
+      </div>
+    }
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <!-- Colonne Gauche : Formulaire Carte Bancaire -->
+      <div class="lg:col-span-7 space-y-6">
+        <!-- Bannière Mode Démo / Carte Test -->
+        <div class="test-card-box">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="badge-demo">Environnement Test</span>
+                <span class="font-bold text-stone-900 text-xs">Simulateur bancaire actif</span>
+              </div>
+              <p class="text-xs text-stone-600 mt-1">
+                Utilisez le numéro se terminant par <strong>4242</strong> pour simuler une transaction acceptée, ou tout autre numéro pour tester un refus bancaire.
+              </p>
+            </div>
+            <button type="button" class="btn-fill-test" (click)="remplirCarteTest()">
+              Pré-remplir
+            </button>
+          </div>
+        </div>
+
+        <!-- Formulaire Carte -->
+        <div class="card-form-section">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-bold text-stone-900 text-base">Coordonnées de la carte</h2>
+            <div class="flex space-x-2">
+              <span class="card-logo">VISA</span>
+              <span class="card-logo">MC</span>
+              <span class="card-logo">CB</span>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Nom titulaire -->
+            <div>
+              <label for="nom-titulaire" class="form-label">Nom sur la carte</label>
+              <input
+                id="nom-titulaire"
+                type="text"
+                [ngModel]="nomTitulaire()"
+                (ngModelChange)="nomTitulaire.set($event)"
+                class="form-input"
+                placeholder="Ex: Taha Asrar"
+                required
+              />
+            </div>
+
+            <!-- Numéro carte -->
+            <div>
+              <label for="numero-carte" class="form-label">Numéro de carte</label>
+              <div class="relative">
+                <input
+                  id="numero-carte"
+                  type="text"
+                  [ngModel]="numeroCarte()"
+                  (ngModelChange)="numeroCarte.set($event)"
+                  class="form-input font-mono tracking-wider pl-10"
+                  placeholder="Numéro de carte (ex: 4242 ... ou tout numéro)"
+                />
+                <span class="icon icon--sm text-stone-400 absolute left-3 top-3">credit_card</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Expiration -->
+              <div>
+                <label for="date-expiration" class="form-label">Date d'expiration</label>
+                <input
+                  id="date-expiration"
+                  type="text"
+                  [ngModel]="dateExpiration()"
+                  (ngModelChange)="dateExpiration.set($event)"
+                  class="form-input font-mono text-center"
+                  placeholder="MM/AA"
+                />
+              </div>
+
+              <!-- CVV -->
+              <div>
+                <label for="cvv" class="form-label">Code CVV / CVC</label>
+                <input
+                  id="cvv"
+                  type="password"
+                  [ngModel]="cvv()"
+                  (ngModelChange)="cvv.set($event)"
+                  class="form-input font-mono text-center"
+                  placeholder="123"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Séquestre & Garantie (RG21) -->
+        <div class="escrow-notice">
+          <span class="icon icon--lg text-stone-700 flex-shrink-0">verified_user</span>
+          <div class="text-xs text-stone-600">
+            <p class="font-semibold text-stone-900">Paiement sous séquestre sécurisé (RG21)</p>
+            <p class="mt-0.5">
+              Votre argent n'est pas versé directement à l'hôte. Il reste consigné sur notre compte séquestre et n'est libéré que 24 heures après votre arrivée, pour vous garantir une conformité totale.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Colonne Droite : Récapitulatif Voyage & Paiement -->
+      <div class="lg:col-span-5 sticky top-8">
+        <div class="summary-card">
+          <!-- Hébergement -->
+          <div class="summary-card__head">
+            @if (r.annonce?.photo_principale) {
+              <img
+                [src]="r.annonce?.photo_principale"
+                [alt]="r.annonce?.titre"
+                class="summary-card__thumb"
+              />
+            }
+            <div class="flex-1 min-w-0">
+              <span class="badge-type">{{ r.annonce?.type_logement }}</span>
+              <h3 class="font-serif font-bold text-stone-900 text-sm truncate mt-1">{{ r.annonce?.titre }}</h3>
+              <p class="text-xs text-stone-500 truncate mt-0.5">{{ r.annonce?.ville || r.annonce?.adresse }}</p>
+              <p class="text-xs text-stone-600 mt-1 font-medium">
+                Du {{ r.date_arrivee }} au {{ r.date_depart }} ({{ r.nb_voyageurs }} voyageurs)
+              </p>
+            </div>
+          </div>
+
+          <!-- Détail du Prix -->
+          <div class="py-4 space-y-2 text-xs border-b border-stone-200 text-stone-700">
+            <div class="flex justify-between">
+              <span>Hébergement</span>
+              <span class="font-medium">{{ (r.montant_total - r.frais_service) | currencyMad }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Frais de service (12%)</span>
+              <span class="font-medium">{{ r.frais_service | currencyMad }}</span>
+            </div>
+          </div>
+
+          <!-- Total Final -->
+          <div class="pt-4 pb-6">
+            <div class="flex justify-between items-baseline">
+              <span class="text-base font-bold text-stone-900">Total à débiter</span>
+              <span class="text-2xl font-bold font-serif text-terracotta">{{ r.montant_total | currencyMad }}</span>
+            </div>
+            <p class="text-xs text-stone-400 mt-1">Émission instantanée du reçu fiscal officiel après validation.</p>
+          </div>
+
+          <!-- Bouton Payer -->
+          <button
+            type="button"
+            class="btn-submit"
+            [disabled]="!formulaireValide()"
+            (click)="payer()"
+          >
+            @if (paiementEnCours()) {
+              <span class="spinner-small"></span>
+              Paiement en cours...
+            } @else {
+              Régler {{ r.montant_total | currencyMad }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+      }
+    }
+  }
 </div>
