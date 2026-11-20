@@ -22,13 +22,13 @@ class PaiementResource extends JsonResource
             'montant' => (float) $this->montant,
             'methode_paiement' => $this->methode_paiement,
             'statut' => $this->statut,
-            'date_transaction' => $this->date_transaction ? Carbon::parse($this->date_transaction)->toIso8601String() : null,
+            'date_transaction' => Carbon::parse($this->date_transaction)->toIso8601String(),
             'recu' => $this->whenLoaded('recu', fn () => $this->recu ? [
                 'id_recu' => $this->recu->id_recu,
                 'id_paiement' => $this->recu->id_paiement,
                 'numero_facture' => $this->recu->numero_facture,
                 'chemin_pdf' => $this->recu->chemin_pdf,
-                'date_generation' => $this->recu->date_generation ? Carbon::parse($this->recu->date_generation)->toIso8601String() : null,
+                'date_generation' => Carbon::parse($this->recu->date_generation)->toIso8601String(),
             ] : null),
             'reservation' => $this->whenLoaded('reservation', fn () => new ReservationResource($this->reservation)),
         ];

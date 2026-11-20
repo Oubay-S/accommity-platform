@@ -15,15 +15,15 @@ class ReservationResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $statut = $this->statut instanceof \BackedEnum ? $this->statut->value : (string) $this->statut;
-        $mode = $this->mode_reservation instanceof \BackedEnum ? $this->mode_reservation->value : (string) $this->mode_reservation;
+        $statut = $this->statut->value;
+        $mode = $this->mode_reservation->value;
 
         $annoncePhoto = null;
         if ($this->relationLoaded('annonce') && $this->annonce) {
             /** @var Annonce $annonce */
             $annonce = $this->annonce;
-            $photos = is_string($annonce->photo_url) ? json_decode($annonce->photo_url, true) : $annonce->photo_url;
-            $firstPhoto = is_array($photos) ? ($photos[0] ?? null) : $annonce->photo_url;
+            $photos = (array) $annonce->photo_url;
+            $firstPhoto = $photos[0] ?? null;
             $annoncePhoto = $firstPhoto ? (str_starts_with($firstPhoto, 'http') ? $firstPhoto : url($firstPhoto)) : null;
         }
 
@@ -46,7 +46,7 @@ class ReservationResource extends JsonResource
             'acteur_annulation' => $this->acteur_annulation,
             'date_confirmation' => $this->date_confirmation ? Carbon::parse($this->date_confirmation)->toIso8601String() : null,
             'date_annulation' => $this->date_annulation ? Carbon::parse($this->date_annulation)->toIso8601String() : null,
-            'date_creation' => $this->date_creation ? Carbon::parse($this->date_creation)->toIso8601String() : null,
+            'date_creation' => Carbon::parse($this->date_creation)->toIso8601String(),
 
             'annonce' => $this->whenLoaded('annonce', fn () => [
                 'id_annonce' => $this->annonce->id_annonce,
@@ -88,7 +88,7 @@ class ReservationResource extends JsonResource
                 'montant' => (float) $this->paiement->montant,
                 'methode_paiement' => $this->paiement->methode_paiement,
                 'statut' => $this->paiement->statut,
-                'date_transaction' => $this->paiement->date_transaction ? Carbon::parse($this->paiement->date_transaction)->toIso8601String() : null,
+                'date_transaction' => Carbon::parse($this->paiement->date_transaction)->toIso8601String(),
             ] : null),
 
             'minuterie' => $this->whenLoaded('minuterie', fn () => $this->minuterie ? [

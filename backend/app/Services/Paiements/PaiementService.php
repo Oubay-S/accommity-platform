@@ -100,8 +100,10 @@ class PaiementService
         );
 
         if ($reservation->annonce?->hote) {
+            /** @var User $hote */
+            $hote = $reservation->annonce->hote;
             $this->notificationService->notifier(
-                $reservation->annonce->hote,
+                $hote,
                 TypeNotification::PAIEMENT,
                 'Séjour réglé par le voyageur',
                 "Le voyageur a réglé la réservation pour {$reservation->annonce->titre}. Les fonds sont sécurisés en séquestre.",
@@ -184,7 +186,7 @@ class PaiementService
 
         $estVoyageur = $paiement->id_voyageur === $user->getKey();
         $estHote = $paiement->reservation?->id_hote === $user->getKey();
-        $estAdmin = method_exists($user, 'estAdmin') ? $user->estAdmin() : false;
+        $estAdmin = $user->estAdmin();
 
         if (! $estVoyageur && ! $estHote && ! $estAdmin) {
             throw new ApiException('Accès non autorisé à ce reçu.', 403, 'ACCES_REFUSE');

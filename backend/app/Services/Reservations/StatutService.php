@@ -33,9 +33,7 @@ class StatutService
             ? $nouveauStatut->value
             : $nouveauStatut;
 
-        $valeurActuelle = $reservation->statut instanceof StatutReservation
-            ? $reservation->statut->value
-            : (string) $reservation->statut;
+        $valeurActuelle = $reservation->statut->value;
 
         if ($valeurActuelle === $valeurNouveau) {
             return $reservation;

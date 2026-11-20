@@ -49,41 +49,38 @@ class PaiementController extends Controller
         $paiement = $this->paiementService->getRecuDetail($paiementId, $request->user());
         $recu = $paiement->recu;
         $reservation = $paiement->reservation;
-        $voyageur = $paiement->voyageur ?? $reservation?->voyageur;
-        $annonce = $reservation?->annonce;
+        $voyageur = $paiement->voyageur ?? $reservation->voyageur;
+        $annonce = $reservation->annonce;
 
-        $montantTotal = (float) ($reservation?->montant_total ?? $paiement->montant);
-        $fraisService = (float) ($reservation?->frais_service ?? 0);
+        $montantTotal = (float) ($reservation->montant_total ?? $paiement->montant);
+        $fraisService = (float) ($reservation->frais_service ?? 0);
         $montantHote = round($montantTotal - $fraisService, 2);
 
-        $typeLogement = $annonce?->type_logement;
-        if ($typeLogement instanceof \BackedEnum) {
-            $typeLogement = $typeLogement->value;
-        }
+        $typeLogement = (string) $annonce->type_logement;
 
         $data = [
-            'id_recu' => $recu?->id_recu ?? '',
+            'id_recu' => $recu->id_recu ?? '',
             'id_paiement' => $paiement->id_paiement,
-            'numero_facture' => $recu?->numero_facture ?? '',
-            'chemin_pdf' => $recu?->chemin_pdf,
-            'date_generation' => $recu?->date_generation ? Carbon::parse($recu->date_generation)->toIso8601String() : null,
+            'numero_facture' => $recu->numero_facture ?? '',
+            'chemin_pdf' => $recu->chemin_pdf ?? null,
+            'date_generation' => Carbon::parse($recu->date_generation)->toIso8601String(),
             'paiement' => new PaiementResource($paiement),
-            'reservation' => $reservation ? new ReservationResource($reservation) : null,
+            'reservation' => new ReservationResource($reservation),
             'montant_total' => $montantTotal,
             'frais_service' => $fraisService,
             'montant_hote' => $montantHote,
             'voyageur' => [
-                'id_utilisateur' => $voyageur?->id_utilisateur ?? '',
-                'nom' => $voyageur?->nom ?? '',
-                'prenom' => $voyageur?->prenom ?? '',
-                'email' => $voyageur?->email ?? '',
+                'id_utilisateur' => $voyageur->id_utilisateur ?? '',
+                'nom' => $voyageur->nom ?? '',
+                'prenom' => $voyageur->prenom ?? '',
+                'email' => $voyageur->email ?? '',
             ],
             'annonce' => [
-                'id_annonce' => $annonce?->id_annonce ?? '',
-                'titre' => $annonce?->titre ?? '',
-                'adresse' => $annonce?->adresse ?? '',
-                'ville' => $annonce?->ville ?? '',
-                'type_logement' => (string) $typeLogement,
+                'id_annonce' => $annonce->id_annonce ?? '',
+                'titre' => $annonce->titre ?? '',
+                'adresse' => $annonce->adresse ?? '',
+                'ville' => $annonce->categorie->ville ?? '',
+                'type_logement' => $typeLogement,
             ],
         ];
 
