@@ -39,21 +39,25 @@ class Annonce extends Model
         'photo_url' => 'array',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function hote(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_hote');
     }
 
+    /** @return BelongsTo<CategorieGeographique, $this> */
     public function categorie(): BelongsTo
     {
         return $this->belongsTo(CategorieGeographique::class, 'id_categorie');
     }
 
+    /** @return BelongsTo<PolitiqueAnnulation, $this> */
     public function politiqueAnnulation(): BelongsTo
     {
         return $this->belongsTo(PolitiqueAnnulation::class, 'id_politique');
     }
 
+    /** @return BelongsTo<PolitiqueAnnulation, $this> */
     public function politique(): BelongsTo
     {
         return $this->politiqueAnnulation();

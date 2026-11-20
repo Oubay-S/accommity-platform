@@ -118,8 +118,10 @@ class ReservationService
             // Notification immédiate pour réservation instantanée
             $this->notificationService->reservationStatutChangee($reservation, $voyageur, 'Confirmée');
             if ($annonce->hote) {
+                /** @var User $hote */
+                $hote = $annonce->hote;
                 $this->notificationService->notifier(
-                    $annonce->hote,
+                    $hote,
                     TypeNotification::RESERVATION,
                     'Nouvelle réservation instantanée',
                     "{$voyageur->prenom} {$voyageur->nom} a réservé {$annonce->titre}.",
@@ -133,8 +135,10 @@ class ReservationService
             $this->minuterieService->demarrerMinuterie24h($reservation->id_reservation);
 
             if ($annonce->hote) {
+                /** @var User $hote */
+                $hote = $annonce->hote;
                 $this->notificationService->notifier(
-                    $annonce->hote,
+                    $hote,
                     TypeNotification::RESERVATION,
                     'Nouvelle demande de réservation',
                     "{$voyageur->prenom} a soumis une demande pour {$annonce->titre}. Vous avez 24h pour y répondre.",
@@ -235,7 +239,7 @@ class ReservationService
 
         $estVoyageur = $reservation->id_voyageur === $user->getKey();
         $estHote = $reservation->id_hote === $user->getKey();
-        $estAdmin = method_exists($user, 'estAdmin') ? $user->estAdmin() : false;
+        $estAdmin = $user->estAdmin();
 
         if (! $estVoyageur && ! $estHote && ! $estAdmin) {
             throw new ApiException('Vous n\'avez pas le droit d\'annuler cette réservation.', 403, 'ACCES_REFUSE');
