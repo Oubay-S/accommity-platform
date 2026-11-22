@@ -2,6 +2,13 @@
 
 > Source de vérité pour l'intégration Angular ↔ Laravel.
 > Toute réponse de l'API utilise l'enveloppe `ApiResponse<T>`.
+>
+> **URLs locales :**
+> - développement : `http://localhost:8000/api`
+> - déploiement local : `http://localhost:8080/api`
+>
+> En déploiement local, la SPA et l'API partagent le même origin ; le frontend
+> utilise donc `apiUrl = '/api'`.
 
 ## 1. Enveloppe
 

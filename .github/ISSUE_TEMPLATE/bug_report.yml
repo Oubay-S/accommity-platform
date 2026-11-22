@@ -1,0 +1,77 @@
+name: Rapport de bug
+description: Signaler un défaut reproductible sur Accommity
+title: "[Bug] "
+labels:
+  - bug
+  - qa
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de fournir un rapport reproductible. Pour un problème de sécurité,
+        contactez directement le responsable DevOps/QA.
+
+  - type: input
+    id: environnement
+    attributes:
+      label: Environnement
+      description: Où le bug a-t-il été observé ?
+      placeholder: "Local (docker compose deploy), navigateur Chrome 157, Windows 11"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severite
+    attributes:
+      label: Sévérité
+      options:
+        - Bloquant (empêche la démo)
+        - Majeur (fonctionnalité principale cassée)
+        - Mineur (gêne sans bloquer)
+        - Cosmétique
+    validations:
+      required: true
+
+  - type: textarea
+    id: etapes
+    attributes:
+      label: Étapes de reproduction
+      description: Numérotez les étapes, avec les comptes utilisés si nécessaire.
+      placeholder: |
+        1. Se connecter avec hote.demo@accommity.ma
+        2. Ouvrir /hote/annonces
+        3. Cliquer sur ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: attendu
+    attributes:
+      label: Résultat attendu
+    validations:
+      required: true
+
+  - type: textarea
+    id: obtenu
+    attributes:
+      label: Résultat obtenu
+      description: Incluez le message d'erreur, le code HTTP ou le `error_code`.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / captures
+      description: Collez les logs utiles ou glissez une capture d'écran.
+      render: shell
+    validations:
+      required: false
+
+  - type: input
+    id: commit
+    attributes:
+      label: Commit ou version
+      placeholder: "0ba06bd / v1.0.0"
+    validations:
+      required: false

@@ -4,6 +4,7 @@ namespace Database\Factories\Utilisateurs;
 
 use App\Models\Utilisateurs\VerificationIdentite;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<VerificationIdentite>
@@ -19,7 +20,7 @@ class VerificationIdentiteFactory extends Factory
             'type_piece' => 'cin',
             'statut' => VerificationIdentite::STATUT_EN_COURS,
             'motif_rejet' => null,
-            'chemin_document' => 'verifications/'.$this->faker->uuid().'.jpg',
+            'chemin_document' => 'verifications/'.Str::uuid().'.jpg',
             'id_admin_traitant' => null,
             'date_traitement' => null,
         ];

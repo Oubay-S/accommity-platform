@@ -2,12 +2,12 @@ name: Backend CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
     paths:
       - 'backend/**'
       - '.github/workflows/backend-ci.yml'
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
     paths:
       - 'backend/**'
       - '.github/workflows/backend-ci.yml'
@@ -29,7 +29,7 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_DB: accommity_test
+          POSTGRES_DB: accommity_test_db
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
         ports:
@@ -46,7 +46,7 @@ jobs:
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
-      DB_DATABASE: accommity_test
+      DB_DATABASE: accommity_test_db
       DB_USERNAME: postgres
       DB_PASSWORD: password
 
@@ -128,6 +128,9 @@ jobs:
             --coverage-clover build/coverage/clover.xml \
             --coverage-text \
             --log-junit build/junit.xml
+
+      - name: Backend Coverage Gate
+        run: cd backend && php scripts/check-coverage.php build/coverage/clover.xml 70 60
 
       - name: Upload Test Reports
         if: always()
