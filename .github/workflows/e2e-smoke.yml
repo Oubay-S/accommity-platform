@@ -1,0 +1,109 @@
+name: E2E Smoke
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'docker/**'
+      - 'deploy/**'
+      - 'scripts/**'
+      - 'docker-compose.deploy.yml'
+      - '.github/workflows/e2e-smoke.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'docker/**'
+      - 'deploy/**'
+      - 'scripts/**'
+      - 'docker-compose.deploy.yml'
+      - '.github/workflows/e2e-smoke.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-smoke:
+    name: E2E Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Prepare local deployment environment
+        run: |
+          cp deploy/.env.example deploy/.env
+          sed -i 's|^APP_KEY=.*|APP_KEY=base64:tQjF90z1f7uG9kS6mG+P3L9Y8Z1X4C7V0B2N5M8Q1W4=|' deploy/.env
+          sed -i 's|^APP_DEBUG=.*|APP_DEBUG=true|' deploy/.env
+
+      - name: Start local stack
+        env:
+          DOCKER_BUILDKIT: 1
+        run: docker compose -f docker-compose.deploy.yml --env-file deploy/.env up -d --build
+
+      - name: Wait for the API
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8080/api/annonces >/dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          docker compose -f docker-compose.deploy.yml --env-file deploy/.env logs --tail=200
+          exit 1
+
+      - name: Install NPM Dependencies
+        run: cd frontend && npm ci
+
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Chromium
+        run: cd frontend && npx playwright install --with-deps chromium
+
+      - name: Run Playwright smoke tests
+        env:
+          CI: 'true'
+          E2E_BASE_URL: http://localhost:8080
+        run: cd frontend && npm run test:e2e
+
+      - name: Show stack logs on failure
+        if: failure()
+        run: docker compose -f docker-compose.deploy.yml --env-file deploy/.env logs --tail=250
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Stop local stack
+        if: always()
+        run: docker compose -f docker-compose.deploy.yml --env-file deploy/.env down -v

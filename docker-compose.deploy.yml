@@ -1,0 +1,122 @@
+name: accommity-deploy
+
+x-backend-build: &backend-build
+  image: accommity-backend-local
+  build:
+    context: .
+    dockerfile: docker/backend.prod.Dockerfile
+
+x-backend-env: &backend-env
+  DB_CONNECTION: pgsql
+  DB_HOST: postgres
+  DB_PORT: 5432
+  DB_DATABASE: accommity_db
+  DB_USERNAME: accommity_user
+  DB_PASSWORD: accommity_password
+  MAIL_MAILER: smtp
+  MAIL_HOST: mailpit
+  MAIL_PORT: 1025
+
+services:
+  backend:
+    <<: *backend-build
+    container_name: accommity-deploy-backend
+    restart: unless-stopped
+    env_file:
+      - deploy/.env
+    environment:
+      <<: *backend-env
+    volumes:
+      - storage-public:/var/www/backend/storage/app/public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "php -r \"exit(@fsockopen('127.0.0.1', 9000) ? 0 : 1);\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 120s
+    networks:
+      - accommity-network
+
+  scheduler:
+    <<: *backend-build
+    container_name: accommity-deploy-scheduler
+    restart: unless-stopped
+    command: ["php", "artisan", "schedule:work"]
+    env_file:
+      - deploy/.env
+    environment:
+      <<: *backend-env
+      SKIP_BOOTSTRAP: "true"
+    volumes:
+      - storage-public:/var/www/backend/storage/app/public
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - accommity-network
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/frontend.prod.Dockerfile
+    container_name: accommity-deploy-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - storage-public:/var/www/backend/storage/app/public:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/ >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    networks:
+      - accommity-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: accommity-deploy-postgres
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: accommity_db
+      POSTGRES_USER: accommity_user
+      POSTGRES_PASSWORD: accommity_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U accommity_user -d accommity_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - accommity-network
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: accommity-deploy-mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - accommity-network
+
+networks:
+  accommity-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local
+  storage-public:
+    driver: local

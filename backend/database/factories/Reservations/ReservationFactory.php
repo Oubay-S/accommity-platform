@@ -43,6 +43,16 @@ class ReservationFactory extends Factory
         return $this->state(fn () => ['statut' => StatutReservation::ANNULEE]);
     }
 
+    /** Séjour déjà terminé, utilisé par les tests d'évaluation (RG27). */
+    public function terminee(): static
+    {
+        return $this->state(fn () => [
+            'date_arrivee' => now()->subDays(10)->toDateString(),
+            'date_depart' => now()->subDays(7)->toDateString(),
+            'statut' => StatutReservation::TERMINEE,
+        ]);
+    }
+
     /** Arrivée dans N jours (utilisé par les tests de rappels RO07). */
     public function arrivantDans(int $jours): static
     {

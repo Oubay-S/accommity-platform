@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Package & Publish Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install & Build Frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build:prod
+
+      - name: Package Artifacts
+        run: |
+          cd frontend/dist/accommity-frontend/browser
+          zip -r "$GITHUB_WORKSPACE/frontend-dist.zip" .
+          cd "$GITHUB_WORKSPACE"
+          git archive --format=tar.gz --prefix=backend/ -o backend-src.tar.gz HEAD:backend
+          sha256sum frontend-dist.zip backend-src.tar.gz > SHA256SUMS
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            frontend-dist.zip \
+            backend-src.tar.gz \
+            SHA256SUMS \
+            --title "Accommity $GITHUB_REF_NAME" \
+            --generate-notes

@@ -1,0 +1,38 @@
+# Contexte de build Docker (racine du monorepo)
+.git
+.github
+.idea
+.vscode
+ORGANISATION_PACKAGES_EQUIPE.md
+
+# Dépendances et artefacts
+backend/vendor
+backend/bootstrap/cache
+backend/storage/framework/cache
+backend/storage/framework/sessions
+backend/storage/framework/views
+backend/storage/logs
+backend/storage/app/public
+backend/public/storage
+backend/build
+backend/.phpunit.result.cache
+frontend/node_modules
+frontend/.angular
+frontend/dist
+frontend/coverage
+frontend/playwright-report
+frontend/test-results
+**/coverage
+**/*.log
+
+# Secrets locaux : seuls les exemples sont autorisés
+backend/.env
+backend/.env.*
+!backend/.env.example
+deploy/.env
+deploy/.env.*
+!deploy/.env.example
+
+# Système
+.DS_Store
+Thumbs.db
