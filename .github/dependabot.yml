@@ -8,6 +8,12 @@ updates:
     labels:
       - dependencies
       - backend
+    groups:
+      composer-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: npm
     directory: /frontend
@@ -17,6 +23,29 @@ updates:
     labels:
       - dependencies
       - frontend
+    groups:
+      angular:
+        applies-to: version-updates
+        patterns:
+          - "@angular/*"
+          - "@angular-devkit/*"
+      npm-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+        exclude-patterns:
+          - "@angular/*"
+          - "@angular-devkit/*"
+    ignore:
+      # karma-jasmine-html-reporter 2.1 ne supporte pas encore jasmine-core 7
+      - dependency-name: jasmine-core
+        update-types:
+          - version-update:semver-major
+      # TypeScript est piloté par Angular (compiler-cli impose >=6.0 <6.1)
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: github-actions
     directory: /
@@ -26,3 +55,7 @@ updates:
     labels:
       - dependencies
       - ci
+    groups:
+      github-actions:
+        patterns:
+          - "*"
